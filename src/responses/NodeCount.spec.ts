@@ -1,0 +1,27 @@
+import { NodeCount } from './NodeCount'
+
+
+describe('NodeCount', () => {
+    const raw = [
+        0x56, 0x54, 0x55, 0x3C, 0x24, 0x00, 0x12, 0x3B, 0x0F, 0x01, 0x02,
+        0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0D, 0x0E,
+        0x0F, 0x10, 0x37,
+    ]
+
+    it('converts a buffer array to an object', () => {
+        const response = new NodeCount(raw)
+
+        expect(response).toHaveProperty('commandID', 0x24)
+        expect(response).toHaveProperty('total', 0x0F)
+        expect(response).toHaveProperty('list', [
+            0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B,
+            0x0D, 0x0E, 0x0F, 0x10,
+        ])
+    })
+
+    it('recieves a buffer or an array', () => {
+        const buffer = Buffer.from(raw)
+
+        expect(new NodeCount(buffer)).toStrictEqual(new NodeCount(raw))
+    })
+})

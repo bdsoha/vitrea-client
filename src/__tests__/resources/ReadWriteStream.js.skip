@@ -1,0 +1,45 @@
+import util   from 'util'
+import events from 'events'
+
+function ReadWriteStream() {
+    events.EventEmitter.call(this)
+    this.readable = true
+    this.writable = true
+}
+
+util.inherits(ReadWriteStream, events.EventEmitter);
+
+// Each of these methods just triggers an event with the same name and calling parameters
+[
+    // Readable Stream
+    // 'data' is only an event triggered by .write()
+    'end'
+    , 'error'
+    , 'close'
+    , 'setEncoding'
+    , 'pause'
+    , 'resume'
+    , 'destroy'
+    //, 'pipe' // currently not supported, inherit from Stream if you want this
+
+    // Writable Stream
+    , 'drain'
+    //, 'error'
+    //, 'close'
+    //, 'pipe'
+    , {name: 'write', event: 'data'}
+    , 'destroySoon',
+
+].forEach(function (func) {
+    ReadWriteStream.prototype[func.name || func] = (function (func) {
+        const event = func.event || func
+        return function () {
+            const args = Array.prototype.slice.call(arguments)
+            args.unshift(event)
+            this.emit.apply(this, args)
+        }
+    }(func))
+
+})
+
+module.exports = ReadWriteStream

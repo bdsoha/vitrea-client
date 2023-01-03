@@ -1,0 +1,44 @@
+import {DataGram}     from '../../src/vitrea/vbox/utilities/DataGram'
+import {BaseResponse} from '../../src/vitrea/vbox/responses/BaseResponse'
+
+describe('Response', () => {
+    test.todo('Validate the response data')
+
+    const raw    = [
+        0x56, 0x54, 0x55, 0x3C, 0x65, 0x00, 0x13, 0x31, 0x0A, 0x0A, 0x0E,
+        0x43, 0x00, 0x75, 0x00, 0x72, 0x00, 0x74, 0x00, 0x61, 0x00, 0x69,
+        0x00, 0x6E, 0x00, 0xDC,
+    ]
+    const buffer = Buffer.from(raw)
+
+    it('is an instance of DataGram', () => {
+        expect(new BaseResponse(buffer)).toBeInstanceOf(DataGram)
+    })
+
+    it('extracts the message ID from a raw buffer object', () => {
+        expect(new BaseResponse(buffer).messageID).toBe(0x31)
+    })
+
+    it('extracts the command ID from a raw buffer object', () => {
+        expect(new BaseResponse(buffer).commandID).toBe(0x65)
+    })
+
+    it('extracts the data from a raw buffer object', () => {
+        expect(new BaseResponse(buffer).data).toStrictEqual([
+            0x0A, 0x0A, 0x0E, 0x43, 0x00, 0x75, 0x00, 0x72, 0x00, 0x74, 0x00,
+            0x61, 0x00, 0x69, 0x00, 0x6E, 0x00,
+        ])
+    })
+
+    it('extracts the data length from a raw buffer object', () => {
+        expect(new BaseResponse(buffer).dataLength).toStrictEqual([0x00, 0x13])
+    })
+
+    it('validates the checksum value', () => {
+        const valid   = [0x56, 0x54, 0x55, 0x3C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x3E]
+        const invalid = [0x56, 0x54, 0x55, 0x3C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x3D]
+
+        expect(new BaseResponse(Buffer.from(valid)).hasValidChecksum).toBeTruthy()
+        expect(new BaseResponse(Buffer.from(invalid)).hasValidChecksum).toBeFalsy()
+    })
+})

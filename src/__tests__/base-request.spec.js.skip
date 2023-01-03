@@ -1,0 +1,97 @@
+import {DataGram}          from '../../src/vitrea/vbox/utilities/DataGram'
+import {MessageID}         from '../../src/vitrea/vbox/utilities/MessageID'
+import {BaseRequest}       from '../../src/vitrea/vbox/requests/BaseRequest'
+import {DataGramDirection} from '../../src/vitrea/vbox/utilities/Enums'
+
+describe('Base Request', () => {
+    beforeEach(() => MessageID.resetID())
+
+    it('is an instance of DataGram', () => {
+        expect(new BaseRequest()).toBeInstanceOf(DataGram)
+    })
+
+    it('generates a Buffer object', () => {
+        expect(new BaseRequest().build()).toBeInstanceOf(Buffer)
+    })
+
+    it('prepends a byte for the direction of the messages', () => {
+        // @ts-ignore
+        expect(new BaseRequest().get(3)).toBe(DataGramDirection.OUTGOING)
+    })
+
+    it('calculates a checksum based on the sum of all values', () => {
+        expect(new BaseRequest(0x00).checksum).toBe(0x40)
+        expect(new BaseRequest(0x01).checksum).toBe(0x42)
+        expect(new BaseRequest(0xC3).checksum).toBe(0x05)
+    })
+
+    it('adds the checksum value to the end of the collection', () => {
+        const datagram = new BaseRequest()
+        expect(datagram).toHaveLength(8)
+        expect(datagram.build()).toHaveLength(9)
+        expect(datagram.build()[8]).toBe(datagram.checksum)
+    })
+
+    it('generates an incremented message ID for each datagram', () => {
+        jest.spyOn(MessageID, 'getNextID')
+        expect(MessageID.getNextID).toHaveBeenCalledTimes(0)
+
+        new BaseRequest()
+        expect(MessageID.getNextID).toHaveBeenCalledTimes(1)
+
+        new BaseRequest()
+        expect(MessageID.getNextID).toHaveBeenCalledTimes(2)
+    })
+
+    it('places the message ID in every message', () => {
+        const id = 0x44
+        MessageID.setNextID(id)
+        const dataGram = new BaseRequest()
+        const built    = dataGram.build()
+        expect(built[BaseRequest.messageIDIndex]).toBe(dataGram.messageID)
+        expect(built[BaseRequest.messageIDIndex]).toBe(id)
+    })
+
+    it('places the command ID in every message', () => {
+        const commandID = 0xEE
+        const dataGram  = new BaseRequest(commandID)
+        expect(dataGram.commandID).toBe(commandID)
+        expect(dataGram.commandID).toBe(dataGram.get(BaseRequest.commandIDIndex))
+    })
+
+    it('generates a unique event-listener name based on command & message IDs', () => {
+        const commandID = 0xEE
+        MessageID.setNextID(0xCC)
+
+        expect(new BaseRequest(commandID).eventName).toBe('data:ee-cc')
+    })
+
+    it('has a data series of arbitrary length', () => {
+        expect(BaseRequest.dataIndex).toBe(8)
+
+        const data     = [0x33, 0x44, 0x55]
+        const dataGram = new BaseRequest(0x00, data)
+        expect(dataGram.data).toStrictEqual(data)
+
+        const shortData = new BaseRequest(0x00, [0x33])
+        expect(shortData.data).toStrictEqual([0x33])
+    })
+
+    it('has an optional data series', () => {
+        const withoutData = new BaseRequest()
+        expect(withoutData.data).toStrictEqual([])
+    })
+
+    it('knows the length of the data segment as a two-byte series', () => {
+        const data     = [0x33, 0x44, 0x55]
+        const dataGram = new BaseRequest(0x00, data)
+        expect(dataGram.dataLength).toStrictEqual([0x00, 0x05])
+        expect(dataGram.hasData).toBeTruthy()
+    })
+
+    it('knows the length of an empty data segment of the datagram', () => {
+        const dataGram = new BaseRequest(0x00)
+        expect(dataGram.dataLength).toStrictEqual([0x00, 0x02])
+        expect(dataGram.hasData).toBeFalsy()
+    })
+})
