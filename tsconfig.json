@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "lib": ["es6"],
+        "module": "commonjs",
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": false,
+        "noUnusedParameters": true,
+        "noUnusedLocals": true,
+        "outDir": "dist",
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "strictNullChecks": false,
+        "target": "es6",
+        "types": ["node", "jest"]
+    },
+    "include": ["src"]
+  }

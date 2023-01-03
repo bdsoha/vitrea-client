@@ -1,0 +1,1 @@
+export { VitreaClient } from './VitreaClient'
