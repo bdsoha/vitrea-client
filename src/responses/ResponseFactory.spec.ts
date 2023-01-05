@@ -1,6 +1,6 @@
-import {RoomCount}       from './RoomCount'
-import {ResponseFactory}       from './ResponseFactory'
-import {DataGramDirection}     from '../utilities/Enums'
+import { RoomCount }         from './RoomCount'
+import { ResponseFactory }   from './ResponseFactory'
+import { DataGramDirection } from '../utilities/Enums'
 
 
 describe('ResponseFactory', () => {

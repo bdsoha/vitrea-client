@@ -20,7 +20,7 @@ describe('NodeMetaDataV2', () => {
     //     expect(response).toHaveProperty('macAddress', '00:15:8D:00:00:69:C4:FF')
     //     expect(response).toHaveProperty('isLocked', false)
     //     expect(response).toHaveProperty('ledLevel', LEDBackgroundBrightness.HIGH)
-        
+
     //     expect(response.keysList).toBeInstanceOf(Array)
     //     expect(response.keysList).toHaveLength(2)
     //     expect(response.keysList[0]).toStrictEqual({

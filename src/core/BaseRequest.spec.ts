@@ -1,7 +1,7 @@
-import {DataGram}          from './DataGram'
-import {MessageID}         from '../utilities/MessageID'
-import {BaseRequest}       from './BaseRequest'
-import {DataGramDirection} from '../utilities/Enums'
+import { DataGram }          from './DataGram'
+import { MessageID }         from '../utilities/MessageID'
+import { BaseRequest }       from './BaseRequest'
+import { DataGramDirection } from '../utilities/Enums'
 
 class SampleRequest extends BaseRequest { }
 
@@ -30,7 +30,7 @@ describe('BaseRequest', () => {
         const datagram = new SampleRequest()
 
         expect(datagram).toHaveLength(8)
-        
+
         expect(datagram.build()).toBeInstanceOf(Buffer)
         expect(datagram.build()).toHaveLength(9)
         expect(datagram.build()[8]).toBe(datagram.checksum)
@@ -54,11 +54,11 @@ describe('BaseRequest', () => {
 
         const dataGram = new SampleRequest()
         const built    = dataGram.build()
-        
+
         expect(built[BaseRequest.messageIDIndex]).toBe(dataGram.messageID)
         expect(built[BaseRequest.messageIDIndex]).toBe(id)
     })
-    
+
     it('[commandID] inserts the command ID in every message', () => {
         const commandID = 0xEE
         const dataGram  = new SampleRequest(commandID)
@@ -68,7 +68,7 @@ describe('BaseRequest', () => {
         expect(built[BaseRequest.commandIDIndex]).toBe(commandID)
     })
 
-    it('[eventName] generates a unique event-listener name based on command & message IDs', () => {        
+    it('[eventName] generates a unique event-listener name based on command & message IDs', () => {
         MessageID.setNextID(0xCC)
 
         expect(new SampleRequest(0xEE).eventName).toBe('data::ee-cc')
@@ -79,16 +79,16 @@ describe('BaseRequest', () => {
 
         const data     = [0x33, 0x44, 0x55]
         const dataGram = new SampleRequest(0x00, data)
-        
+
         expect(dataGram.getData()).toStrictEqual(data)
         expect(dataGram.hasData).toBeTruthy()
 
         const shortData = new SampleRequest(0x00, [0x33])
         expect(shortData.getData()).toStrictEqual([0x33])
         expect(shortData.hasData).toBeTruthy()
-        
+
         const withoutData = new SampleRequest()
-    
+
         expect(withoutData.getData()).toStrictEqual([])
         expect(withoutData.hasData).toBeFalsy()
     })

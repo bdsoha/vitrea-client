@@ -20,8 +20,8 @@ describe('SplitMultipleBuffers', () => {
 
         expect(split).toHaveLength(2)
         expect(split).toEqual([
-            Buffer.from(raw), 
-            Buffer.from(raw), 
+            Buffer.from(raw),
+            Buffer.from(raw),
         ])
     })
 })

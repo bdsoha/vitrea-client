@@ -1211,6 +1211,11 @@ eslint-plugin-align-assignments@^1.1.2:
   resolved "https://registry.yarnpkg.com/eslint-plugin-align-assignments/-/eslint-plugin-align-assignments-1.1.2.tgz#83e1a8a826d4adf29e82b52d0bb39c88b301b576"
   integrity sha512-I1ZJgk9EjHfGVU9M2Ex8UkVkkjLL5Y9BS6VNnQHq79eHj2H4/Cgxf36lQSUTLgm2ntB03A2NtF+zg9fyi5vChg==
 
+eslint-plugin-align-import@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-align-import/-/eslint-plugin-align-import-1.0.0.tgz#3fcc92f87c3d20acfa39da9c8834c899548cd153"
+  integrity sha512-bUUcAssxWgsmIvDnREgBrIOtNkLcr2QfZf/zjZDtq8LqxKm9krFt2eSRKNTqIoEnEy8EQ4k8qBkm8azQxyC98Q==
+
 eslint-scope@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/eslint-scope/-/eslint-scope-5.1.1.tgz#e786e59a66cb92b3f6c1fb0d508aab174848f48c"

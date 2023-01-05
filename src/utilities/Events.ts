@@ -3,7 +3,7 @@ export class Events {
 
     public static generate(...keys: any[]) : string {
         const toJoin = keys.map(key => key.toString(16))
-        
+
         return `data::${toJoin.join('-')}`
     }
 }

@@ -1,4 +1,4 @@
-import {BaseResponse} from '../core'
+import { BaseResponse } from '../core'
 
 
 export class RoomMetaData extends BaseResponse {
@@ -7,11 +7,11 @@ export class RoomMetaData extends BaseResponse {
 
     get name() {
         return this.bufferToString(
-            (<typeof RoomMetaData>this.constructor).nameIndex,
+            this.$self.nameIndex,
         )
     }
 
     get id() {
-        return this.get((<typeof RoomMetaData>this.constructor).idIndex)
+        return this.get(this.$self.idIndex)
     }
 }

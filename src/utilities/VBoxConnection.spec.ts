@@ -1,4 +1,4 @@
-import { VBoxConnection } from "./VBoxConnection"
+import { VBoxConnection } from './VBoxConnection'
 
 
 describe('VBoxConnection', () => {
@@ -20,8 +20,8 @@ describe('VBoxConnection', () => {
         const client = VBoxConnection.create()
 
         expect(client).toStrictEqual({
-            host: '192.168.1.111',
-            port: 1234,
+            host:     '192.168.1.111',
+            port:     1234,
             username: 'admin',
             password: 'secret'
         })
@@ -29,15 +29,15 @@ describe('VBoxConnection', () => {
 
     it('[create] uses paramaters when available', () => {
         const client = VBoxConnection.create({
-            host: '192.168.1.111',
-            port: 1234,
+            host:     '192.168.1.111',
+            port:     1234,
             username: 'admin',
             password: 'secret'
         })
 
         expect(client).toStrictEqual({
-            host: '192.168.1.111',
-            port: 1234,
+            host:     '192.168.1.111',
+            port:     1234,
             username: 'admin',
             password: 'secret'
         })
@@ -50,8 +50,8 @@ describe('VBoxConnection', () => {
         })
 
         expect(client).toStrictEqual({
-            host: '192.168.1.23',
-            port: 11501,
+            host:     '192.168.1.23',
+            port:     11501,
             username: 'admin',
             password: 'secret'
         })
@@ -59,7 +59,7 @@ describe('VBoxConnection', () => {
 
     it('[create] raises an exception for missing host', () => {
         const callback = () => VBoxConnection.create({
-             host: '',  
+             host:     '',
              username: 'admin',
              password: 'secret'
         })

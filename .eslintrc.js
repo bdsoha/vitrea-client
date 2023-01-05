@@ -17,12 +17,23 @@ const ERR  = 2
 
 module.exports = {
     root: true,
-    
-    extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+
+    ignorePatterns: [
+        '/*',
+        '!/src'
+    ],
+
+    extends: [
+        'eslint:recommended', 
+        'plugin:@typescript-eslint/recommended'
+    ],
     
     parser: '@typescript-eslint/parser',
     
-    plugins: ['@typescript-eslint', 'align-assignments'],
+    plugins: [
+        '@typescript-eslint',
+        'eslint-plugin-align-import'
+    ],
 
     rules: {
         'camelcase':            ERR,
@@ -32,10 +43,13 @@ module.exports = {
         'no-duplicate-imports': ERR,
         'no-empty':             [ERR, {allowEmptyCatch: true}],
         'no-extra-parens':      ERR,
-        'no-trailing-spaces':   [ERR, {'ignoreComments': true}],
+        'no-trailing-spaces':   [ERR, {ignoreComments: true}],
         'no-useless-escape':    OFF,
         'no-useless-rename':    ERR,
+        'object-curly-spacing': [ERR, 'always'],
         'quotes':               [ERR, 'single'],
         'semi':                 [ERR, 'never'],
+
+        'align-import/align-import': ERR
     }
 }

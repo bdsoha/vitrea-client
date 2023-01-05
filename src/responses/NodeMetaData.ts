@@ -1,4 +1,4 @@
-import { BaseResponse } from '../core'
+import { BaseResponse }                        from '../core'
 import { LEDBackgroundBrightness, LockStatus } from '../utilities/Enums'
 
 
@@ -13,7 +13,7 @@ export class NodeMetaData extends BaseResponse {
     protected static readonly rawRoomIDIndex           = 7
 
     protected offset(byIndex: number) {
-        return (<typeof NodeMetaData>this.constructor).offsetStartIndex + this.totalKeys + byIndex
+        return this.$self.offsetStartIndex + this.totalKeys + byIndex
     }
 
     protected atOffset(byIndex: number) {
@@ -21,21 +21,21 @@ export class NodeMetaData extends BaseResponse {
     }
 
     get id() {
-        return this.get((<typeof NodeMetaData>this.constructor).idIndex)
+        return this.get(this.$self.idIndex)
     }
 
     get roomID() {
-        return this.atOffset((<typeof NodeMetaData>this.constructor).rawRoomIDIndex)
+        return this.atOffset(this.$self.rawRoomIDIndex)
     }
 
     get version() {
-        const offset = this.offset((<typeof NodeMetaData>this.constructor).rawVersionIndex)
+        const offset = this.offset(this.$self.rawVersionIndex)
         const [version, subversion, patch] = this.buffer.slice(offset, offset + 3)
         return `${version}.${subversion}${patch}`
     }
 
     get macAddress() {
-        const start = (<typeof NodeMetaData>this.constructor).macAddressIndex
+        const start = this.$self.macAddressIndex
 
         return this.toHexString(
             this.buffer.slice(start, start + 8)
@@ -43,36 +43,36 @@ export class NodeMetaData extends BaseResponse {
     }
 
     get totalKeys() {
-        return this.get((<typeof NodeMetaData>this.constructor).totalKeysIndex)
+        return this.get(this.$self.totalKeysIndex)
     }
 
     get keysList() {
         return [...Array(this.totalKeys)].map((_, i) => ({
-            id: i,
+            id:   i,
             type: this.atOffset(i),
         }))
     }
 
     get isLocked() {
-        const byIndex = (<typeof NodeMetaData>this.constructor).rawLockedStateIndex
+        const byIndex = this.$self.rawLockedStateIndex
 
         return this.atOffset(byIndex) === LockStatus.LOCKED
     }
 
     get ledLevel(): LEDBackgroundBrightness {
-        return this.atOffset((<typeof NodeMetaData>this.constructor).rawLEDLevelIndex)
+        return this.atOffset(this.$self.rawLEDLevelIndex)
     }
 
     protected get toLog() {
         return {
             ...super.toLog,
-            nodeID: this.id,
-            totalKeys: this.totalKeys,
-            isLocked: this.isLocked,
-            keysList: this.keysList,
-            version: this.version,
+            nodeID:     this.id,
+            totalKeys:  this.totalKeys,
+            isLocked:   this.isLocked,
+            keysList:   this.keysList,
+            version:    this.version,
             macAddress: this.macAddress,
-            ledLevel: LEDBackgroundBrightness[this.ledLevel]
+            ledLevel:   LEDBackgroundBrightness[this.ledLevel]
         }
     }
 }

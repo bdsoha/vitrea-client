@@ -37,7 +37,7 @@ export abstract class DataGram {
     public constructor(rawBuffer?: Buffer | number[]) {
         this.buffer = rawBuffer
             ? [...rawBuffer]
-            : [...(<typeof DataGram>this.constructor).prefix]
+            : [...this.$self.prefix]
     }
 
     public get(index: number) {
@@ -46,6 +46,10 @@ export abstract class DataGram {
 
     public getData(): number[] {
         return [...this.data]
+    }
+
+    protected get $self() : Record<string, any> {
+        return this.constructor
     }
 
     protected toHexString(buffer?: number[]): string {
@@ -72,46 +76,46 @@ export abstract class DataGram {
     }
 
     get direction(): DataGramDirection {
-        return this.get((<typeof DataGram>this.constructor).directionIndex)
+        return this.get(this.$self.directionIndex)
     }
 
     /**
      * The checksum for the datagram.
      */
     get checksum() {
-        return this.buffer.reduce((sum, curr) => (sum + curr) & 0xFF)
+        return this.buffer.reduce((sum, curr) => sum + curr & 0xFF)
     }
 
     /**
      * The command ID for the datagram.
      */
     get commandID() {
-        return this.get((<typeof DataGram>this.constructor).commandIDIndex)
+        return this.get(this.$self.commandIDIndex)
     }
 
     /**
      * The message ID for the datagram.
      */
     get messageID() {
-        return this.get((<typeof DataGram>this.constructor).messageIDIndex)
+        return this.get(this.$self.messageIDIndex)
     }
 
     protected get data() {
         if (this.hasData) {
-            return this.buffer.slice((<typeof DataGram>this.constructor).dataIndex)
+            return this.buffer.slice(this.$self.dataIndex)
         }
 
         return []
     }
 
     public get hasData() {
-        return this.length > (<typeof DataGram>this.constructor).dataIndex
+        return this.length > this.$self.dataIndex
     }
 
     public get dataLength(): [number, number] {
         const length = this.data.length + 2
 
-        return [(length >> 8) & 0xFF, length & 0xFF]
+        return [length >> 8 & 0xFF, length & 0xFF]
     }
 
     public get eventName() {
@@ -128,12 +132,12 @@ export abstract class DataGram {
 
     public get logData(): object {
         return {
-            command: this.commandName,
+            command:   this.commandName,
             direction: DataGramDirection[this.direction],
             commandID: this.commandID.toString(16),
             messageID: this.messageID.toString(16),
             ...this.toLog,
-            raw: this.toHexString()
+            raw:       this.toHexString()
         }
     }
 }

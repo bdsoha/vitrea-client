@@ -1,6 +1,6 @@
-import {Heartbeat}                from '../requests'
-import {WritableSocketContract}   from './WritableSocketContract'
-import {AbstractHeartbeatHandler} from './AbstractHeartbeatHandler'
+import { Heartbeat }                from '../requests'
+import { WritableSocketContract }   from './WritableSocketContract'
+import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
 
 export class VitreaHeartbeatHandler extends AbstractHeartbeatHandler {
     public constructor(socket : WritableSocketContract) {

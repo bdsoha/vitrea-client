@@ -1,5 +1,5 @@
+import { CommandID }   from '../responses/ResponseCodes'
 import { BaseRequest } from '../core'
-import {CommandID}   from '../responses/ResponseCodes'
 
 
 export class NodeMetaData extends BaseRequest {

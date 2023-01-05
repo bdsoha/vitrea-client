@@ -1,5 +1,5 @@
-import {DataGram}     from './DataGram'
-import {BaseResponse} from './BaseResponse'
+import { DataGram }          from './DataGram'
+import { BaseResponse }      from './BaseResponse'
 import { DataGramDirection } from '../utilities/Enums'
 
 class SampleResponse extends BaseResponse { }
