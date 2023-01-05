@@ -1,5 +1,5 @@
 import {EventEmitter}             from 'events'
-import {TimeoutException}         from '../TimeoutException'
+import {TimeoutException}         from './TimeoutException'
 // import {getLogger, Logger}        from '@/core/logger'
 import {WritableSocketContract}   from './WritableSocketContract'
 import {AbstractHeartbeatHandler} from './AbstractHeartbeatHandler'

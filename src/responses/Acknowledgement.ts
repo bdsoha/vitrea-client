@@ -1,5 +1,5 @@
 import { CommandID }    from './ResponseCodes'
-import { BaseResponse } from './BaseResponse'
+import { BaseResponse } from '../core'
 import { Events } from '../utilities/Events'
 
 

@@ -1,5 +1,5 @@
-import { DataGramDirection } from './Enums'
-import { Events } from './Events'
+import { Events }            from '../utilities/Events'
+import { DataGramDirection } from '../utilities/Enums'
 
 export abstract class DataGram {
     /**
@@ -44,18 +44,22 @@ export abstract class DataGram {
         return this.buffer[index]
     }
 
+    public getData(): number[] {
+        return [...this.data]
+    }
+
     protected toHexString(buffer?: number[]): string {
         buffer = buffer ?? this.buffer
-        
+
         return buffer
-        .map(entry => entry.toString(16).padStart(2, '0'))
-        .map(octal => octal.toUpperCase())
-        .join(':')
+            .map(entry => entry.toString(16).padStart(2, '0'))
+            .map(octal => octal.toUpperCase())
+            .join(':')
     }
-    
-    protected bufferToString(offset : number, buffer? : number[]): string {
+
+    protected bufferToString(offset: number, buffer?: number[]): string {
         buffer = buffer ?? this.buffer
-        
+
         return buffer
             .slice(offset)
             .filter(Boolean)
@@ -100,12 +104,13 @@ export abstract class DataGram {
         return []
     }
 
-    protected get hasData() {
+    public get hasData() {
         return this.length > (<typeof DataGram>this.constructor).dataIndex
     }
 
-    protected get dataLength(): [number, number] {
+    public get dataLength(): [number, number] {
         const length = this.data.length + 2
+
         return [(length >> 8) & 0xFF, length & 0xFF]
     }
 

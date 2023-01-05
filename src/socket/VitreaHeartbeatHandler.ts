@@ -1,4 +1,4 @@
-import {Heartbeat}                from '../requests/Heartbeat'
+import {Heartbeat}                from '../requests'
 import {WritableSocketContract}   from './WritableSocketContract'
 import {AbstractHeartbeatHandler} from './AbstractHeartbeatHandler'
 

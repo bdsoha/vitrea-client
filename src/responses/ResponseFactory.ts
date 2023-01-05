@@ -1,6 +1,6 @@
-import {DataGram}          from '../utilities/DataGram'
+import {DataGram}          from '../core'
 import {CommandID}         from './ResponseCodes'
-import {BaseResponse}      from './BaseResponse'
+import {BaseResponse}      from '../core'
 import {DataGramDirection} from '../utilities/Enums'
 import * as Responses      from '.'
 

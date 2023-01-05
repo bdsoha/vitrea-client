@@ -1,5 +1,5 @@
 import { KeyCategory } from '../utilities/Enums'
-import { BaseResponse } from './BaseResponse'
+import { BaseResponse } from '../core'
 
 
 export class KeyParameters extends BaseResponse {

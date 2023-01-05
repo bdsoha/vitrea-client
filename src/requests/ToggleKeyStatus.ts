@@ -1,4 +1,4 @@
-import {BaseRequest}     from './BaseRequest'
+import { BaseRequest } from '../core'
 import {KeyPowerStatus}  from '../utilities/Enums'
 import {Acknowledgement} from '../responses'
 

@@ -1,8 +1,8 @@
-import { DataGram }          from '../utilities/DataGram'
+import { DataGram }          from './DataGram'
 import { MessageID }         from '../utilities/MessageID'
 import { DataGramDirection } from '../utilities/Enums'
 
-export class BaseRequest extends DataGram {
+export abstract class BaseRequest extends DataGram {
     constructor(commandID = 0x00, data? : number[]) {
         super()
 
