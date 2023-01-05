@@ -1,4 +1,4 @@
-import {BaseResponse} from './BaseResponse'
+import {BaseResponse} from '../core'
 
 
 export class RoomMetaDataV2 extends BaseResponse {

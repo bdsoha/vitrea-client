@@ -1,4 +1,4 @@
-import { BaseResponse } from './BaseResponse'
+import { BaseResponse } from '../core'
 import { KeyPowerStatus } from '../utilities/Enums'
 import { Events } from '../utilities/Events'
 

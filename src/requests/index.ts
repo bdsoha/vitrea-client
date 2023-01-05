@@ -1,3 +1,4 @@
+export * from './Heartbeat'
 export * from './InternalUnitStatuses'
 export * from './KeyParameters'
 export * from './KeyStatus'

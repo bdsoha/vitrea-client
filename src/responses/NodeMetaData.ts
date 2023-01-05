@@ -1,4 +1,4 @@
-import { BaseResponse } from './BaseResponse'
+import { BaseResponse } from '../core'
 import { LEDBackgroundBrightness, LockStatus } from '../utilities/Enums'
 
 

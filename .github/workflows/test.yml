@@ -12,6 +12,8 @@ on:
 
 jobs:
   tests:
+    name: Tests
+
     runs-on: ubuntu-latest
 
     steps:

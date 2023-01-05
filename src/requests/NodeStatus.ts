@@ -1,4 +1,4 @@
-import {BaseRequest} from './BaseRequest'
+import { BaseRequest } from '../core'
 
 
 export class NodeStatus extends BaseRequest {

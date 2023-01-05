@@ -1,6 +1,6 @@
 import {CommandID}   from '../responses/ResponseCodes'
 import { Events } from '../utilities/Events'
-import {BaseRequest} from './BaseRequest'
+import { BaseRequest } from '../core'
 
 
 export class KeyStatus extends BaseRequest {
