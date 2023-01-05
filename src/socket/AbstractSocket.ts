@@ -1,8 +1,8 @@
 import {EventEmitter}             from 'events'
 import {TimeoutException}         from '../TimeoutException'
 // import {getLogger, Logger}        from '@/core/logger'
-import {WritableSocketContract}   from '/WritableSocketContract'
-import {AbstractHeartbeatHandler} from '/AbstractHeartbeatHandler'
+import {WritableSocketContract}   from './WritableSocketContract'
+import {AbstractHeartbeatHandler} from './AbstractHeartbeatHandler'
 import * as Net                   from 'net'
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {

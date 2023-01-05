@@ -1,26 +1,24 @@
-import {Mutex}                  from 'async-mutex'
-import {Login}                  from './requests/Login'
-import {BaseRequest}            from './requests/BaseRequest'
-import {BaseResponse}           from './responses/BaseResponse'
-import {AbstractSocket}         from './socket/AbstractSocket'
-import {ResponseFactory}        from './responses/ResponseFactory'
-import {TimeoutException}       from './TimeoutException'
-import {ToggleHeartBeat}        from './requests/ToggleHeartBeat'
-import {SplitMultipleBuffers}   from './utilities/SplitMultipleBuffers'
-import {VitreaHeartbeatHandler} from './VitreaHeartbeatHandler'
-import Net                      from 'net'
+import { Mutex }                       from 'async-mutex'
+import { Login }                       from './requests/Login'
+import { BaseRequest }                 from './requests/BaseRequest'
+import { BaseResponse }                from './responses/BaseResponse'
+import { AbstractSocket }              from './socket/AbstractSocket'
+import { ResponseFactory }             from './responses/ResponseFactory'
+import { TimeoutException }            from './TimeoutException'
+import { ToggleHeartBeat }             from './requests/ToggleHeartBeat'
+import { SplitMultipleBuffers }        from './utilities/SplitMultipleBuffers'
+import { VitreaHeartbeatHandler }      from './socket/VitreaHeartbeatHandler'
+import { VBoxConfigs, VBoxConnection } from './utilities/VBoxConnection'
+import Net                             from 'net'
 
 export class VitreaClient extends AbstractSocket {
     protected readonly mutex = new Mutex()
-    protected readonly username : string
-    protected readonly password : string
+    protected readonly configs : VBoxConfigs
 
-    public constructor(host : string, port : number, username : string, password : string) {
-        super(host, port)
-        this.username  = username
-        this.password  = password
-        this.heartbeat = new VitreaHeartbeatHandler(this)
-        this.heartbeat.restart()
+    public constructor(configs: Required<VBoxConfigs>) {
+        super(configs.host, configs.port)
+        this.configs  = configs
+        this.heartbeat = VitreaHeartbeatHandler.create(this)
     }
 
     public async send<T extends BaseRequest, R extends BaseResponse>(request : T) : Promise<R> {
@@ -66,7 +64,7 @@ export class VitreaClient extends AbstractSocket {
 
         await this.send(new ToggleHeartBeat())
 
-        await this.send(new Login(this.username, this.password))
+        await this.send(new Login(this.configs.username, this.configs.password))
     }
 
     protected onData(data : Buffer) : void {
@@ -87,5 +85,11 @@ export class VitreaClient extends AbstractSocket {
         } else {
             // this.log.warn('Ignoring unrecognized received data', {raw: data.toString('hex')})
         }
+    }
+
+    public static create(configs: Partial<VBoxConfigs> = {}) {
+        return new this(
+            VBoxConnection.create(configs)
+        )
     }
 }
