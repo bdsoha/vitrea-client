@@ -1,6 +1,6 @@
+import { Events }       from '../utilities/Events'
 import { CommandID }    from './ResponseCodes'
 import { BaseResponse } from '../core'
-import { Events } from '../utilities/Events'
 
 
 export class Acknowledgement extends BaseResponse {

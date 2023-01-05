@@ -1,6 +1,8 @@
 import {
-    KeyPowerStatus, DataGramDirection,
-    LEDBackgroundBrightness, LockStatus,
+    LockStatus,
+    KeyPowerStatus,
+    DataGramDirection, 
+    LEDBackgroundBrightness,
 } from './Enums'
 
 describe('Enums', () => {

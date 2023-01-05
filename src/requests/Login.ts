@@ -1,4 +1,4 @@
-import {AcknowledgeRequest} from './AcknowledgeRequest'
+import { AcknowledgeRequest } from './AcknowledgeRequest'
 
 
 export class Login extends AcknowledgeRequest {

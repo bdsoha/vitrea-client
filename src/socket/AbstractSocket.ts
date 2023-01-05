@@ -1,9 +1,9 @@
-import {EventEmitter}             from 'events'
-import {TimeoutException}         from './TimeoutException'
+import { EventEmitter }     from 'events'
+import { TimeoutException } from './TimeoutException'
 // import {getLogger, Logger}        from '@/core/logger'
-import {WritableSocketContract}   from './WritableSocketContract'
-import {AbstractHeartbeatHandler} from './AbstractHeartbeatHandler'
-import * as Net                   from 'net'
+import { WritableSocketContract }   from './WritableSocketContract'
+import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
+import * as Net                     from 'net'
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
     protected port : number
@@ -13,7 +13,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     protected shouldReconnect : boolean
     // protected readonly log : Logger
 
-    protected constructor(host : string, port : number, shouldReconnect : boolean = true) {
+    protected constructor(host : string, port : number, shouldReconnect  = true) {
         super()
         this.host            = host
         this.port            = port
@@ -70,7 +70,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     public async write(data : Buffer) : Promise<void> {
         return new Promise((res, rej) => {
             if (!this.socket) {
-                return rej(new Error(`Can't write, no socket connection established`))
+                return rej(new Error('Can\'t write, no socket connection established'))
             }
 
             this.socket.write(data, (error? : Error) => {

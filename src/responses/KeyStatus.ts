@@ -1,6 +1,6 @@
-import { BaseResponse } from '../core'
+import { Events }         from '../utilities/Events'
+import { BaseResponse }   from '../core'
 import { KeyPowerStatus } from '../utilities/Enums'
-import { Events } from '../utilities/Events'
 
 
 export class KeyStatus extends BaseResponse {
@@ -9,15 +9,15 @@ export class KeyStatus extends BaseResponse {
     protected static readonly powerIndex  = 10
 
     get nodeID() {
-        return this.get((<typeof KeyStatus>this.constructor).nodeIDIndex)
+        return this.get(this.$self.nodeIDIndex)
     }
 
     get keyID() {
-        return this.get((<typeof KeyStatus>this.constructor).keyIDIndex)
+        return this.get(this.$self.keyIDIndex)
     }
 
     get power(): KeyPowerStatus {
-        return this.get((<typeof KeyStatus>this.constructor).powerIndex)
+        return this.get(this.$self.powerIndex)
     }
 
     get isOn() {

@@ -1,8 +1,7 @@
-import {DataGram}          from '../core'
-import {CommandID}         from './ResponseCodes'
-import {BaseResponse}      from '../core'
-import {DataGramDirection} from '../utilities/Enums'
-import * as Responses      from '.'
+import { CommandID }              from './ResponseCodes'
+import { DataGramDirection }      from '../utilities/Enums'
+import { BaseResponse, DataGram } from '../core'
+import * as Responses             from '.'
 
 export class ResponseFactory {
     protected static readonly lookupTable : Record<CommandID, typeof BaseResponse> = {

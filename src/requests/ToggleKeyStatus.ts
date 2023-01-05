@@ -1,6 +1,6 @@
-import { BaseRequest } from '../core'
-import {KeyPowerStatus}  from '../utilities/Enums'
-import {Acknowledgement} from '../responses'
+import { BaseRequest }     from '../core'
+import { KeyPowerStatus }  from '../utilities/Enums'
+import { Acknowledgement } from '../responses'
 
 /** @vbox {SetKeyStatusCommand} */
 export class ToggleKeyStatus extends BaseRequest {

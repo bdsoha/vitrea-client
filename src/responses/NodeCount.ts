@@ -1,4 +1,4 @@
-import {BaseResponse} from '../core'
+import { BaseResponse } from '../core'
 
 export class NodeCount extends BaseResponse {
     get total() {

@@ -1,4 +1,4 @@
-import {DataGram} from './DataGram'
+import { DataGram } from './DataGram'
 
 class SampleDataGram extends DataGram {}
 

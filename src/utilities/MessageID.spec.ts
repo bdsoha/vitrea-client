@@ -1,4 +1,4 @@
-import {MessageID} from './MessageID'
+import { MessageID } from './MessageID'
 
 describe('Message ID', () => {
     beforeEach(() => MessageID.resetID())

@@ -8,7 +8,7 @@ export abstract class BaseRequest extends DataGram {
 
         this.buffer.push(DataGramDirection.OUTGOING, commandID)
 
-        this.buffer[(<typeof BaseRequest>this.constructor).messageIDIndex] = MessageID.getNextID()
+        this.buffer[this.$self.messageIDIndex] = MessageID.getNextID()
 
         if (Array.isArray(data)) {
             this.buffer.push(...data)
@@ -19,7 +19,7 @@ export abstract class BaseRequest extends DataGram {
 
     protected setDataLength() {
         this.buffer.splice(
-            (<typeof BaseRequest>this.constructor).dataLengthIndex,
+            this.$self.dataLengthIndex,
             2,
             ...this.dataLength
         )

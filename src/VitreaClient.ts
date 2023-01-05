@@ -1,11 +1,11 @@
-import { Mutex }                       from 'async-mutex'
 import { Login }                       from './requests/Login'
+import { Mutex }                       from 'async-mutex'
 import { BaseRequest }                 from './core/BaseRequest'
 import { BaseResponse }                from './core/BaseResponse'
 import { AbstractSocket }              from './socket/AbstractSocket'
 import { ResponseFactory }             from './responses/ResponseFactory'
-import { TimeoutException }            from './socket/TimeoutException'
 import { ToggleHeartBeat }             from './requests/ToggleHeartBeat'
+import { TimeoutException }            from './socket/TimeoutException'
 import { SplitMultipleBuffers }        from './utilities/SplitMultipleBuffers'
 import { VitreaHeartbeatHandler }      from './socket/VitreaHeartbeatHandler'
 import { VBoxConfigs, VBoxConnection } from './utilities/VBoxConnection'
@@ -28,7 +28,7 @@ export class VitreaClient extends AbstractSocket {
         const release = await this.mutex.acquire()
         // this.log.debug('Acquired mutex', eventName)
 
-        return new Promise(async (res, rej) => {
+        return new Promise((res, rej) => {
             // this.log.info('Sending data', request.logData)
 
             let callback : (data : R) => void
