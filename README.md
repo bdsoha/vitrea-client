@@ -11,11 +11,9 @@ npm install vitrea-client
 ## Usage
 
 ```ts
-import { 
-    ProtocolVersion,
-    Requests,
-    VitreaClient,
-} from 'vitrea-client'
+import * as Requests                     from 'vitrea-client/requests'
+import { ProtocolVersion, VitreaClient } from 'vitrea-client'
+
 
 const client = VitreaClient.create({
     host:     '192.168.1.111',
