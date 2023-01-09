@@ -1,5 +1,5 @@
-import { ProtocolVersion } from './ProtocolVersion'
 import { VBoxConnection }  from './VBoxConnection'
+import { ProtocolVersion } from './ProtocolVersion'
 
 
 describe('VBoxConnection', () => {
