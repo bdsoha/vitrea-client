@@ -7,8 +7,6 @@ export class KeyParameters extends BaseResponse {
     protected static readonly keyIDIndex = 9
     protected static readonly categoryIndex = 11
     protected static readonly nameIndex = 21
-    protected static readonly hiddenRegex = /\(?MW\)?$/i
-    protected static readonly sceneRegex = /\(?SCENE\)?$/i
 
     public get name() {
         return this.bufferToString(this.$self.nameIndex)
@@ -22,15 +20,6 @@ export class KeyParameters extends BaseResponse {
         return this.get(this.$self.keyIDIndex)
     }
 
-    public get isHidden(): boolean {
-        return this.$self.hiddenRegex.test(this.name)
-            || this.name === 'EMPTY'
-    }
-
-    public get isScene(): boolean {
-        return this.$self.sceneRegex.test(this.name)
-    }
-
     public get category(): KeyCategory {
         return this.get(this.$self.categoryIndex) as KeyCategory
     }
@@ -42,7 +31,6 @@ export class KeyParameters extends BaseResponse {
             nodeID:   this.nodeID,
             keyID:    this.keyID,
             category: this.category,
-            hidden:   this.isHidden,
         }
     }
 }
