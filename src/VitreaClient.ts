@@ -79,7 +79,7 @@ export class VitreaClient extends AbstractSocket {
 
         data = split[0]
 
-        const response = ResponseFactory.find(data, this.version)
+        const response = ResponseFactory.find(data, this.configs.version)
 
         if (response) {
             this.log.info('Data Received', response.logData)
