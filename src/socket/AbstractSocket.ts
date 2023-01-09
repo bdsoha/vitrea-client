@@ -93,7 +93,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         this.socket = undefined
 
         if (this.shouldReconnect) {
-            this.log.info('Automatically reconnecting', {shouldReconnect: this.shouldReconnect})
+            this.log.info('Automatically reconnecting', { shouldReconnect: this.shouldReconnect })
             return await this.connect()
         }
 
