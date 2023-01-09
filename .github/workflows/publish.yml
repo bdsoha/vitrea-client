@@ -1,18 +1,13 @@
-name: 🧪 Test
+name: 🚀 Publish
 
 on: 
-  push:
-    branches: 
-      - '*'
-      
-  pull_request:
-    types:
-      - opened
-      - synchronize
+  release:
+    types: 
+      - published
 
 jobs:
-  test:
-    name: 🧪 Test
+  publish:
+    name: 🚀 Publish
 
     runs-on: ubuntu-latest
 
@@ -29,5 +24,7 @@ jobs:
       - name: ⏬ Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: 🧪 Run tests
-        run: npm run test:ci
+      - name: 🚀 Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
