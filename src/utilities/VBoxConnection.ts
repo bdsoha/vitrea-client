@@ -1,8 +1,12 @@
+import { ProtocolVersion } from './ProtocolVersion'
+
+
 export type VBoxConfigs = {
     host: string,
     port?: number,
     username: string,
-    password: string
+    password: string,
+    version: ProtocolVersion
 }
 
 export class VBoxConnection {
@@ -25,7 +29,8 @@ export class VBoxConnection {
             host:     this.get(configs, 'host', '192.168.1.23'),
             port:     Number(this.get(configs, 'port', 11501)),
             username: this.get(configs, 'username'),
-            password: this.get(configs, 'password')
+            password: this.get(configs, 'password'),
+            version:  this.get(configs, 'version', ProtocolVersion.V2),
         }
     }
 }

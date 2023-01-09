@@ -1,19 +1,20 @@
 import { Login }                       from './requests/Login'
 import { Mutex }                       from 'async-mutex'
-import { BaseRequest }                 from './core/BaseRequest'
-import { BaseResponse }                from './core/BaseResponse'
 import { AbstractSocket }              from './socket/AbstractSocket'
+import { ProtocolVersion }             from './utilities/ProtocolVersion'
 import { ResponseFactory }             from './responses/ResponseFactory'
 import { ToggleHeartBeat }             from './requests/ToggleHeartBeat'
 import { TimeoutException }            from './socket/TimeoutException'
 import { SplitMultipleBuffers }        from './utilities/SplitMultipleBuffers'
 import { VitreaHeartbeatHandler }      from './socket/VitreaHeartbeatHandler'
+import { BaseRequest, BaseResponse }   from './core'
 import { VBoxConfigs, VBoxConnection } from './utilities/VBoxConnection'
 import Net                             from 'net'
 
 export class VitreaClient extends AbstractSocket {
     protected readonly mutex = new Mutex()
     protected readonly configs : VBoxConfigs
+    protected readonly version: ProtocolVersion
 
     public constructor(configs: Required<VBoxConfigs>) {
         super(configs.host, configs.port)
@@ -76,7 +77,7 @@ export class VitreaClient extends AbstractSocket {
 
         data = split[0]
 
-        const response = ResponseFactory.find(data)
+        const response = ResponseFactory.find(data, this.version)
 
         if (response) {
             // this.log.info('Data Received', response.logData)

@@ -1,4 +1,5 @@
-import { VBoxConnection } from './VBoxConnection'
+import { ProtocolVersion } from './ProtocolVersion'
+import { VBoxConnection }  from './VBoxConnection'
 
 
 describe('VBoxConnection', () => {
@@ -16,6 +17,7 @@ describe('VBoxConnection', () => {
         process.env.VITREA_VBOX_PORT = '1234'
         process.env.VITREA_VBOX_USERNAME = 'admin'
         process.env.VITREA_VBOX_PASSWORD = 'secret'
+        process.env.VITREA_VBOX_VERSION = 'v1'
 
         const client = VBoxConnection.create()
 
@@ -23,7 +25,8 @@ describe('VBoxConnection', () => {
             host:     '192.168.1.111',
             port:     1234,
             username: 'admin',
-            password: 'secret'
+            password: 'secret',
+            version:  ProtocolVersion.V1
         })
     })
 
@@ -32,14 +35,16 @@ describe('VBoxConnection', () => {
             host:     '192.168.1.111',
             port:     1234,
             username: 'admin',
-            password: 'secret'
+            password: 'secret',
+            version:  'v1'
         })
 
         expect(client).toStrictEqual({
             host:     '192.168.1.111',
             port:     1234,
             username: 'admin',
-            password: 'secret'
+            password: 'secret',
+            version:  'v1'
         })
     })
 
@@ -53,7 +58,8 @@ describe('VBoxConnection', () => {
             host:     '192.168.1.23',
             port:     11501,
             username: 'admin',
-            password: 'secret'
+            password: 'secret',
+            version:  ProtocolVersion.V2
         })
     })
 
