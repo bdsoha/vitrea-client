@@ -76,7 +76,7 @@ export abstract class DataGram {
     }
 
     get direction(): DataGramDirection {
-        return this.get(this.$self.directionIndex)
+        return this.get(this.$self.directionIndex) as DataGramDirection
     }
 
     /**
@@ -133,7 +133,7 @@ export abstract class DataGram {
     public get logData(): object {
         return {
             command:   this.commandName,
-            direction: DataGramDirection[this.direction],
+            direction: DataGramDirection.INCOMING === this.direction ? 'Incoming' : 'Outgoing',
             commandID: this.commandID.toString(16),
             messageID: this.messageID.toString(16),
             ...this.toLog,

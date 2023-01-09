@@ -32,7 +32,7 @@ export class KeyParameters extends BaseResponse {
     }
 
     public get category(): KeyCategory {
-        return this.get(this.$self.categoryIndex)
+        return this.get(this.$self.categoryIndex) as KeyCategory
     }
 
     protected get toLog() {
@@ -41,7 +41,7 @@ export class KeyParameters extends BaseResponse {
             name:     this.name,
             nodeID:   this.nodeID,
             keyID:    this.keyID,
-            category: KeyCategory[this.category],
+            category: this.category,
             hidden:   this.isHidden,
         }
     }

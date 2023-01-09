@@ -17,7 +17,7 @@ export class KeyStatus extends BaseResponse {
     }
 
     get power(): KeyPowerStatus {
-        return this.get(this.$self.powerIndex)
+        return this.get(this.$self.powerIndex) as KeyPowerStatus
     }
 
     get isOn() {
