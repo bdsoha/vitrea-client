@@ -22,6 +22,7 @@ export class VitreaClient extends AbstractSocket {
         this.configs = configs
         this.heartbeat = VitreaHeartbeatHandler.create(this)
         this.log = logger ?? new Core.NullLogger()
+        this.version = configs.version
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
