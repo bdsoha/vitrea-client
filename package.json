@@ -1,5 +1,5 @@
 {
-  "name": "@bdsoha/vitrea-client",
+  "name": "vitrea-client",
   "version": "0.0.1-alpha.0",
   "description": "Vitrea Smart Home API Client",
   "main": "dist/index.js",
