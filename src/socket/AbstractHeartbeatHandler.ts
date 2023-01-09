@@ -11,9 +11,14 @@ export abstract class AbstractHeartbeatHandler {
         this.socket = socket
     }
 
+    public get isPaused(): boolean{
+        return !this.timer
+    }
+
     public pause() {
-        if (this.timer) {
+        if (!this.isPaused) {
             clearTimeout(this.timer)
+            this.timer = null
         }
     }
 
