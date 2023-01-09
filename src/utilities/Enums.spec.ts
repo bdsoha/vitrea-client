@@ -1,7 +1,7 @@
 import {
     LockStatus,
     KeyPowerStatus,
-    DataGramDirection, 
+    DataGramDirection,
     LEDBackgroundBrightness,
 } from './Enums'
 

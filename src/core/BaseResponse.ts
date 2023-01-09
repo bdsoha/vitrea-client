@@ -18,8 +18,6 @@ export abstract class BaseResponse extends DataGram {
     }
 
     protected get toLog() {
-        return {
-            hasValidChecksum: this.hasValidChecksum
-        }
+        return { hasValidChecksum: this.hasValidChecksum }
     }
 }

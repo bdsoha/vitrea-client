@@ -60,7 +60,7 @@ export class NodeMetaData extends BaseResponse {
     }
 
     get ledLevel(): LEDBackgroundBrightness {
-        return this.atOffset(this.$self.rawLEDLevelIndex)
+        return this.atOffset(this.$self.rawLEDLevelIndex) as LEDBackgroundBrightness
     }
 
     protected get toLog() {
@@ -72,7 +72,7 @@ export class NodeMetaData extends BaseResponse {
             keysList:   this.keysList,
             version:    this.version,
             macAddress: this.macAddress,
-            ledLevel:   LEDBackgroundBrightness[this.ledLevel]
+            ledLevel:   this.ledLevel
         }
     }
 }
