@@ -22,7 +22,6 @@ export class VitreaClient extends AbstractSocket {
         this.configs = configs
         this.heartbeat = VitreaHeartbeatHandler.create(this)
         this.log = logger ?? new Core.NullLogger()
-        this.version = configs.version
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
@@ -80,7 +79,7 @@ export class VitreaClient extends AbstractSocket {
 
         data = split[0]
 
-        const response = ResponseFactory.find(data, this.version)
+        const response = ResponseFactory.find(data, this.configs.version)
 
         if (response) {
             this.log.info('Data Received', response.logData)
