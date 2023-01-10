@@ -1,10 +1,10 @@
 import { Login }                       from './requests/Login'
 import { Mutex }                       from 'async-mutex'
+import { Timeout }                     from './socket/Timeout'
 import { AbstractSocket }              from './socket/AbstractSocket'
 import { ProtocolVersion }             from './utilities/ProtocolVersion'
 import { ResponseFactory }             from './responses/ResponseFactory'
 import { ToggleHeartBeat }             from './requests/ToggleHeartBeat'
-import { TimeoutException }            from './socket/TimeoutException'
 import { SplitMultipleBuffers }        from './utilities/SplitMultipleBuffers'
 import { VitreaHeartbeatHandler }      from './socket/VitreaHeartbeatHandler'
 import { VBoxConfigs, VBoxConnection } from './utilities/VBoxConnection'
@@ -31,25 +31,27 @@ export class VitreaClient extends AbstractSocket {
         const release = await this.mutex.acquire()
         this.log.debug('Acquired mutex', eventName)
 
-        return new Promise((res, rej) => {
+        return new Promise(res => {
             this.log.info('Sending data', request.logData)
 
             let callback: (data: R) => void
 
-            const timeout = setTimeout(() => {
-                const message = 'Sending timeout reached'
-
-                this.log.error(message, eventName)
+            const onTimeout = (error: Error) => {
+                this.log.error(error.message, eventName)
 
                 this.removeListener(request.eventName, callback)
 
-                rej(new TimeoutException(message))
-
                 release()
-            }, 1000)
+            }
+
+            const timeout = Timeout.create(1000, {
+                onTimeout,
+                message: 'Sending timeout reached',
+            })
 
             callback = data => {
-                clearTimeout(timeout)
+                timeout.stop()
+
                 setTimeout(() => {
                     release()
                     res(data)
