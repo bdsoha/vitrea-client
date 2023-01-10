@@ -1,5 +1,5 @@
+import { Timeout }                    from './Timeout'
 import { EventEmitter }               from 'events'
-import { TimeoutException }           from './TimeoutException'
 import { WritableSocketContract }     from './WritableSocketContract'
 import { AbstractHeartbeatHandler }   from './AbstractHeartbeatHandler'
 import { LoggerContract, NullLogger } from '../core'
@@ -33,13 +33,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
                 return rej(new Error(message))
             }
 
-            const timeout = setTimeout(() => {
-                const message = 'Connection timeout reached'
-
-                this.log.error(message)
-
-                rej(new TimeoutException(message))
-            }, 1000)
+            const timeout = Timeout.create(1000)
 
             const socket = new Net.Socket()
                 .connect({
@@ -47,7 +41,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
                     host: this.host
                 })
                 .on('connect', () => {
-                    clearTimeout(timeout)
+                    timeout.stop()
                     res(null)
                     this.onConnect(socket)
                 })
