@@ -1,11 +1,10 @@
-import { Login }                       from './requests/Login'
 import { Mutex }                       from 'async-mutex'
 import { Timeout }                     from './socket/Timeout'
 import { AbstractSocket }              from './socket/AbstractSocket'
 import { ProtocolVersion }             from './utilities/ProtocolVersion'
 import { ResponseFactory }             from './responses/ResponseFactory'
-import { ToggleHeartBeat }             from './requests/ToggleHeartBeat'
 import { SplitMultipleBuffers }        from './utilities/SplitMultipleBuffers'
+import { Login, ToggleHeartbeat }      from './requests'
 import { VitreaHeartbeatHandler }      from './socket/VitreaHeartbeatHandler'
 import { VBoxConfigs, VBoxConnection } from './utilities/VBoxConnection'
 import Net                             from 'net'
@@ -15,13 +14,11 @@ export class VitreaClient extends AbstractSocket {
     protected readonly mutex = new Mutex()
     protected readonly configs: VBoxConfigs
     protected readonly version: ProtocolVersion
-    protected readonly log: Core.LoggerContract
 
-    public constructor(configs: Required<VBoxConfigs>, logger: Core.LoggerContract = null) {
+    protected constructor(configs: Required<VBoxConfigs>) {
         super(configs.host, configs.port)
         this.configs = configs
         this.heartbeat = VitreaHeartbeatHandler.create(this)
-        this.log = logger ?? new Core.NullLogger()
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
@@ -67,7 +64,7 @@ export class VitreaClient extends AbstractSocket {
     protected async onConnect(socket: Net.Socket) {
         await super.onConnect(socket)
 
-        await this.send(new ToggleHeartBeat())
+        await this.send(new ToggleHeartbeat())
 
         await this.send(new Login(this.configs.username, this.configs.password))
     }

@@ -3,9 +3,9 @@ import { MessageID } from '../utilities/MessageID'
 
 
 describe('Login', () => {
-    it('converts credentials as 16-byte characters', () => {
-        MessageID.setNextID(1)
+    beforeEach(() => MessageID.resetID())
 
+    it('converts credentials as 16-byte characters', () => {
         const command = new Login('user', 'super')
 
         expect(command.build()).toStrictEqual(Buffer.from([
@@ -13,5 +13,11 @@ describe('Login', () => {
             0x00, 0x65, 0x00, 0x72, 0x00, 0x0A, 0x73, 0x00, 0x75, 0x00, 0x70, 0x00,
             0x65, 0x00, 0x72, 0x00, 0x57
         ]))
+    })
+
+    it('[eventName] uses the Acknowledgement event name', () => {
+        const command = new Login('user', 'super')
+
+        expect(command).toHaveProperty('eventName', 'data::00-01')
     })
 })
