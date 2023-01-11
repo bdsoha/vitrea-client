@@ -1,9 +1,9 @@
-import { Events }      from '../utilities/Events'
-import { CommandID }   from '../responses/ResponseCodes'
 import { BaseRequest } from '../core'
+import { Events }      from '../utilities/Events'
+
 
 export class AcknowledgeRequest extends BaseRequest {
-    public get eventName() : string {
-        return Events.generate(CommandID.Acknowledgement, this.messageID)
+    public get eventName(): string {
+        return Events.acknowledgement(this.messageID)
     }
 }

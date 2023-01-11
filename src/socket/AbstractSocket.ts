@@ -1,30 +1,31 @@
-import { Timeout } from './Timeout'
-import { EventEmitter } from 'events'
-import { WritableSocketContract } from './WritableSocketContract'
-import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
+import { Timeout }                    from './Timeout'
+import { EventEmitter }               from 'events'
+import { WritableSocketContract }     from './WritableSocketContract'
+import { AbstractHeartbeatHandler }   from './AbstractHeartbeatHandler'
 import { LoggerContract, NullLogger } from '../core'
-import * as Net from 'net'
+import * as Net                       from 'net'
+import * as Exceptions                from '../exceptions'
 
 
-type SocketConfigs = Partial<{
+export type SocketConfigs = Partial<{
     log: LoggerContract,
-    socket: Net.Socket,
+    socketSupplier: () => Net.Socket,
 }>
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
     protected socket?: Net.Socket
     protected heartbeat?: AbstractHeartbeatHandler
     protected shouldReconnect: boolean
+    protected readonly socketSupplier?: SocketConfigs['socketSupplier']
     protected readonly log: LoggerContract
-
 
     protected constructor(
         protected readonly host: string,
         protected readonly port: number,
-        { log = new NullLogger(), socket = undefined }: SocketConfigs = {}
+        { log = new NullLogger(), socketSupplier = undefined }: SocketConfigs = {}
     ) {
         super()
-        this.socket = socket
+        this.socketSupplier = socketSupplier
         this.log = log
         this.shouldReconnect = true
     }
@@ -33,33 +34,41 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         return !!this.socket
     }
 
+    protected createNewSocket(): Net.Socket {
+        const socket = this.socketSupplier
+            ? this.socketSupplier()
+            : new Net.Socket()
+
+        return socket
+            .on('connect', () => this.onConnect(socket))
+            .on('data', this.onData.bind(this))
+            .on('end', this.onDisconnect.bind(this))
+            .on('error', this.onError.bind(this))
+    }
+
     public async connect() {
         this.log.debug('Attempting to make a connection')
 
-        return new Promise((res, rej) => {
-            if (this.socket) {
-                const message = 'Socket already exists'
+        if (this.socket) {
+            const error = new Exceptions.ConnectionExistsException()
 
-                this.log.error(message)
+            this.log.error(error.message)
 
-                return rej(new Error(message))
-            }
+            throw error
+        }
 
+        return new Promise(res => {
             const timeout = Timeout.create(1000)
 
-            const socket = new Net.Socket()
+            this.createNewSocket()
+                .on('connect', () => {
+                    timeout.stop()
+                    res(null)
+                })
                 .connect({
                     port: this.port,
                     host: this.host
                 })
-                .on('connect', () => {
-                    timeout.stop()
-                    res(null)
-                    this.onConnect(socket)
-                })
-                .on('data', this.onData.bind(this))
-                .on('end', this.onDisconnect.bind(this))
-                .on('error', this.onError.bind(this))
         })
     }
 
@@ -74,11 +83,11 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     }
 
     public async write(data: Buffer): Promise<void> {
-        return new Promise((res, rej) => {
-            if (!this.socket) {
-                return rej(new Error('Can\'t write, no socket connection established'))
-            }
+        if (!this.socket) {
+            throw new Exceptions.NoConnectionException()
+        }
 
+        return new Promise((res, rej) => {
             this.socket.write(data, (error?: Error) => {
                 this.restartHeartbeat()
 
@@ -119,9 +128,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     }
 
     protected restartHeartbeat() {
-        if (this.heartbeat) {
-            this.heartbeat.restart()
-        }
+        this.heartbeat?.restart()
     }
 
     protected abstract onData(data: Buffer): void

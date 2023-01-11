@@ -1,4 +1,4 @@
-import { MessageID } from '../utilities/MessageID'
+import { MessageID }            from '../utilities/MessageID'
 import { InternalUnitStatuses } from './InternalUnitStatuses'
 
 

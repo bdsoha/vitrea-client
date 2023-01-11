@@ -10,6 +10,7 @@ export abstract class BaseResponse extends DataGram {
 
     get dataLength(): [number, number] {
         const start = this.$self.dataLengthIndex
+
         return [this.get(start), this.get(start + 1)]
     }
 
