@@ -24,7 +24,6 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest",
-    "test:ci": "jest --ci",
     "test:cov": "jest --coverage",
     "test:watch": "jest --watch"
   },

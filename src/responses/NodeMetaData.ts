@@ -31,6 +31,7 @@ export class NodeMetaData extends BaseResponse {
     get version() {
         const offset = this.offset(this.$self.rawVersionIndex)
         const [version, subversion, patch] = this.buffer.slice(offset, offset + 3)
+
         return `${version}.${subversion}${patch}`
     }
 

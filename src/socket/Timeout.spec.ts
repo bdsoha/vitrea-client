@@ -1,5 +1,5 @@
 import { Timeout }          from './Timeout'
-import { TimeoutException } from './TimeoutException'
+import { TimeoutException } from '../exceptions/TimeoutException'
 
 
 describe('Timeout', () => {

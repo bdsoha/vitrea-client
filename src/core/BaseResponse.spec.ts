@@ -48,4 +48,17 @@ describe('BaseResponse', () => {
         expect(new SampleResponse(valid).hasValidChecksum).toBeTruthy()
         expect(new SampleResponse(invalid).hasValidChecksum).toBeFalsy()
     })
+
+    it('[logData] retrieve data to log', () => {
+        const dataGram = new SampleResponse(buffer)
+
+        expect(dataGram.logData).toStrictEqual({
+            command:          'SampleResponse',
+            commandID:        '0x65',
+            direction:        'Incoming',
+            messageID:        '0x31',
+            hasValidChecksum: true,
+            raw:              '56:54:55:3C:65:00:13:31:0A:0A:0E:43:00:75:00:72:00:74:00:61:00:69:00:6E:00',
+        })
+    })
 })

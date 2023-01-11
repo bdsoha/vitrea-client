@@ -30,9 +30,6 @@ export abstract class BaseRequest extends DataGram {
     }
 
     protected get toLog() {
-        return {
-            ...super.toLog,
-            data: this.toHexString(this.data)
-        }
+        return { data: this.toHexString(this.data) }
     }
 }

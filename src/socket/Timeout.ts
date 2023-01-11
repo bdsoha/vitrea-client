@@ -1,4 +1,4 @@
-import { TimeoutException } from './TimeoutException'
+import { TimeoutException } from '../exceptions'
 
 
 type TimeoutConfig = Partial<{
