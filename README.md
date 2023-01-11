@@ -1,6 +1,20 @@
 # Vitrea Client
 
-> Vitrea Smart Home API Client
+**Vitrea Smart Home API Client**
+
+<a href="https://github.com/bdsoha/vitrea-client/actions/workflows/test.yml">
+    <img alt="GitHub Workflow" src="https://img.shields.io/github/actions/workflow/status/bdsoha/vitrea-client/test.yml?branch=develop&logo=github&style=for-the-badge">
+</a>
+
+<a href="https://codeclimate.com/github/bdsoha/vitrea-client">
+    <img alt="Code Climate maintainability" src="https://img.shields.io/codeclimate/maintainability/bdsoha/vitrea-client?logo=codeclimate&style=for-the-badge">
+</a>
+
+<a href="https://codeclimate.com/github/bdsoha/vitrea-client">
+    <img alt="Code Climate coverage" src="https://img.shields.io/codeclimate/coverage/bdsoha/vitrea-client?logo=codeclimate&style=for-the-badge">
+</a>
+
+---
 
 ## Installation
 
@@ -13,7 +27,6 @@ npm install vitrea-client
 ```ts
 import * as Requests                     from 'vitrea-client/requests'
 import { ProtocolVersion, VitreaClient } from 'vitrea-client'
-
 
 const client = VitreaClient.create({
     host:     '192.168.1.111',
