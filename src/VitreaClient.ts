@@ -1,24 +1,25 @@
-import { Mutex }                       from 'async-mutex'
-import { Timeout }                     from './socket/Timeout'
-import { AbstractSocket }              from './socket/AbstractSocket'
-import { ProtocolVersion }             from './utilities/ProtocolVersion'
-import { ResponseFactory }             from './responses/ResponseFactory'
-import { SplitMultipleBuffers }        from './utilities/SplitMultipleBuffers'
-import { Login, ToggleHeartbeat }      from './requests'
-import { VitreaHeartbeatHandler }      from './socket/VitreaHeartbeatHandler'
-import { VBoxConfigs, VBoxConnection } from './utilities/VBoxConnection'
-import Net                             from 'net'
-import * as Core                       from './core'
+import { Mutex }                         from 'async-mutex'
+import { Timeout }                       from './socket/Timeout'
+import { ProtocolVersion }               from './utilities/ProtocolVersion'
+import { ResponseFactory }               from './responses/ResponseFactory'
+import { SplitMultipleBuffers }          from './utilities/SplitMultipleBuffers'
+import { Login, ToggleHeartbeat }        from './requests'
+import { VitreaHeartbeatHandler }        from './socket/VitreaHeartbeatHandler'
+import { VBoxConfigs, VBoxConnection }   from './utilities/VBoxConnection'
+import { AbstractSocket, SocketConfigs } from './socket/AbstractSocket'
+import Net                               from 'net'
+import * as Core                         from './core'
+
 
 export class VitreaClient extends AbstractSocket {
     protected readonly mutex = new Mutex()
     protected readonly configs: VBoxConfigs
     protected readonly version: ProtocolVersion
 
-    protected constructor(configs: Required<VBoxConfigs>) {
-        super(configs.host, configs.port)
+    protected constructor(configs: Required<VBoxConfigs>, socketConfigs: SocketConfigs) {
+        super(configs.host, configs.port, socketConfigs)
         this.configs = configs
-        this.heartbeat = VitreaHeartbeatHandler.create(this)
+        this.heartbeat = new VitreaHeartbeatHandler(this)
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
@@ -89,9 +90,10 @@ export class VitreaClient extends AbstractSocket {
         }
     }
 
-    public static create(configs: Partial<VBoxConfigs> = {}) {
+    public static create(configs: Partial<VBoxConfigs> = {}, socketConfigs: SocketConfigs = {}) {
         return new this(
-            VBoxConnection.create(configs)
+            VBoxConnection.create(configs),
+            socketConfigs
         )
     }
 }
