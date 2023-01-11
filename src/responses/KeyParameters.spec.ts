@@ -26,4 +26,27 @@ describe('KeyParameters', () => {
 
         expect(new KeyParameters(buffer)).toStrictEqual(new KeyParameters(raw))
     })
+
+
+    it('[logData] retrieve data to log', () => {
+        const dataGram = new KeyParameters(raw)
+
+        expect(dataGram.logData).toStrictEqual({
+            command:          'KeyParameters',
+            commandID:        '0x2B',
+            direction:        'Incoming',
+            messageID:        '0x78',
+            hasValidChecksum: true,
+            category:         1,
+            name:             'Dining Room Toilet',
+            nodeID:           1,
+            keyID:            0,
+            raw:              [
+                '56:54:55:3C:2B:00:33:78:01:00:FF:01:00:78:78:01:64',
+                '01:00:00:24:44:00:69:00:6E:00:69:00:6E:00:67:00:20',
+                '00:52:00:6F:00:6F:00:6D:00:20:00:54:00:6F:00:69:00',
+                '6C:00:65:00:74:00',
+            ].join(':')
+        })
+    })
 })

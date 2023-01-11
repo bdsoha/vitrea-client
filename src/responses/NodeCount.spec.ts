@@ -24,4 +24,19 @@ describe('NodeCount', () => {
 
         expect(new NodeCount(buffer)).toStrictEqual(new NodeCount(raw))
     })
+
+    it('[logData] retrieve data to log', () => {
+        const dataGram = new NodeCount(raw)
+
+        expect(dataGram.logData).toStrictEqual({
+            command:          'NodeCount',
+            commandID:        '0x24',
+            direction:        'Incoming',
+            messageID:        '0x3B',
+            hasValidChecksum: true,
+            total:            15,
+            list:             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16,],
+            raw:              '56:54:55:3C:24:00:12:3B:0F:01:02:03:04:05:06:07:08:09:0A:0B:0D:0E:0F:10'
+        })
+    })
 })

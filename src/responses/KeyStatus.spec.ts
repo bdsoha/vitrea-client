@@ -24,4 +24,10 @@ describe('KeyStatus', () => {
 
         expect(new KeyStatus(buffer)).toStrictEqual(new KeyStatus(raw))
     })
+
+    it('[eventName] uses the *status update* event name', () => {
+        const command = new KeyStatus(raw)
+
+        expect(command).toHaveProperty('eventName', 'vitrea::status::update')
+    })
 })
