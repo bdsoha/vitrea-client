@@ -1,6 +1,12 @@
 # Vitrea Client
 
-> Vitrea Smart Home API Client
+**Vitrea Smart Home API Client**
+
+![GitHub Workflow Status (with branch)](https://img.shields.io/github/actions/workflow/status/bdsoha/vitrea-client/test.yml?branch=develop&logo=github&style=for-the-badge)
+![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/bdsoha/vitrea-client?logo=codeclimate&style=for-the-badge)
+![Code Climate coverage](https://img.shields.io/codeclimate/coverage/bdsoha/vitrea-client?logo=codeclimate&style=for-the-badge)
+
+---
 
 ## Installation
 
