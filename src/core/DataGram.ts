@@ -52,12 +52,15 @@ export abstract class DataGram {
         return this.constructor
     }
 
+    protected toHex(number: number): string {
+        return ['0x', number.toString(16).padStart(2, '0').toUpperCase()].join('')
+    }
+
     protected toHexString(buffer?: number[]): string {
         buffer = buffer ?? this.buffer
 
         return buffer
-            .map(entry => entry.toString(16).padStart(2, '0'))
-            .map(octal => octal.toUpperCase())
+            .map(entry => this.toHex(entry).replace('0x', ''))
             .join(':')
     }
 
@@ -134,8 +137,8 @@ export abstract class DataGram {
         return {
             command:   this.commandName,
             direction: DataGramDirection.INCOMING === this.direction ? 'Incoming' : 'Outgoing',
-            commandID: this.commandID.toString(16),
-            messageID: this.messageID.toString(16),
+            commandID: this.toHex(this.commandID),
+            messageID: this.toHex(this.messageID),
             ...this.toLog,
             raw:       this.toHexString()
         }

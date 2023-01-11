@@ -106,4 +106,17 @@ describe('BaseRequest', () => {
 
         expect(dataGram.dataLength).toStrictEqual([0x00, 0x02])
     })
+
+    it('[logData] retrieve data to log', () => {
+        const dataGram = new SampleRequest(0xFF)
+
+        expect(dataGram.logData).toStrictEqual({
+            command:   'SampleRequest',
+            commandID: '0xFF',
+            data:      '',
+            direction: 'Outgoing',
+            messageID: '0x01',
+            raw:       '56:54:55:3E:FF:00:02:01',
+        })
+    })
 })
