@@ -1,9 +1,9 @@
-import { Timeout } from './Timeout'
-import { EventEmitter } from 'events'
-import { WritableSocketContract } from './WritableSocketContract'
-import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
+import { Timeout }                    from './Timeout'
+import { EventEmitter }               from 'events'
+import { WritableSocketContract }     from './WritableSocketContract'
+import { AbstractHeartbeatHandler }   from './AbstractHeartbeatHandler'
 import { LoggerContract, NullLogger } from '../core'
-import * as Net from 'net'
+import * as Net                       from 'net'
 
 
 type SocketConfigs = Partial<{
