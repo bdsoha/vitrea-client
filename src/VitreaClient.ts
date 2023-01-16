@@ -7,7 +7,6 @@ import { Login, ToggleHeartbeat }        from './requests'
 import { VitreaHeartbeatHandler }        from './socket/VitreaHeartbeatHandler'
 import { VBoxConfigs, VBoxConnection }   from './utilities/VBoxConnection'
 import { AbstractSocket, SocketConfigs } from './socket/AbstractSocket'
-import Net                               from 'net'
 import * as Core                         from './core'
 
 
@@ -62,8 +61,8 @@ export class VitreaClient extends AbstractSocket {
         })
     }
 
-    protected async onConnect(socket: Net.Socket) {
-        await super.onConnect(socket)
+    protected async onConnect() {
+        await super.onConnect()
 
         await this.send(new ToggleHeartbeat())
 

@@ -5,7 +5,7 @@ export class Events {
         return this.generate(0x00, messageID)
     }
 
-    public static generate(...keys: any[]) : string {
+    public static generate(...keys: Array<string | number>): string {
         const toJoin = keys.map(key => key.toString(16).padStart(2, '0'))
 
         return `data::${toJoin.join('-')}`

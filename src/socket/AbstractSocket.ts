@@ -10,6 +10,7 @@ import * as Exceptions                from '../exceptions'
 export type SocketConfigs = Partial<{
     log: LoggerContract,
     socketSupplier: () => Net.Socket,
+    shouldReconnect: boolean
 }>
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
@@ -22,31 +23,27 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     protected constructor(
         protected readonly host: string,
         protected readonly port: number,
-        { log = new NullLogger(), socketSupplier = undefined }: SocketConfigs = {}
+        { log = new NullLogger(), socketSupplier = undefined, shouldReconnect = true }: SocketConfigs = {}
     ) {
         super()
         this.socketSupplier = socketSupplier
         this.log = log
-        this.shouldReconnect = true
-    }
-
-    public get isConnected(): boolean {
-        return !!this.socket
+        this.shouldReconnect = shouldReconnect
     }
 
     protected createNewSocket(): Net.Socket {
-        const socket = this.socketSupplier
+        this.socket = this.socketSupplier
             ? this.socketSupplier()
             : new Net.Socket()
 
-        return socket
-            .on('connect', () => this.onConnect(socket))
+        return this.socket
+            .on('connect', this.onConnect.bind(this))
             .on('data', this.onData.bind(this))
             .on('end', this.onDisconnect.bind(this))
             .on('error', this.onError.bind(this))
     }
 
-    public async connect() {
+    public async connect() :Promise<void> {
         this.log.debug('Attempting to make a connection')
 
         if (this.socket) {
@@ -75,10 +72,10 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     public disconnect() {
         if (this.socket) {
             this.log.info('Forced a disconnection')
+            this.heartbeat?.pause()
             this.shouldReconnect = false
             this.socket.end()
             this.socket = undefined
-            this.heartbeat?.pause()
         }
     }
 
@@ -109,6 +106,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
 
         if (this.shouldReconnect) {
             this.log.info('Automatically reconnecting', { shouldReconnect: this.shouldReconnect })
+
             return await this.connect()
         }
 
@@ -120,10 +118,11 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         this.log.error(`An error occurred - ${error.message}`)
     }
 
-    protected async onConnect(socket: Net.Socket) {
+    protected async onConnect() {
         this.log.debug('Connection established')
-        this.socket = socket
+
         this.shouldReconnect = true
+
         this.restartHeartbeat()
     }
 

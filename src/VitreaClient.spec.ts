@@ -1,7 +1,11 @@
-import { Socket }        from 'net'
-import { VitreaClient }  from './VitreaClient'
-import { SocketConfigs } from './socket/AbstractSocket'
-import * as Exceptions   from './exceptions'
+import { Socket }                    from 'net'
+import { BaseRequest, BaseResponse } from './core'
+import { VitreaClient }              from './VitreaClient'
+import { SocketConfigs }             from './socket/AbstractSocket'
+import { RoomMetaDataV2 }            from './responses'
+import * as Exceptions               from './exceptions'
+import { Login, ToggleHeartbeat }    from './requests'
+
 
 describe('VitreaClient', () => {
     jest.useFakeTimers()
@@ -42,11 +46,104 @@ describe('VitreaClient', () => {
         }
     })
 
+    it('[onConnect] sends login and heartbeat requests', async () => {
+        expect.assertions(2)
+
+        const socket = new Socket()
+
+        const client = getClient({ socketSupplier: () => socket })
+
+        jest.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
+            expect(request).toBeInstanceOf(ToggleHeartbeat)
+            return undefined
+        })
+
+        jest.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
+            expect(request).toBeInstanceOf(Login)
+            return undefined
+        })
+
+        // @ts-ignore
+        client.createNewSocket()
+
+        socket.emit('connect')
+    })
+
     it('[write] cannot write to a disconnected socket', async () => {
         const buffer = Buffer.from([])
 
         await expect(getClient().write(buffer)).rejects.toBeInstanceOf(
             Exceptions.NoConnectionException
         )
+    })
+
+    it('[onDisconnect] will attempt to reconnect by default', async () => {
+        const socket = new Socket()
+
+        const mock = jest.spyOn(socket, 'connect').mockImplementation(() => socket)
+
+        const client = getClient({ socketSupplier: () => socket })
+
+        // @ts-ignore
+        client.createNewSocket()
+
+        expect(mock).not.toHaveBeenCalled()
+
+        socket.emit('end')
+
+        expect(mock).toBeCalledTimes(1)
+    })
+
+    it('[onDisconnect] will not attempt to reconnect by default', async () => {
+        const socket = new Socket()
+
+        const mock = jest.spyOn(socket, 'connect')
+
+        const client = getClient({ shouldReconnect: false,  socketSupplier: () => socket })
+
+        // @ts-ignore
+        client.createNewSocket()
+
+        socket.emit('end')
+
+        expect(mock).not.toHaveBeenCalled()
+    })
+
+    it('[onData] will fire an event for received buffer', async () => {
+        expect.assertions(1)
+
+        const buffer = Buffer.from([
+            0x56, 0x54, 0x55, 0x3C, 0x1A, 0x00, 0x15, 0x1F, 0x00, 0x00, 0x10,
+            0x45, 0x00, 0x6E, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6E,
+            0x00, 0x63, 0x00, 0x65, 0x00, 0xC9,
+        ])
+
+        const socket = new Socket()
+
+        const client = getClient({ socketSupplier: () => socket })
+
+        // @ts-ignore
+        client.createNewSocket()
+
+        client.addListener('data::1a-1f', (response: BaseResponse) => {
+            expect(response).toBeInstanceOf(RoomMetaDataV2)
+        })
+
+        socket.emit('data', buffer)
+    })
+
+    it('[disconnect] will not attempt to reconnect when explicitly disconnected', async () => {
+        const socket = new Socket()
+
+        const mock = jest.spyOn(socket, 'connect')
+
+        const client = getClient({ socketSupplier: () => socket })
+
+        // @ts-ignore
+        client.createNewSocket()
+
+        client.disconnect()
+
+        expect(mock).not.toHaveBeenCalled()
     })
 })
