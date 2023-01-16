@@ -21,7 +21,6 @@ const lookup: Record<CommandID, typeof BaseResponse> = {
 const lookupv2: Record<CommandID, typeof BaseResponse> = {
     ...lookup,
     [CommandID.NodeMetaData]: Responses.NodeMetaDataV2,
-    [CommandID.RoomMetaData]: Responses.RoomMetaDataV2
 } as const
 
 export class ResponseFactory {
