@@ -1,10 +1,10 @@
 import { Socket }                    from 'net'
-import { BaseRequest, BaseResponse } from './core'
+import { RoomMetaData }              from './responses'
 import { VitreaClient }              from './VitreaClient'
 import { SocketConfigs }             from './socket/AbstractSocket'
-import { RoomMetaDataV2 }            from './responses'
 import * as Exceptions               from './exceptions'
 import { Login, ToggleHeartbeat }    from './requests'
+import { BaseRequest, BaseResponse } from './core'
 
 
 describe('VitreaClient', () => {
@@ -126,7 +126,7 @@ describe('VitreaClient', () => {
         client.createNewSocket()
 
         client.addListener('data::1a-1f', (response: BaseResponse) => {
-            expect(response).toBeInstanceOf(RoomMetaDataV2)
+            expect(response).toBeInstanceOf(RoomMetaData)
         })
 
         socket.emit('data', buffer)
