@@ -7,8 +7,8 @@ import { Login, ToggleHeartbeat }        from './requests'
 import { VitreaHeartbeatHandler }        from './socket/VitreaHeartbeatHandler'
 import { VBoxConfigs, VBoxConnection }   from './utilities/VBoxConnection'
 import { AbstractSocket, SocketConfigs } from './socket/AbstractSocket'
-import Net                               from 'net'
 import * as Core                         from './core'
+import { Events }                        from './utilities/Events'
 
 
 export class VitreaClient extends AbstractSocket {
@@ -22,12 +22,20 @@ export class VitreaClient extends AbstractSocket {
         this.heartbeat = new VitreaHeartbeatHandler(this)
     }
 
+    protected async acquire(eventName: string) {
+        this.log.debug('Waiting for mutex', eventName)
+
+        const release = await this.mutex.acquire()
+
+        this.log.debug('Acquired mutex', eventName)
+
+        return release
+    }
+
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
         const eventName = { eventName: request.eventName }
 
-        this.log.debug('Waiting for mutex', eventName)
-        const release = await this.mutex.acquire()
-        this.log.debug('Acquired mutex', eventName)
+        const release = await this.acquire(eventName.eventName)
 
         return new Promise(res => {
             this.log.info('Sending data', request.logData)
@@ -62,8 +70,8 @@ export class VitreaClient extends AbstractSocket {
         })
     }
 
-    protected async onConnect(socket: Net.Socket) {
-        await super.onConnect(socket)
+    protected async onConnect() {
+        await super.onConnect()
 
         await this.send(new ToggleHeartbeat())
 
@@ -86,8 +94,12 @@ export class VitreaClient extends AbstractSocket {
 
             this.emit(response.eventName, response)
         } else {
-            this.log.warn('Ignoring unrecognized received data', { raw: data.toString('hex') })
+            this.emit(Events.UNKNOWN_DATA, data)
         }
+    }
+
+    protected onUnknownData(data: Buffer): void {
+        this.log.warn('Ignoring unrecognized received data', { raw: data.toString('hex') })
     }
 
     public static create(configs: Partial<VBoxConfigs> = {}, socketConfigs: SocketConfigs = {}) {
