@@ -1,8 +1,8 @@
-import { CommandID }              from './ResponseCodes'
-import { ProtocolVersion }        from '../utilities/ProtocolVersion'
-import { DataGramDirection }      from '../utilities/Enums'
-import { BaseResponse, DataGram } from '../core'
-import * as Responses             from '.'
+import { CommandID }              from '../ResponseCodes'
+import { ProtocolVersion }        from '../../utilities/ProtocolVersion'
+import { DataGramDirection }      from '../../utilities/Enums'
+import { BaseResponse, DataGram } from '../../core'
+import * as Responses             from '..'
 
 const lookup: Record<CommandID, typeof BaseResponse> = {
     [CommandID.Acknowledgement]:      Responses.Acknowledgement,
@@ -20,7 +20,8 @@ const lookup: Record<CommandID, typeof BaseResponse> = {
 
 const lookupv2: Record<CommandID, typeof BaseResponse> = {
     ...lookup,
-    [CommandID.NodeMetaData]: Responses.NodeMetaDataV2,
+    [CommandID.NodeMetaData]:  Responses.NodeMetaDataV2,
+    [CommandID.KeyParameters]: Responses.KeyParametersV2,
 } as const
 
 export class ResponseFactory {
