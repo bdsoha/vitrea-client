@@ -67,11 +67,7 @@ export abstract class DataGram {
     protected bufferToString(offset: number, buffer?: number[]): string {
         buffer = buffer ?? this.buffer
 
-        return buffer
-            .slice(offset)
-            .filter(Boolean)
-            .map(hex => String.fromCharCode(hex))
-            .join('')
+        return Buffer.from(buffer.slice(offset)).toString('utf16le')
     }
 
     protected get length() {
