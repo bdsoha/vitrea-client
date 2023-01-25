@@ -1,7 +1,7 @@
 import { Mutex }                         from 'async-mutex'
 import { Timeout }                       from './socket/Timeout'
 import { ProtocolVersion }               from './utilities/ProtocolVersion'
-import { ResponseFactory }               from './responses/ResponseFactory'
+import { ResponseFactory }               from './responses/helpers'
 import { SplitMultipleBuffers }          from './utilities/SplitMultipleBuffers'
 import { Login, ToggleHeartbeat }        from './requests'
 import { VitreaHeartbeatHandler }        from './socket/VitreaHeartbeatHandler'

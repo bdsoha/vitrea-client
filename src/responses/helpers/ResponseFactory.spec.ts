@@ -1,8 +1,8 @@
-import { RoomCount }         from './RoomCount'
-import { ProtocolVersion }   from '../utilities/ProtocolVersion'
+import { RoomCount }         from '../RoomCount'
+import { NodeMetaDataV2 }    from '../NodeMetaDataV2'
+import { ProtocolVersion }   from '../../utilities/ProtocolVersion'
 import { ResponseFactory }   from './ResponseFactory'
-import { DataGramDirection } from '../utilities/Enums'
-import { NodeMetaDataV2 }    from './NodeMetaDataV2'
+import { DataGramDirection } from '../../utilities/Enums'
 
 
 describe('ResponseFactory', () => {
