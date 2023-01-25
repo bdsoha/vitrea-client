@@ -28,11 +28,10 @@ describe('RoomMetaData', () => {
             .toStrictEqual(new RoomMetaData(raw))
     })
 
-    it('[bufferToString] displays correctly UTF-16 little endian strings (Hebrew, Arabic) room names', () => {
-
+    it('displays room names in Hebrew', () => {
         const response = new RoomMetaData(hebrewRoomName)
+
         expect(response).toHaveProperty('commandID', 0x1A)
         expect(response).toHaveProperty('name', 'מטבח')
-
     })
 })
