@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export interface LoggerContract<T = any, R = void> {
     log(message: string, level: string): R
 
