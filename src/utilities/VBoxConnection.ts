@@ -13,7 +13,7 @@ export class VBoxConnection {
     protected static get<T extends keyof VBoxConfigs>(
         configs: Partial<VBoxConfigs>,
         key: T,
-        fallback: any = null,
+        fallback: VBoxConfigs[T] = null,
     ) {
         const found = configs[key] ?? process.env[`VITREA_VBOX_${key.toUpperCase()}`] ?? fallback
 
@@ -30,7 +30,7 @@ export class VBoxConnection {
             port:     Number(this.get(configs, 'port', 11501)),
             username: this.get(configs, 'username'),
             password: this.get(configs, 'password'),
-            version:  this.get(configs, 'version', ProtocolVersion.V2),
+            version:  this.get(configs, 'version', ProtocolVersion.V2) as ProtocolVersion,
         }
     }
 }

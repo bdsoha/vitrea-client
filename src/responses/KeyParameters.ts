@@ -6,7 +6,7 @@ export class KeyParameters extends BaseResponse {
     protected static readonly nodeIDIndex = 8
     protected static readonly keyIDIndex = 9
     protected static readonly categoryIndex = 11
-    protected static readonly nameIndex = 21
+    protected static readonly nameIndex: number = 20
 
     public get name() {
         return this.bufferToString(this.$self.nameIndex)
