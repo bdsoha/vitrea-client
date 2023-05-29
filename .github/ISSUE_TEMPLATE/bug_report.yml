@@ -22,8 +22,11 @@ body:
       description: |
         Please add a self-contained, [minimal, reproducible, example](https://stackoverflow.com/help/minimal-reproducible-example) with your use case.
       placeholder: |
-        import * as Requests                     from 'vitrea-client/requests'
-        import { ProtocolVersion, VitreaClient } from 'vitrea-client'
+        import { 
+          ProtocolVersion,
+          Requests,
+          VitreaClient 
+        } from 'vitrea-client'
 
         const client = VitreaClient.create({
             host:     '192.168.1.111',
