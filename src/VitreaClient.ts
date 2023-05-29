@@ -1,4 +1,5 @@
 import { Mutex }                         from 'async-mutex'
+import { Events }                        from './utilities/Events'
 import { Timeout }                       from './socket/Timeout'
 import { ProtocolVersion }               from './utilities/ProtocolVersion'
 import { ResponseFactory }               from './responses/helpers'
@@ -8,7 +9,6 @@ import { VitreaHeartbeatHandler }        from './socket/VitreaHeartbeatHandler'
 import { VBoxConfigs, VBoxConnection }   from './utilities/VBoxConnection'
 import { AbstractSocket, SocketConfigs } from './socket/AbstractSocket'
 import * as Core                         from './core'
-import { Events }                        from './utilities/Events'
 
 
 export class VitreaClient extends AbstractSocket {
