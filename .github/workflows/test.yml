@@ -1,6 +1,6 @@
 name: 🧪 Test
 
-on: 
+on:
   push:
 
 jobs:
@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: 📚 Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔵 Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
           cache: yarn
 
       - name: ⏬ Install Dependencies
@@ -26,7 +26,7 @@ jobs:
         run: npm run test:cov
 
       - name: 💯 Coverage
-        uses: paambaati/codeclimate-action@v4.0.0
+        uses: paambaati/codeclimate-action@v9.0.0
         if: github.ref == 'refs/heads/master'
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
