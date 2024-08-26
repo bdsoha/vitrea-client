@@ -16,6 +16,10 @@
 
 ---
 
+## Requirements
+
+Version `"^18.17.0 || >=20.5.0"` of NodeJS is required to install this package.
+
 ## Installation
 
 ```bash
@@ -25,10 +29,10 @@ npm install vitrea-client
 ## Usage
 
 ```ts
-import { 
+import {
     ProtocolVersion,
     Requests,
-    VitreaClient 
+    VitreaClient
 } from 'vitrea-client'
 
 
