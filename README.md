@@ -48,3 +48,45 @@ await client.connect()
 
 await client.send(new Requests.RoomCount())
 ```
+
+### Add Existing Logger
+
+If you already have a *logger* that implements the interface below, you can integrate
+it as follows:
+
+```ts
+import { getLogger }    from '@/core/logger'
+import { VitreaClient } from 'vitrea-client'
+
+const client = VitreaClient.create(
+    {
+        host:     '192.168.1.111',
+        port:     1234,
+        username: 'admin',
+        password: 'secret',
+    },
+    {
+        log: getLogger('vBox')
+    }
+)
+```
+
+```ts
+export interface Logger {
+    log(message: string, level: string) : void
+
+    error(message : string, meta? : Record<string, any>) : void
+
+    warn(message : string, meta? : Record<string, any>) : void
+
+    info(message : string, meta? : Record<string, any>) : void
+
+    http(message : string, meta? : Record<string, any>) : void
+
+    debug(message : string, meta? : Record<string, any>) : void
+
+    silly(message : string, meta? : Record<string, any>) : void
+
+    verbose(message : string, meta? : Record<string, any>) : void
+}
+```
