@@ -16,19 +16,19 @@ describe('VitreaHeartbeatHandler', () => {
     it('[constructor] is paused by default', () => {
         const handler = new VitreaHeartbeatHandler(socket)
 
-        expect(socket.write).toBeCalledTimes(0)
+        expect(socket.write).toHaveBeenCalledTimes(0)
         expect(handler.isPaused).toBeTruthy()
     })
 
     it('[create] is not paused by default', () => {
         const handler = VitreaHeartbeatHandler.create(socket)
 
-        expect(socket.write).toBeCalledTimes(0)
+        expect(socket.write).toHaveBeenCalledTimes(0)
         expect(handler.isPaused).toBeFalsy()
 
         jest.advanceTimersByTime(3000)
 
-        expect(socket.write).toBeCalledTimes(1)
+        expect(socket.write).toHaveBeenCalledTimes(1)
     })
 
     it('[pause] can pause', () => {
@@ -38,7 +38,7 @@ describe('VitreaHeartbeatHandler', () => {
 
         handler.pause()
 
-        expect(socket.write).toBeCalledTimes(0)
+        expect(socket.write).toHaveBeenCalledTimes(0)
         expect(handler.isPaused).toBeTruthy()
     })
 

@@ -37,10 +37,10 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
             : new Net.Socket()
 
         return this.socket
-            .on('connect', this.onConnect.bind(this))
-            .on('data', this.onData.bind(this))
-            .on('end', this.onDisconnect.bind(this))
-            .on('error', this.onError.bind(this))
+            .on('connect', this.handleConnect.bind(this))
+            .on('data', this.handleData.bind(this))
+            .on('end', this.handleDisconnect.bind(this))
+            .on('error', this.handleError.bind(this))
     }
 
     public async connect() :Promise<void> {
@@ -99,7 +99,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         })
     }
 
-    protected async onDisconnect() {
+    protected async handleDisconnect() {
         this.log.debug('Connection closed')
 
         this.socket = undefined
@@ -113,12 +113,12 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         this.log.info('Not reconnecting', { shouldReconnect: this.shouldReconnect })
     }
 
-    protected onError(error: Error) {
+    protected handleError(error: Error) {
         this.shouldReconnect = false
         this.log.error(`An error occurred - ${error.message}`)
     }
 
-    protected async onConnect() {
+    protected async handleConnect() {
         this.log.debug('Connection established')
 
         this.shouldReconnect = true
@@ -130,7 +130,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         this.heartbeat?.restart()
     }
 
-    protected abstract onData(data: Buffer): void
+    protected abstract handleData(data: Buffer): void
 
-    protected abstract onUnknownData(data: Buffer): void
+    protected abstract handleUnknownData(data: Buffer): void
 }
