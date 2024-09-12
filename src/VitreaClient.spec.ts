@@ -91,7 +91,7 @@ describe('VitreaClient', () => {
 
         socket.emit('end')
 
-        expect(mock).toBeCalledTimes(1)
+        expect(mock).toHaveBeenCalledTimes(1)
     })
 
     it('[onDisconnect] will not attempt to reconnect by default', async () => {

@@ -1,3 +1,4 @@
+export { Events }          from './utilities/Events'
 export { VitreaClient }    from './VitreaClient'
 export { ProtocolVersion } from './utilities/ProtocolVersion'
 export * as Enums          from './utilities/Enums'

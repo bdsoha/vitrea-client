@@ -70,19 +70,19 @@ export class VitreaClient extends AbstractSocket {
         })
     }
 
-    protected async onConnect() {
-        await super.onConnect()
+    protected async handleConnect() {
+        await super.handleConnect()
 
         await this.send(new ToggleHeartbeat())
 
         await this.send(new Login(this.configs.username, this.configs.password))
     }
 
-    protected onData(data: Buffer): void {
+    protected handleData(data: Buffer): void {
         const split = SplitMultipleBuffers.handle(data)
 
         if (split.length > 1) {
-            return split.forEach(buffer => this.onData(buffer))
+            return split.forEach(buffer => this.handleData(buffer))
         }
 
         data = split[0]
@@ -98,7 +98,7 @@ export class VitreaClient extends AbstractSocket {
         }
     }
 
-    protected onUnknownData(data: Buffer): void {
+    protected handleUnknownData(data: Buffer): void {
         this.log.warn('Ignoring unrecognized received data', { raw: data.toString('hex') })
     }
 

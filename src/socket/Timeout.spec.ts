@@ -30,7 +30,7 @@ describe('Timeout', () => {
             expect(e).toBeInstanceOf(TimeoutException)
         }
 
-        expect(onTimeout).toBeCalledTimes(1)
+        expect(onTimeout).toHaveBeenCalledTimes(1)
         expect(onTimeout).toHaveBeenCalledWith(new TimeoutException('hello world'))
     })
 
