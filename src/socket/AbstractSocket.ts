@@ -11,6 +11,7 @@ export type SocketConfigs = Partial<{
     log: LoggerContract,
     socketSupplier: () => Net.Socket,
     shouldReconnect: boolean
+    requestTimeout: number
 }>
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
@@ -19,16 +20,23 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     protected shouldReconnect: boolean
     protected readonly socketSupplier?: SocketConfigs['socketSupplier']
     protected readonly log: LoggerContract
+    protected readonly requestTimeout: number
 
     protected constructor(
         protected readonly host: string,
         protected readonly port: number,
-        { log = new NullLogger(), socketSupplier = undefined, shouldReconnect = true }: SocketConfigs = {}
+        {
+            log = new NullLogger(),
+            socketSupplier = undefined,
+            shouldReconnect = true,
+            requestTimeout = 1000
+        }: SocketConfigs = {}
     ) {
         super()
         this.socketSupplier = socketSupplier
         this.log = log
         this.shouldReconnect = shouldReconnect
+        this.requestTimeout = requestTimeout
     }
 
     protected createNewSocket(): Net.Socket {
@@ -55,7 +63,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         }
 
         return new Promise(res => {
-            const timeout = Timeout.create(1000)
+            const timeout = Timeout.create(this.requestTimeout)
 
             this.createNewSocket()
                 .on('connect', () => {
