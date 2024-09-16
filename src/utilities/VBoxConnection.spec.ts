@@ -30,7 +30,7 @@ describe('VBoxConnection', () => {
         })
     })
 
-    it('[create] uses paramaters when available', () => {
+    it('[create] uses parameters when available', () => {
         const client = VBoxConnection.create({
             host:     '192.168.1.111',
             port:     1234,

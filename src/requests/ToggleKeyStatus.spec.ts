@@ -16,7 +16,7 @@ describe('ToggleKeyStatus ', () => {
     })
 
     it('sets dimmer ratio', () => {
-        const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF, {dimmerRatio: 99})
+        const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF, { dimmerRatio: 99 })
 
         expect(command.build()).toStrictEqual(Buffer.from([
             0x56, 0x54, 0x55, 0x3E, 0x28, 0x00, 0x08, 0x79, 0x01,
@@ -25,7 +25,7 @@ describe('ToggleKeyStatus ', () => {
     })
 
     it('sets timer', () => {
-        const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF, {timer: 6890})
+        const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF, { timer: 6890 })
 
         expect(command.build()).toStrictEqual(Buffer.from([
             0x56, 0x54, 0x55, 0x3E, 0x28, 0x00, 0x08, 0x79, 0x01,

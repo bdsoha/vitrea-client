@@ -1,6 +1,7 @@
 import { Mutex }                         from 'async-mutex'
 import { Events }                        from './utilities/Events'
 import { Timeout }                       from './socket/Timeout'
+import { KeyStatus }                     from './responses'
 import { ProtocolVersion }               from './utilities/ProtocolVersion'
 import { ResponseFactory }               from './responses/helpers'
 import { SplitMultipleBuffers }          from './utilities/SplitMultipleBuffers'
@@ -100,6 +101,10 @@ export class VitreaClient extends AbstractSocket {
 
     protected handleUnknownData(data: Buffer): void {
         this.log.warn('Ignoring unrecognized received data', { raw: data.toString('hex') })
+    }
+
+    public onKeyStatus(listener: (status: KeyStatus) => void): void {
+        this.on(Events.STATUS_UPDATE, listener)
     }
 
     public static create(configs: Partial<VBoxConfigs> = {}, socketConfigs: SocketConfigs = {}) {
