@@ -30,7 +30,7 @@ describe('NodeMetaDataV2', () => {
         })
     })
 
-    it('recieves a buffer or an array', () => {
+    it('receives a buffer or an array', () => {
         const buffer = Buffer.from(raw)
 
         expect(new NodeMetaDataV2(buffer)).toStrictEqual(new NodeMetaDataV2(raw))

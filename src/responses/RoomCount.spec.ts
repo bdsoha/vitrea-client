@@ -17,7 +17,7 @@ describe('RoomCount', () => {
         ])
     })
 
-    it('recieves a buffer or an array', () => {
+    it('receives a buffer or an array', () => {
         const buffer = Buffer.from(raw)
 
         expect(new RoomCount(buffer)).toStrictEqual(new RoomCount(raw))

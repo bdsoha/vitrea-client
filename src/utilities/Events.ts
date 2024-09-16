@@ -1,6 +1,6 @@
 export class Events {
-    public static readonly STATUS_UPDATE = 'vitrea::status::update'
-    public static readonly UNKNOWN_DATA = 'vitrea::data::unknown'
+    public static readonly STATUS_UPDATE: string = 'vitrea::status::update'
+    public static readonly UNKNOWN_DATA: string = 'vitrea::data::unknown'
 
     public static acknowledgement(messageID: number): string {
         return this.generate(0x00, messageID)

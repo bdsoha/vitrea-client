@@ -21,7 +21,7 @@ describe('KeyParametersV2', () => {
         expect(response).toHaveProperty('category', KeyCategory.LIGHT)
     })
 
-    it('recieves a buffer or an array', () => {
+    it('receives a buffer or an array', () => {
         const buffer = Buffer.from(raw)
 
         expect(new KeyParametersV2(buffer)).toStrictEqual(new KeyParametersV2(raw))

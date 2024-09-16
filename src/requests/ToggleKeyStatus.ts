@@ -1,5 +1,5 @@
-import { Events } from '../utilities/Events'
-import { BaseRequest } from '../core'
+import { Events }         from '../utilities/Events'
+import { BaseRequest }    from '../core'
 import { KeyPowerStatus } from '../utilities/Enums'
 
 

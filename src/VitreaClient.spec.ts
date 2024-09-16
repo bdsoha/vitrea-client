@@ -1,11 +1,10 @@
 import { Socket }                    from 'net'
-import { RoomMetaData }              from './responses'
+import { KeyStatus, RoomMetaData }   from './responses'
 import { VitreaClient }              from './VitreaClient'
 import { SocketConfigs }             from './socket/AbstractSocket'
 import * as Exceptions               from './exceptions'
 import { Login, ToggleHeartbeat }    from './requests'
 import { BaseRequest, BaseResponse } from './core'
-
 
 describe('VitreaClient', () => {
     jest.useFakeTimers()
@@ -46,7 +45,7 @@ describe('VitreaClient', () => {
         }
     })
 
-    it('[onConnect] sends login and heartbeat requests', async () => {
+    it('[handleConnect] sends login and heartbeat requests', async () => {
         expect.assertions(2)
 
         const socket = new Socket()
@@ -77,7 +76,7 @@ describe('VitreaClient', () => {
         )
     })
 
-    it('[onDisconnect] will attempt to reconnect by default', async () => {
+    it('[handleDisconnect] will attempt to reconnect by default', async () => {
         const socket = new Socket()
 
         const mock = jest.spyOn(socket, 'connect').mockImplementation(() => socket)
@@ -94,7 +93,7 @@ describe('VitreaClient', () => {
         expect(mock).toHaveBeenCalledTimes(1)
     })
 
-    it('[onDisconnect] will not attempt to reconnect by default', async () => {
+    it('[handleDisconnect] will not attempt to reconnect by default', async () => {
         const socket = new Socket()
 
         const mock = jest.spyOn(socket, 'connect')
@@ -109,7 +108,7 @@ describe('VitreaClient', () => {
         expect(mock).not.toHaveBeenCalled()
     })
 
-    it('[onData] will fire an event for received buffer', async () => {
+    it('[handleData] will fire an event for received buffer', async () => {
         expect.assertions(2)
 
         const raw = [
@@ -134,7 +133,7 @@ describe('VitreaClient', () => {
         socket.emit('data', buffer)
     })
 
-    it('[onUnknownData] will fire an event for unknown buffer', async () => {
+    it('[handleUnknownData] will fire an event for unknown buffer', async () => {
         expect.assertions(1)
 
         const buffer = Buffer.from([1, 2, 3, 4])
@@ -166,5 +165,23 @@ describe('VitreaClient', () => {
         client.disconnect()
 
         expect(mock).not.toHaveBeenCalled()
+    })
+
+    it('[onKeyStatus] can register a listener for key status changes', () => {
+        const client = getClient()
+
+        const mock = jest.fn()
+
+        client.onKeyStatus(mock)
+
+        const status = new KeyStatus([
+            0x56, 0x54, 0x55, 0x3C, 0x29, 0x00, 0x0A, 0x48, 0x01, 0x00, 0x46,
+            0x00, 0x00, 0x00, 0x41, 0x00, 0x3E,
+        ])
+
+        client.emit('vitrea::status::update', status)
+
+        expect(mock).toHaveBeenCalledTimes(1)
+        expect(mock).toHaveBeenCalledWith(status)
     })
 })

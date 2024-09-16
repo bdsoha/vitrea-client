@@ -18,7 +18,7 @@ const lookup: Record<CommandID, typeof BaseResponse> = {
     [CommandID.NodeExistenceStatus]: Responses.GenericUnusedResponse,
 } as const
 
-const lookupv2: Record<CommandID, typeof BaseResponse> = {
+const lookupV2: Record<CommandID, typeof BaseResponse> = {
     ...lookup,
     [CommandID.NodeMetaData]:  Responses.NodeMetaDataV2,
     [CommandID.KeyParameters]: Responses.KeyParametersV2,
@@ -27,7 +27,7 @@ const lookupv2: Record<CommandID, typeof BaseResponse> = {
 export class ResponseFactory {
     protected static readonly lookupTable = {
         [ProtocolVersion.V1]: lookup,
-        [ProtocolVersion.V2]: lookupv2,
+        [ProtocolVersion.V2]: lookupV2,
     }
 
     protected static isIncoming(rawBuffer: Buffer): boolean {

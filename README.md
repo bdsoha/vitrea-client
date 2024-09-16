@@ -18,7 +18,7 @@
 
 ## Requirements
 
-Version `"^18.17.0 || >=20.5.0"` of NodeJS is required to install this package.
+NodeJS version `"^18.17.0 || >=20.5.0"` is required to install this package.
 
 ## Installation
 
@@ -28,8 +28,8 @@ npm install vitrea-client
 
 ## Configurations
 
-The section below outlines the different configuration values available and their corresponding
-default settings.
+The section below outlines the different configuration values available and their
+corresponding default settings.
 
 | Config                          | Description                                | Default              |
 | ------------------------------- | ------------------------------------------ | -------------------- |
@@ -71,7 +71,7 @@ const client = VitreaClient.create({
 
 await client.connect()
 
-await client.send(new Requests.RoomCount())
+const count = await client.send(new Requests.RoomCount())
 ```
 
 ### Logging
@@ -107,4 +107,24 @@ export interface Logger {
     silly(message : string, meta? : Record<string, any>) : void
     verbose(message : string, meta? : Record<string, any>) : void
 }
+```
+
+### Status Updates
+
+Vitrea's *vBox* sends updates to the client whenever a key is pressed.
+You can supply a custom callback listener to manage these updates as they happen.
+
+```ts
+import { VitreaClient, Responses } from 'vitrea-client'
+
+const client = VitreaClient.create(...)
+
+const listener = (status: Responses.KeyStatus) => {
+    console.log(status.nodeID)
+    console.log(status.keyID)
+    console.log(status.isOff)
+    console.log(status.isOn)
+}
+
+client.onKeyStatus(listener)
 ```

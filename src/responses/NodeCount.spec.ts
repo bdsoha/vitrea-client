@@ -19,7 +19,7 @@ describe('NodeCount', () => {
         ])
     })
 
-    it('recieves a buffer or an array', () => {
+    it('receives a buffer or an array', () => {
         const buffer = Buffer.from(raw)
 
         expect(new NodeCount(buffer)).toStrictEqual(new NodeCount(raw))
