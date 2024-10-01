@@ -1,11 +1,11 @@
 import { ProtocolVersion } from './ProtocolVersion'
 
 
-export type VBoxConfigs = {
-    host: string,
-    port?: number,
-    username: string,
-    password: string,
+export interface VBoxConfigs {
+    host: string
+    port?: number
+    username: string
+    password: string
     version: ProtocolVersion
 }
 

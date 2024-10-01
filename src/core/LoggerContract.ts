@@ -9,11 +9,5 @@ export interface LoggerContract<T = any, R = void> {
 
     info(message: string, ...args: T[]): R
 
-    http(message: string, ...args: T[]): R
-
-    verbose(message: string, ...args: T[]): R
-
     debug(message: string, ...args: T[]): R
-
-    silly(message: string, ...args: T[]): R
 }

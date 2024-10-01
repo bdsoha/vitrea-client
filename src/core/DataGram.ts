@@ -64,10 +64,10 @@ export abstract class DataGram {
             .join(':')
     }
 
-    protected bufferToString(offset: number, buffer?: number[]): string {
-        buffer = buffer ?? this.buffer
+    protected bufferToString(offset: number): string {
+        const slice = this.buffer.slice(offset)
 
-        return Buffer.from(buffer.slice(offset)).toString('utf16le')
+        return Buffer.from(slice).toString('utf16le')
     }
 
     protected get length() {

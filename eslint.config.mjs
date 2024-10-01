@@ -1,92 +1,89 @@
-import js                from '@eslint/js'
-import path              from 'node:path'
-import tsParser          from '@typescript-eslint/parser'
-import alignImport       from 'eslint-plugin-align-import'
-import { FlatCompat }    from '@eslint/eslintrc'
-import typescriptEslint  from '@typescript-eslint/eslint-plugin'
-import { fileURLToPath } from 'node:url'
+import alignImport from 'eslint-plugin-align-import'
+import eslint from '@eslint/js'
+import tseslint from 'typescript-eslint'
 
-const compat = new FlatCompat({
-    baseDirectory: path.dirname(fileURLToPath(import.meta.url)),
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-})
 
-export default [{
-    ignores: ['*', '!src'],
-}, ...compat.extends('eslint:recommended', 'plugin:@typescript-eslint/recommended'), {
-    plugins: {
-        '@typescript-eslint': typescriptEslint,
-        'align-import': alignImport,
-    },
+export default tseslint.config(
+    eslint.configs.recommended,
+    ...tseslint.configs.strict,
+    ...tseslint.configs.stylistic,
+    {
+        plugins: {
+            'align-import': alignImport,
+        },
+        rules: {
+            'align-import/align-import': 2,
 
-    languageOptions: {
-        parser: tsParser,
-    },
+            camelcase: 2,
 
-    rules: {
-        camelcase: 2,
+            complexity: [1, {
+                max: 4,
+            }],
 
-        complexity: [1, {
-            max: 4,
-        }],
+            'comma-spacing': [2, {
+                before: false,
+                after: true,
+            }],
 
-        'comma-spacing': [2, {
-            before: false,
-            after: true,
-        }],
+            'key-spacing': [2, {
+                align: 'value',
+            }],
 
-        'key-spacing': [2, {
-            align: 'value',
-        }],
+            'eol-last': [2, 'always'],
 
-        'eol-last': [2, 'always'],
-        'linebreak-style': [2, 'unix'],
-        'no-console': 0,
-        'no-duplicate-imports': 2,
+            'linebreak-style': [2, 'unix'],
 
-        'no-empty': [2, {
-            allowEmptyCatch: true,
-        }],
+            'no-console': 0,
 
-        'no-extra-parens': 2,
+            'no-duplicate-imports': 2,
 
-        'no-trailing-spaces': [2, {
-            ignoreComments: true,
-        }],
+            'no-empty': [2, {
+                allowEmptyCatch: true,
+            }],
 
-        'no-useless-rename': 2,
+            'no-extra-parens': 2,
 
-        'object-curly-newline': [2, {
-            ObjectExpression: {
-                multiline: true,
-            },
+            'no-trailing-spaces': [2, {
+                ignoreComments: true,
+            }],
 
-            ObjectPattern: {
-                multiline: true,
-            },
+            'no-useless-rename': 2,
 
-            ImportDeclaration: {
-                multiline: true,
-                minProperties: 4,
-            },
+            'object-curly-newline': [2, {
+                ObjectExpression: {
+                    multiline: true,
+                },
 
-            ExportDeclaration: {
-                multiline: true,
-                minProperties: 4,
-            },
-        }],
+                ObjectPattern: {
+                    multiline: true,
+                },
 
-        'object-curly-spacing': [2, 'always'],
-        quotes: [2, 'single'],
-        semi: [2, 'never'],
+                ImportDeclaration: {
+                    multiline: true,
+                    minProperties: 4,
+                },
 
-        'spaced-comment': [2, 'always', {
-            exceptions: ['-', '+'],
-        }],
+                ExportDeclaration: {
+                    multiline: true,
+                    minProperties: 4,
+                },
+            }],
 
-        'space-infix-ops': 2,
-        'align-import/align-import': 2,
-        '@typescript-eslint/ban-ts-comment': 0,
-    },
-}]
+            'object-curly-spacing': [2, 'always'],
+
+            quotes: [2, 'single'],
+
+            semi: [2, 'never'],
+
+            'spaced-comment': [2, 'always', {
+                exceptions: ['-', '+'],
+            }],
+
+            'space-infix-ops': 2,
+
+            '@typescript-eslint/ban-ts-comment': 0,
+
+            "@typescript-eslint/no-extraneous-class": 0
+        },
+    }
+)

@@ -47,8 +47,9 @@ corresponding default settings.
 
 If you prefer not to provide the configuration values directly, you can use environment
 variables instead.
-All configuration values can be represented as environment variables by converting the
-config key to uppercase and prefixing it with `VITREA_VBOX_`.
+
+All `VBoxConfigs` configuration values can be represented as environment variables by converting
+the config key to uppercase and prefixing it with `VITREA_VBOX_`.
 For instance, the key `username` would be represented as `VITREA_VBOX_USERNAME`.
 
 ## Usage
@@ -97,15 +98,12 @@ const client = VitreaClient.create(
 ```
 
 ```ts
-export interface Logger {
-    log(message: string, level: string) : void
-    error(message : string, meta? : Record<string, any>) : void
-    warn(message : string, meta? : Record<string, any>) : void
-    info(message : string, meta? : Record<string, any>) : void
-    http(message : string, meta? : Record<string, any>) : void
-    debug(message : string, meta? : Record<string, any>) : void
-    silly(message : string, meta? : Record<string, any>) : void
-    verbose(message : string, meta? : Record<string, any>) : void
+interface LoggerContract<T = any, R = void> {
+    log(message: string, level: string): R
+    error(message: string, ...args: T[]): R
+    warn(message: string, ...args: T[]): R
+    info(message: string, ...args: T[]): R
+    debug(message: string, ...args: T[]): R
 }
 ```
 

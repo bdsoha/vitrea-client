@@ -5,7 +5,7 @@ export abstract class BaseResponse extends DataGram {
 
     constructor(rawBuffer: Buffer | number[]) {
         super(Array.from(rawBuffer))
-        this.rawChecksum = <number>this.buffer.pop()
+        this.rawChecksum = this.buffer.pop() as number
     }
 
     get dataLength(): [number, number] {
