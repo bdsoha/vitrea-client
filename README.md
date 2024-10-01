@@ -77,6 +77,21 @@ const count = await client.send(new Requests.RoomCount())
 
 ### Logging
 
+By default, all logs are sent to the `NullLogger`, which discards them.
+To log messages, you can use our `ConsoleLogger`
+*(which wraps the native `console` object)*, set below:
+
+```ts
+import { ConsoleLogger, VitreaClient } from 'vitrea-client'
+
+const client = VitreaClient.create(
+    { /* ... */ },
+    {
+        log: new ConsoleLogger()
+    }
+)
+```
+
 If you already have a *logger* that implements the interface below, you can integrate
 it as follows:
 
@@ -85,12 +100,7 @@ import { getLogger }    from '@/core/logger'
 import { VitreaClient } from 'vitrea-client'
 
 const client = VitreaClient.create(
-    {
-        host:     '192.168.1.111',
-        port:     1234,
-        username: 'admin',
-        password: 'secret',
-    },
+    { /* ... */ },
     {
         log: getLogger('vBox')
     }
