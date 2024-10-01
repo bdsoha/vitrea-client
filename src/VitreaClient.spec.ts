@@ -1,10 +1,10 @@
 import { Socket }                    from 'net'
-import { KeyStatus, RoomMetaData }   from './responses'
 import { VitreaClient }              from './VitreaClient'
 import { SocketConfigs }             from './socket/AbstractSocket'
-import * as Exceptions               from './exceptions'
 import { Login, ToggleHeartbeat }    from './requests'
+import { KeyStatus, RoomMetaData }   from './responses'
 import { BaseRequest, BaseResponse } from './core'
+import * as Exceptions               from './exceptions'
 
 describe('VitreaClient', () => {
     jest.useFakeTimers()

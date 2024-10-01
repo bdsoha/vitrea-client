@@ -4,8 +4,8 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
-        "lib": ["es6"],
-        "module": "commonjs",
+        "lib": [ "ES6" ],
+        "module": "CommonJS",
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
@@ -16,8 +16,9 @@
         "resolveJsonModule": true,
         "sourceMap": true,
         "strictNullChecks": false,
-        "target": "es6",
-        "types": ["node", "jest"]
+        "target": "ES2020",
+        "types": [ "node", "jest" ]
     },
-    "include": ["src"]
-  }
+    "include": [ "src" ],
+    "exclude": [ "node_modules" ]
+}
