@@ -1,8 +1,9 @@
 export const KeyPowerStatus = {
-    ON:    0x4F,
-    OFF:   0x46,
-    LONG:  0x4C,
-    SHORT: 0x53
+    ON:       0x4F,
+    OFF:      0x46,
+    LONG:     0x4C,
+    SHORT:    0x53,
+    RELEASED: 0x52,
 } as const
 
 export const LEDBackgroundBrightness  = {
