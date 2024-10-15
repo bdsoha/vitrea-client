@@ -17,6 +17,7 @@ describe('KeyStatus', () => {
         expect(response).toHaveProperty('power', KeyPowerStatus.OFF)
         expect(response).toHaveProperty('isOff', true)
         expect(response).toHaveProperty('isOn', false)
+        expect(response).toHaveProperty('isReleased', false)
     })
 
     it('receives a buffer or an array', () => {
