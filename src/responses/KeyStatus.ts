@@ -28,6 +28,10 @@ export class KeyStatus extends BaseResponse {
         return this.power === KeyPowerStatus.OFF
     }
 
+    get isReleased() {
+        return this.power === KeyPowerStatus.RELEASED
+    }
+
     public get eventName(): string {
         return Events.STATUS_UPDATE
     }
