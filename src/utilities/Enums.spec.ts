@@ -11,6 +11,7 @@ describe('Enums', () => {
         expect(KeyPowerStatus.OFF).toBe(0x46)
         expect(KeyPowerStatus.LONG).toBe(0x4C)
         expect(KeyPowerStatus.SHORT).toBe(0x53)
+        expect(KeyPowerStatus.RELEASED).toBe(0x52)
     })
 
     it('LEDBackgroundBrightness', () => {
