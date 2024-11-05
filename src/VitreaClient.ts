@@ -1,23 +1,28 @@
-import { Mutex }                         from 'async-mutex'
-import { Events }                        from './utilities/Events'
-import { Timeout }                       from './socket/Timeout'
-import { KeyStatus }                     from './responses'
-import { ProtocolVersion }               from './utilities/ProtocolVersion'
-import { ResponseFactory }               from './responses/helpers'
-import { SplitMultipleBuffers }          from './utilities/SplitMultipleBuffers'
-import { Login, ToggleHeartbeat }        from './requests'
-import { VitreaHeartbeatHandler }        from './socket/VitreaHeartbeatHandler'
-import { VBoxConfigs, VBoxConnection }   from './utilities/VBoxConnection'
-import { AbstractSocket, SocketConfigs } from './socket/AbstractSocket'
-import * as Core                         from './core'
+import { Mutex }                  from 'async-mutex'
+import { Events }                 from './utilities/Events'
+import { Timeout }                from './socket/Timeout'
+import { KeyStatus }              from './responses'
+import { AbstractSocket }         from './socket/AbstractSocket'
+import { ResponseFactory }        from './responses/helpers'
+import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
+import { Login, ToggleHeartbeat } from './requests'
+import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
+import * as Core                  from './core'
+import {
+    ConnectionConfigs,
+    ConnectionConfigParser,
+    ProtocolVersion,
+    SocketConfigs,
+    SocketConfigParser
+} from './configs'
 
 
 export class VitreaClient extends AbstractSocket {
     protected readonly mutex = new Mutex()
-    protected readonly configs: VBoxConfigs
+    protected readonly configs: ConnectionConfigs
     protected readonly version: ProtocolVersion
 
-    protected constructor(configs: Required<VBoxConfigs>, socketConfigs: SocketConfigs) {
+    protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
         this.heartbeat = new VitreaHeartbeatHandler(this)
@@ -107,10 +112,10 @@ export class VitreaClient extends AbstractSocket {
         this.on(Events.STATUS_UPDATE, listener)
     }
 
-    public static create(configs: Partial<VBoxConfigs> = {}, socketConfigs: SocketConfigs = {}) {
+    public static create(configs: Partial<ConnectionConfigs> = {}, socketConfigs: Partial<SocketConfigs> = {}) {
         return new this(
-            VBoxConnection.create(configs),
-            socketConfigs
+            ConnectionConfigParser.create(configs),
+            SocketConfigParser.create(socketConfigs)
         )
     }
 }

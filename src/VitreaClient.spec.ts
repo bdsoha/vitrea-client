@@ -1,6 +1,6 @@
 import { Socket }                    from 'net'
 import { VitreaClient }              from './VitreaClient'
-import { SocketConfigs }             from './socket/AbstractSocket'
+import { SocketConfigs }             from './configs'
 import { Login, ToggleHeartbeat }    from './requests'
 import { KeyStatus, RoomMetaData }   from './responses'
 import { BaseRequest, BaseResponse } from './core'
@@ -9,7 +9,7 @@ import * as Exceptions               from './exceptions'
 describe('VitreaClient', () => {
     jest.useFakeTimers()
 
-    const getClient = (configs?: SocketConfigs) => {
+    const getClient = (configs?: Partial<SocketConfigs>) => {
         return VitreaClient.create({
             username: 'admin',
             password: 'secret'
