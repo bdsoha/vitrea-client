@@ -48,9 +48,10 @@ corresponding default settings.
 If you prefer not to provide the configuration values directly, you can use environment
 variables instead.
 
-All `VBoxConfigs` configuration values can be represented as environment variables by converting
-the config key to uppercase and prefixing it with `VITREA_VBOX_`.
-For instance, the key `username` would be represented as `VITREA_VBOX_USERNAME`.
+All `VBoxConfigs` configuration values can be represented as environment variables by
+converting the config key to uppercase and prefixing it with `VITREA_VBOX_`.
+For instance, the key `username` would be represented as `VITREA_VBOX_USERNAME` and
+`requestTimeout` as `VITREA_VBOX_REQUEST_TIMEOUT`.
 
 ## Usage
 

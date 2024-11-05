@@ -1,48 +1,29 @@
-import { Timeout }                    from './Timeout'
-import { EventEmitter }               from 'events'
-import { WritableSocketContract }     from './WritableSocketContract'
-import { AbstractHeartbeatHandler }   from './AbstractHeartbeatHandler'
-import { LoggerContract, NullLogger } from '../core'
-import * as Net                       from 'net'
-import * as Exceptions                from '../exceptions'
+import { Timeout }                  from './Timeout'
+import { EventEmitter }             from 'events'
+import { SocketConfigs }            from '../configs'
+import { LoggerContract }           from '../core'
+import { WritableSocketContract }   from './WritableSocketContract'
+import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
+import * as Net                     from 'net'
+import * as Exceptions              from '../exceptions'
 
-
-export type SocketConfigs = Partial<{
-    log: LoggerContract,
-    socketSupplier: () => Net.Socket,
-    shouldReconnect: boolean
-    requestTimeout: number
-}>
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
     protected socket?: Net.Socket
     protected heartbeat?: AbstractHeartbeatHandler
-    protected shouldReconnect: boolean
-    protected readonly socketSupplier?: SocketConfigs['socketSupplier']
     protected readonly log: LoggerContract
-    protected readonly requestTimeout: number
 
     protected constructor(
         protected readonly host: string,
         protected readonly port: number,
-        {
-            log = new NullLogger(),
-            socketSupplier = undefined,
-            shouldReconnect = true,
-            requestTimeout = 1000
-        }: SocketConfigs = {}
+        protected readonly socketConfigs: SocketConfigs,
     ) {
         super()
-        this.socketSupplier = socketSupplier
-        this.log = log
-        this.shouldReconnect = shouldReconnect
-        this.requestTimeout = requestTimeout
+        this.log = socketConfigs.log
     }
 
     protected createNewSocket(): Net.Socket {
-        this.socket = this.socketSupplier
-            ? this.socketSupplier()
-            : new Net.Socket()
+        this.socket = this.socketConfigs.socketSupplier()
 
         return this.socket
             .on('connect', this.handleConnect.bind(this))
@@ -63,7 +44,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         }
 
         return new Promise(res => {
-            const timeout = Timeout.create(this.requestTimeout)
+            const timeout = Timeout.create(this.socketConfigs.requestTimeout)
 
             this.createNewSocket()
                 .on('connect', () => {
@@ -81,7 +62,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         if (this.socket) {
             this.log.info('Forced a disconnection')
             this.heartbeat?.pause()
-            this.shouldReconnect = false
+            this.socketConfigs.shouldReconnect = false
             this.socket.end()
             this.socket = undefined
         }
@@ -112,24 +93,24 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
 
         this.socket = undefined
 
-        if (this.shouldReconnect) {
-            this.log.info('Automatically reconnecting', { shouldReconnect: this.shouldReconnect })
+        if (this.socketConfigs.shouldReconnect) {
+            this.log.info('Automatically reconnecting', { shouldReconnect: this.socketConfigs.shouldReconnect })
 
             return await this.connect()
         }
 
-        this.log.info('Not reconnecting', { shouldReconnect: this.shouldReconnect })
+        this.log.info('Not reconnecting', { shouldReconnect: this.socketConfigs.shouldReconnect })
     }
 
     protected handleError(error: Error) {
-        this.shouldReconnect = false
+        this.socketConfigs.shouldReconnect = false
         this.log.error(`An error occurred - ${error.message}`)
     }
 
     protected async handleConnect() {
         this.log.debug('Connection established')
 
-        this.shouldReconnect = true
+        this.socketConfigs.shouldReconnect = true
 
         this.restartHeartbeat()
     }
