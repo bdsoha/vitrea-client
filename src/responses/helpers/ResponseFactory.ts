@@ -1,5 +1,5 @@
 import { CommandID }              from '../ResponseCodes'
-import { ProtocolVersion }        from '../../utilities/ProtocolVersion'
+import { ProtocolVersion }        from '../../configs'
 import { DataGramDirection }      from '../../utilities/Enums'
 import { BaseResponse, DataGram } from '../../core'
 import * as Responses             from '..'

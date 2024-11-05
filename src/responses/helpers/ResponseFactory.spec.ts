@@ -1,6 +1,6 @@
 import { RoomCount }         from '../RoomCount'
 import { NodeMetaDataV2 }    from '../NodeMetaDataV2'
-import { ProtocolVersion }   from '../../utilities/ProtocolVersion'
+import { ProtocolVersion }   from '../../configs'
 import { ResponseFactory }   from './ResponseFactory'
 import { DataGramDirection } from '../../utilities/Enums'
 

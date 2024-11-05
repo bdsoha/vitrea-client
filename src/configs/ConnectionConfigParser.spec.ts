@@ -1,8 +1,7 @@
-import { VBoxConnection }  from './VBoxConnection'
-import { ProtocolVersion } from './ProtocolVersion'
+import { ConnectionConfigParser, ProtocolVersion } from './ConnectionConfigParser'
 
 
-describe('VBoxConnection', () => {
+describe('ConnectionConfigParser', () => {
     const env = process.env
 
     beforeEach(() => {
@@ -19,7 +18,7 @@ describe('VBoxConnection', () => {
         process.env.VITREA_VBOX_PASSWORD = 'secret'
         process.env.VITREA_VBOX_VERSION = 'v1'
 
-        const client = VBoxConnection.create()
+        const client = ConnectionConfigParser.create()
 
         expect(client).toStrictEqual({
             host:     '192.168.1.111',
@@ -31,7 +30,7 @@ describe('VBoxConnection', () => {
     })
 
     it('[create] uses parameters when available', () => {
-        const client = VBoxConnection.create({
+        const client = ConnectionConfigParser.create({
             host:     '192.168.1.111',
             port:     1234,
             username: 'admin',
@@ -49,7 +48,7 @@ describe('VBoxConnection', () => {
     })
 
     it('[create] uses a default port and host', () => {
-        const client = VBoxConnection.create({
+        const client = ConnectionConfigParser.create({
             username: 'admin',
             password: 'secret'
         })
@@ -64,23 +63,23 @@ describe('VBoxConnection', () => {
     })
 
     it('[create] raises an exception for missing host', () => {
-        const callback = () => VBoxConnection.create({
-             host:     '',
-             username: 'admin',
-             password: 'secret'
+        const callback = () => ConnectionConfigParser.create({
+            host:     '',
+            username: 'admin',
+            password: 'secret'
         })
 
         expect(callback).toThrow(TypeError)
     })
 
     it('[create] raises an exception for missing username', () => {
-        const callback = () => VBoxConnection.create({ password: 'secret' })
+        const callback = () => ConnectionConfigParser.create({ password: 'secret' })
 
         expect(callback).toThrow(TypeError)
     })
 
     it('[create] raises an exception for missing password', () => {
-        const callback = () => VBoxConnection.create({ username: 'admin' })
+        const callback = () => ConnectionConfigParser.create({ username: 'admin' })
 
         expect(callback).toThrow(TypeError)
     })
