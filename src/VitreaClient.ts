@@ -11,7 +11,6 @@ import * as Core                  from './core'
 import {
     ConnectionConfigs,
     ConnectionConfigParser,
-    ProtocolVersion,
     SocketConfigs,
     SocketConfigParser
 } from './configs'
@@ -20,7 +19,6 @@ import {
 export class VitreaClient extends AbstractSocket {
     protected readonly mutex = new Mutex()
     protected readonly configs: ConnectionConfigs
-    protected readonly version: ProtocolVersion
 
     protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
@@ -56,7 +54,7 @@ export class VitreaClient extends AbstractSocket {
                 release()
             }
 
-            const timeout = Timeout.create(1000, {
+            const timeout = Timeout.create(this.socketConfigs.requestTimeout, {
                 onTimeout,
                 message: 'Sending timeout reached',
             })
@@ -67,7 +65,7 @@ export class VitreaClient extends AbstractSocket {
                 setTimeout(() => {
                     release()
                     res(data)
-                }, 250)
+                }, this.socketConfigs.requestBuffer)
             }
 
             this.once(request.eventName, callback)
@@ -113,9 +111,20 @@ export class VitreaClient extends AbstractSocket {
     }
 
     public static create(configs: Partial<ConnectionConfigs> = {}, socketConfigs: Partial<SocketConfigs> = {}) {
-        return new this(
-            ConnectionConfigParser.create(configs),
-            SocketConfigParser.create(socketConfigs)
-        )
+        const parsedConnectionConfigs = ConnectionConfigParser.create(configs)
+        const parsedSocketConfigs = SocketConfigParser.create(socketConfigs)
+
+        const instance = new this(parsedConnectionConfigs, parsedSocketConfigs)
+
+        instance.log.debug('VitreaClient instance created', {
+            connection: { ...parsedConnectionConfigs },
+            socket:     {
+                shouldReconnect: parsedSocketConfigs.shouldReconnect,
+                requestBuffer:   parsedSocketConfigs.requestBuffer,
+                requestTimeout:  parsedSocketConfigs.requestTimeout
+            },
+        })
+
+        return instance
     }
 }

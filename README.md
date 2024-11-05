@@ -41,6 +41,7 @@ corresponding default settings.
 | `SocketConfigs.log`             | Logger to print values                     | `null`               |
 | `SocketConfigs.shouldReconnect` | Automatically reconnect on lost connection | `true`               |
 | `SocketConfigs.socketSupplier`  | Provide a prebuilt `Net.Socket` object     | `null`               |
+| `SocketConfigs.requestBuffer`   | Buffer time between requests               | `250`                |
 | `SocketConfigs.requestTimeout`  | Max timeout for requests                   | `1000`               |
 
 ### Environment Variables

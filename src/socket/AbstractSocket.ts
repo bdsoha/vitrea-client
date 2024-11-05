@@ -4,12 +4,11 @@ import { SocketConfigs }            from '../configs'
 import { LoggerContract }           from '../core'
 import { WritableSocketContract }   from './WritableSocketContract'
 import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
-import * as Net                     from 'net'
 import * as Exceptions              from '../exceptions'
 
 
 export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
-    protected socket?: Net.Socket
+    protected socket?: ReturnType<SocketConfigs['socketSupplier']>
     protected heartbeat?: AbstractHeartbeatHandler
     protected readonly log: LoggerContract
 
@@ -22,7 +21,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         this.log = socketConfigs.log
     }
 
-    protected createNewSocket(): Net.Socket {
+    protected createNewSocket(): ReturnType<SocketConfigs['socketSupplier']> {
         this.socket = this.socketConfigs.socketSupplier()
 
         return this.socket
