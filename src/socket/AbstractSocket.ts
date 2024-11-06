@@ -25,13 +25,14 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
         this.socket = this.socketConfigs.socketSupplier()
 
         return this.socket
+            .setTimeout(this.socketConfigs.requestTimeout * 10)
             .on('connect', this.handleConnect.bind(this))
             .on('data', this.handleData.bind(this))
             .on('end', this.handleDisconnect.bind(this))
             .on('error', this.handleError.bind(this))
     }
 
-    public async connect() :Promise<void> {
+    public async connect(): Promise<void> {
         this.log.debug('Attempting to make a connection')
 
         if (this.socket) {
@@ -68,7 +69,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     }
 
     public async write(data: Buffer): Promise<void> {
-        if (!this.socket) {
+        if (!this.socket || this.socket.destroyed) {
             throw new Exceptions.NoConnectionException()
         }
 
@@ -103,6 +104,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
 
     protected handleError(error: Error) {
         this.socketConfigs.shouldReconnect = false
+
         this.log.error(`An error occurred - ${error.message}`)
     }
 

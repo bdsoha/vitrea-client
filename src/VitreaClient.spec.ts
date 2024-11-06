@@ -93,7 +93,7 @@ describe('VitreaClient', () => {
         expect(mock).toHaveBeenCalledTimes(1)
     })
 
-    it('[handleDisconnect] will not attempt to reconnect by default', async () => {
+    it('[handleDisconnect] will not attempt to reconnect', async () => {
         const socket = new Socket()
 
         const mock = jest.spyOn(socket, 'connect')
