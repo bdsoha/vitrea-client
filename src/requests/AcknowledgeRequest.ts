@@ -1,5 +1,5 @@
-import { BaseRequest } from '../core'
 import { Events }      from '../utilities/Events'
+import { BaseRequest } from '../core'
 
 
 export class AcknowledgeRequest extends BaseRequest {

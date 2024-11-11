@@ -1,10 +1,10 @@
-import { Socket }                    from 'net'
-import { VitreaClient }              from './VitreaClient'
-import { SocketConfigs }             from './configs'
-import { Login, ToggleHeartbeat }    from './requests'
-import { KeyStatus, RoomMetaData }   from './responses'
-import { BaseRequest, BaseResponse } from './core'
-import * as Exceptions               from './exceptions'
+import { Socket }                                    from 'net'
+import { VitreaClient }                              from './VitreaClient'
+import { SocketConfigs }                             from './configs'
+import { Login, ToggleHeartbeat }                    from './requests'
+import { KeyStatus, RoomMetaData }                   from './responses'
+import { BaseRequest, BaseResponse, LoggerContract } from './core'
+import * as Exceptions                               from './exceptions'
 
 describe('VitreaClient', () => {
     jest.useFakeTimers()
@@ -14,6 +14,16 @@ describe('VitreaClient', () => {
             username: 'admin',
             password: 'secret'
         }, configs)
+    }
+
+    const getLogger = () => {
+        return {
+            log:   jest.fn(),
+            error: jest.fn(),
+            warn:  jest.fn(),
+            info:  jest.fn(),
+            debug: jest.fn(),
+        } as jest.Mocked<LoggerContract>
     }
 
     it('[connect] cannot overwrite an existing connection', async () => {
@@ -133,6 +143,39 @@ describe('VitreaClient', () => {
         socket.emit('data', buffer)
     })
 
+    it('[handleData] can ignore Ack logs', async () => {
+        const ack = [
+            0x56, 0x54, 0x55, 0x3C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x3E
+        ]
+
+        const notAck = [
+            0x56, 0x54, 0x55, 0x3C, 0x1A, 0x00, 0x15, 0x1F, 0x00, 0x00, 0x10,
+            0x45, 0x00, 0x6E, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6E,
+            0x00, 0x63, 0x00, 0x65, 0x00, 0xC9,
+        ]
+
+        const socket = new Socket()
+
+        const mock = getLogger()
+
+        const client = getClient({
+            socketSupplier: () => socket,
+            log:            mock,
+            ignoreAckLogs:  true
+        })
+
+        // @ts-ignore
+        client.createNewSocket()
+
+        socket.emit('data', Buffer.from(ack))
+
+        expect(mock.info).toHaveBeenCalledTimes(0)
+
+        socket.emit('data', Buffer.from(notAck))
+
+        expect(mock.info).toHaveBeenCalledTimes(1)
+    })
+
     it('[handleUnknownData] will fire an event for unknown buffer', async () => {
         expect.assertions(1)
 
@@ -183,5 +226,25 @@ describe('VitreaClient', () => {
 
         expect(mock).toHaveBeenCalledTimes(1)
         expect(mock).toHaveBeenCalledWith(status)
+    })
+
+    it('[create] redact user credentials in log', function () {
+        const mock = getLogger()
+
+        getClient({ log: mock })
+
+        expect(mock.debug).toHaveBeenCalledTimes(1)
+        expect(mock.debug).toHaveBeenCalledWith(
+            expect.anything(),
+            expect.objectContaining({
+                connection: {
+                    host:     '192.168.1.23',
+                    username: 'a***n',
+                    password: 's***t',
+                    port:     11501,
+                    version:  'v2'
+                }
+            })
+        )
     })
 })

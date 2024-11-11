@@ -4,6 +4,7 @@ import * as Net                       from 'net'
 
 export interface SocketConfigs {
     log: LoggerContract,
+    ignoreAckLogs: boolean
     shouldReconnect: boolean
     requestBuffer: number
     requestTimeout: number
@@ -22,6 +23,7 @@ export class SocketConfigParser extends AbstractConfigParser<SocketConfigs> {
         return {
             log:             instance.configs.log ?? new NullLogger(),
             socketSupplier:  instance.configs.socketSupplier ?? (() => new Net.Socket()),
+            ignoreAckLogs:   instance.toBoolean(instance.get('ignoreAckLogs', false)),
             shouldReconnect: instance.toBoolean(instance.get('shouldReconnect', true)),
             requestBuffer:   Number(instance.get('requestBuffer', 250)),
             requestTimeout:  Number(instance.get('requestTimeout', 1000))
