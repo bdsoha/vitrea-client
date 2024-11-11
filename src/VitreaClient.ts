@@ -1,13 +1,18 @@
-import { Mutex }                      from 'async-mutex'
-import { Events }                     from './utilities/Events'
-import { Timeout }                    from './socket/Timeout'
-import { Acknowledgement, KeyStatus } from './responses'
-import { AbstractSocket }             from './socket/AbstractSocket'
-import { ResponseFactory }            from './responses/helpers'
-import { SplitMultipleBuffers }       from './utilities/SplitMultipleBuffers'
-import { Login, ToggleHeartbeat }     from './requests'
-import { VitreaHeartbeatHandler }     from './socket/VitreaHeartbeatHandler'
-import * as Core                      from './core'
+import { Mutex }                  from 'async-mutex'
+import { Events }                 from './utilities/Events'
+import { Timeout }                from './socket/Timeout'
+import { AbstractSocket }         from './socket/AbstractSocket'
+import { ResponseFactory }        from './responses/helpers'
+import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
+import { Login, ToggleHeartbeat } from './requests'
+import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
+import * as Core                  from './core'
+import {
+    Acknowledgement,
+    GenericUnusedResponse,
+    KeyStatus
+
+} from './responses'
 import {
     ConnectionConfigs,
     ConnectionConfigParser,
@@ -74,10 +79,9 @@ export class VitreaClient extends AbstractSocket {
         })
     }
 
-    protected logResponseData(response: Core.BaseResponse) {
-        if (!(this.socketConfigs.ignoreAckLogs && response instanceof Acknowledgement)) {
-            this.log.info('Data Received', response.logData)
-        }
+    protected shouldLogResponse(response: Core.BaseResponse): boolean {
+        return !this.socketConfigs.ignoreAckLogs
+            || !(response instanceof Acknowledgement || response instanceof GenericUnusedResponse)
     }
 
     protected async handleConnect() {
@@ -105,7 +109,9 @@ export class VitreaClient extends AbstractSocket {
             return
         }
 
-        this.logResponseData(response)
+        if (this.shouldLogResponse(response)) {
+            this.log.info('Data Received', response.logData)
+        }
 
         this.emit(response.eventName, response)
     }
