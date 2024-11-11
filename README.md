@@ -39,10 +39,11 @@ corresponding default settings.
 | `VBoxConfigs.password`          | Password used to connect to the vBox       | `null`               |
 | `VBoxConfigs.version`           | Protocol version of vBox                   | `ProtocolVersion.V2` |
 | `SocketConfigs.log`             | Logger to print values                     | `null`               |
-| `SocketConfigs.shouldReconnect` | Automatically reconnect on lost connection | `true`               |
-| `SocketConfigs.socketSupplier`  | Provide a prebuilt `Net.Socket` object     | `null`               |
+| `SocketConfigs.ignoreAckLogs`   | Ignore `Acknowledgement` logs              | `false`              |
 | `SocketConfigs.requestBuffer`   | Buffer time between requests               | `250`                |
 | `SocketConfigs.requestTimeout`  | Max timeout for requests                   | `1000`               |
+| `SocketConfigs.shouldReconnect` | Automatically reconnect on lost connection | `true`               |
+| `SocketConfigs.socketSupplier`  | Provide a prebuilt `Net.Socket` object     | `null`               |
 
 ### Environment Variables
 

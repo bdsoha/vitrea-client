@@ -1,13 +1,13 @@
-import { Mutex }                  from 'async-mutex'
-import { Events }                 from './utilities/Events'
-import { Timeout }                from './socket/Timeout'
-import { KeyStatus }              from './responses'
-import { AbstractSocket }         from './socket/AbstractSocket'
-import { ResponseFactory }        from './responses/helpers'
-import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
-import { Login, ToggleHeartbeat } from './requests'
-import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
-import * as Core                  from './core'
+import { Mutex }                      from 'async-mutex'
+import { Events }                     from './utilities/Events'
+import { Timeout }                    from './socket/Timeout'
+import { Acknowledgement, KeyStatus } from './responses'
+import { AbstractSocket }             from './socket/AbstractSocket'
+import { ResponseFactory }            from './responses/helpers'
+import { SplitMultipleBuffers }       from './utilities/SplitMultipleBuffers'
+import { Login, ToggleHeartbeat }     from './requests'
+import { VitreaHeartbeatHandler }     from './socket/VitreaHeartbeatHandler'
+import * as Core                      from './core'
 import {
     ConnectionConfigs,
     ConnectionConfigParser,
@@ -27,11 +27,11 @@ export class VitreaClient extends AbstractSocket {
     }
 
     protected async acquire(eventName: string) {
-        this.log.debug('Waiting for mutex', eventName)
+        this.log.debug('Waiting for mutex', { eventName })
 
         const release = await this.mutex.acquire()
 
-        this.log.debug('Acquired mutex', eventName)
+        this.log.debug('Acquired mutex', { eventName })
 
         return release
     }
@@ -47,7 +47,7 @@ export class VitreaClient extends AbstractSocket {
             let callback: (data: R) => void
 
             const onTimeout = (error: Error) => {
-                this.log.error(error.message, eventName)
+                this.log.error(error.message, request.logData)
 
                 this.removeListener(request.eventName, callback)
 
@@ -74,6 +74,12 @@ export class VitreaClient extends AbstractSocket {
         })
     }
 
+    protected logResponseData(response: Core.BaseResponse) {
+        if (!(this.socketConfigs.ignoreAckLogs && response instanceof Acknowledgement)) {
+            this.log.info('Data Received', response.logData)
+        }
+    }
+
     protected async handleConnect() {
         await super.handleConnect()
 
@@ -93,13 +99,15 @@ export class VitreaClient extends AbstractSocket {
 
         const response = ResponseFactory.find(data, this.configs.version)
 
-        if (response) {
-            this.log.info('Data Received', response.logData)
-
-            this.emit(response.eventName, response)
-        } else {
+        if (!response) {
             this.emit(Events.UNKNOWN_DATA, data)
+
+            return
         }
+
+        this.logResponseData(response)
+
+        this.emit(response.eventName, response)
     }
 
     protected handleUnknownData(data: Buffer): void {
@@ -113,12 +121,19 @@ export class VitreaClient extends AbstractSocket {
     public static create(configs: Partial<ConnectionConfigs> = {}, socketConfigs: Partial<SocketConfigs> = {}) {
         const parsedConnectionConfigs = ConnectionConfigParser.create(configs)
         const parsedSocketConfigs = SocketConfigParser.create(socketConfigs)
+        const redact = (str: string) => `${str[0]}***${str[str.length - 1]}`
 
         const instance = new this(parsedConnectionConfigs, parsedSocketConfigs)
 
         instance.log.debug('VitreaClient instance created', {
-            connection: { ...parsedConnectionConfigs },
-            socket:     {
+            connection: {
+                host:     parsedConnectionConfigs.host,
+                username: redact(parsedConnectionConfigs.username),
+                password: redact(parsedConnectionConfigs.password),
+                port:     parsedConnectionConfigs.port,
+                version:  parsedConnectionConfigs.version,
+            },
+            socket: {
                 shouldReconnect: parsedSocketConfigs.shouldReconnect,
                 requestBuffer:   parsedSocketConfigs.requestBuffer,
                 requestTimeout:  parsedSocketConfigs.requestTimeout
