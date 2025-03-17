@@ -1,4 +1,4 @@
-import { Socket }                                    from 'net'
+import { Socket }                                    from 'node:net'
 import { VitreaClient }                              from './VitreaClient'
 import { SocketConfigs }                             from './configs'
 import { Login, ToggleHeartbeat }                    from './requests'

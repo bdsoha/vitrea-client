@@ -11,7 +11,6 @@ import {
     Acknowledgement,
     GenericUnusedResponse,
     KeyStatus
-
 } from './responses'
 import {
     ConnectionConfigs,
@@ -38,7 +37,11 @@ export class VitreaClient extends AbstractSocket {
 
         this.log.debug('Acquired mutex', { eventName })
 
-        return release
+        return async () => {
+            release()
+
+            this.log.debug('Released mutex', { eventName })
+        }
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {

@@ -1,6 +1,6 @@
 import { AbstractConfigParser }       from './AbstractConfigParser'
 import { LoggerContract, NullLogger } from '../core'
-import * as Net                       from 'net'
+import * as Net                       from 'node:net'
 
 export interface SocketConfigs {
     log: LoggerContract,
