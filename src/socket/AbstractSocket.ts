@@ -1,5 +1,5 @@
 import { Timeout }                  from './Timeout'
-import { EventEmitter }             from 'events'
+import { EventEmitter }             from 'node:events'
 import { SocketConfigs }            from '../configs'
 import { LoggerContract }           from '../core'
 import { WritableSocketContract }   from './WritableSocketContract'
@@ -19,6 +19,7 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     ) {
         super()
         this.log = socketConfigs.log
+        this.setMaxListeners(60)
     }
 
     protected createNewSocket(): ReturnType<SocketConfigs['socketSupplier']> {
