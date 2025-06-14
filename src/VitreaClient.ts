@@ -109,6 +109,8 @@ export class VitreaClient extends AbstractSocket {
         if (!response) {
             this.emit(Events.UNKNOWN_DATA, data)
 
+            this.handleUnknownData(data)
+
             return
         }
 
