@@ -1,13 +1,13 @@
-import { Timeout }                  from './Timeout'
-import { EventEmitter }             from 'node:events'
-import { SocketConfigs }            from '../configs'
-import { LoggerContract }           from '../core'
-import { WritableSocketContract }   from './WritableSocketContract'
-import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
-import * as Exceptions              from '../exceptions'
+import { Timeout }                                   from './Timeout'
+import { EventEmitter }                              from 'node:events'
+import { SocketConfigs }                             from '../configs'
+import { BaseRequest, BaseResponse, LoggerContract } from '../core'
+import { RequestSenderContract }                     from './RequestSenderContract'
+import { AbstractHeartbeatHandler }                  from './AbstractHeartbeatHandler'
+import * as Exceptions                               from '../exceptions'
 
 
-export abstract class AbstractSocket extends EventEmitter implements WritableSocketContract {
+export abstract class AbstractSocket extends EventEmitter implements RequestSenderContract {
     protected socket?: ReturnType<SocketConfigs['socketSupplier']>
     protected heartbeat?: AbstractHeartbeatHandler
     protected readonly log: LoggerContract
@@ -124,4 +124,6 @@ export abstract class AbstractSocket extends EventEmitter implements WritableSoc
     protected abstract handleData(data: Buffer): void
 
     protected abstract handleUnknownData(data: Buffer): void
+
+    public abstract send<T extends BaseRequest, R extends BaseResponse>(request: T): Promise<R>
 }
