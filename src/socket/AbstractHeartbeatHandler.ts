@@ -1,17 +1,18 @@
-import { WritableSocketContract } from './WritableSocketContract'
+import { BaseRequest }           from '../core'
+import { RequestSenderContract } from './RequestSenderContract'
 
 
 export abstract class AbstractHeartbeatHandler {
     protected interval: number
     protected timer?: NodeJS.Timeout
-    protected socket: WritableSocketContract
+    protected socket: RequestSenderContract
 
-    protected constructor(interval: number, socket: WritableSocketContract) {
+    protected constructor(interval: number, socket: RequestSenderContract) {
         this.interval = interval
         this.socket = socket
     }
 
-    public get isPaused(): boolean{
+    public get isPaused(): boolean {
         return !this.timer
     }
 
@@ -32,10 +33,10 @@ export abstract class AbstractHeartbeatHandler {
     }
 
     protected async handleHeartbeat() {
-        await this.socket.write(this.getHeartbeatDataGram())
+        await this.socket.send(this.getHeartbeatRequest())
 
         this.restart()
     }
 
-    protected abstract getHeartbeatDataGram(): Buffer
+    protected abstract getHeartbeatRequest<T extends BaseRequest>(): T
 }
