@@ -4,14 +4,9 @@ import * as Net                      from 'net'
 
 
 describe('SocketConfigParser', () => {
-    const env = process.env
-
     beforeEach(() => {
-        jest.resetModules()
-        process.env = { ...env }
+        vi.unstubAllEnvs()
     })
-
-    afterEach(() => process.env = env)
 
     it('[create] has default values', () => {
         const configs = SocketConfigParser.create()
@@ -26,10 +21,10 @@ describe('SocketConfigParser', () => {
     })
 
     it('[create] uses environment variables when available', () => {
-        process.env.VITREA_VBOX_REQUEST_BUFFER = '100'
-        process.env.VITREA_VBOX_REQUEST_TIMEOUT = '2000'
-        process.env.VITREA_VBOX_IGNORE_ACK_LOGS = 'true'
-        process.env.VITREA_VBOX_SHOULD_RECONNECT = 'false'
+        vi.stubEnv('VITREA_VBOX_REQUEST_BUFFER', '100')
+        vi.stubEnv('VITREA_VBOX_REQUEST_TIMEOUT', '2000')
+        vi.stubEnv('VITREA_VBOX_IGNORE_ACK_LOGS', 'true')
+        vi.stubEnv('VITREA_VBOX_SHOULD_RECONNECT', 'false')
 
         const configs = SocketConfigParser.create()
 
@@ -40,7 +35,7 @@ describe('SocketConfigParser', () => {
     })
 
     it('[create] uses parameters when available', () => {
-        const supplier = jest.fn()
+        const supplier = vi.fn()
 
         const configs = SocketConfigParser.create({
             socketSupplier:  supplier,

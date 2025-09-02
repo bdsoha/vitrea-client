@@ -49,7 +49,7 @@ export class VitreaClient extends AbstractSocket {
 
         const release = await this.acquire(eventName.eventName)
 
-        return new Promise(res => {
+        return new Promise(async res => {
             this.log.info('Sending data', request.logData)
 
             let callback: (data: R) => void
@@ -78,7 +78,7 @@ export class VitreaClient extends AbstractSocket {
 
             this.once(request.eventName, callback)
 
-            this.write(request.build())
+            await this.write(request.build())
         })
     }
 

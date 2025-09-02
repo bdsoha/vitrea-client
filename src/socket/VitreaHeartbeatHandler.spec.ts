@@ -6,10 +6,10 @@ import { RequestSenderContract }  from './RequestSenderContract'
 describe('VitreaHeartbeatHandler', () => {
     let socket: RequestSenderContract
 
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     beforeEach(() => {
-        socket = { send: jest.fn().mockResolvedValue({}) }
+        socket = { send: vi.fn().mockResolvedValue({}) }
         MessageID.setNextID(100)
     })
 
@@ -26,7 +26,7 @@ describe('VitreaHeartbeatHandler', () => {
         expect(socket.send).toHaveBeenCalledTimes(0)
         expect(handler.isPaused).toBeFalsy()
 
-        jest.advanceTimersByTime(3000)
+        vi.advanceTimersByTime(3000)
 
         expect(socket.send).toHaveBeenCalledTimes(1)
     })
@@ -34,7 +34,7 @@ describe('VitreaHeartbeatHandler', () => {
     it('[pause] can pause', () => {
         const handler = VitreaHeartbeatHandler.create(socket)
 
-        jest.advanceTimersByTime(2999)
+        vi.advanceTimersByTime(2999)
 
         handler.pause()
 
@@ -45,7 +45,7 @@ describe('VitreaHeartbeatHandler', () => {
     it('sends a Heartbeat DataGram', () => {
         VitreaHeartbeatHandler.create(socket)
 
-        jest.advanceTimersByTime(3000)
+        vi.advanceTimersByTime(3000)
 
         expect(socket.send).toHaveBeenCalledWith(expect.any(Object))
     })

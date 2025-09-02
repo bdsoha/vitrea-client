@@ -7,7 +7,7 @@ import { BaseRequest, BaseResponse, LoggerContract } from './core'
 import * as Exceptions                               from './exceptions'
 
 describe('VitreaClient', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     const getClient = (configs?: Partial<SocketConfigs>) => {
         return VitreaClient.create({
@@ -16,14 +16,14 @@ describe('VitreaClient', () => {
         }, configs)
     }
 
-    const getLogger = () => {
+    const getLogger = (): LoggerContract => {
         return {
-            log:   jest.fn(),
-            error: jest.fn(),
-            warn:  jest.fn(),
-            info:  jest.fn(),
-            debug: jest.fn(),
-        } as jest.Mocked<LoggerContract>
+            log:   vi.fn(),
+            error: vi.fn(),
+            warn:  vi.fn(),
+            info:  vi.fn(),
+            debug: vi.fn(),
+        }
     }
 
     it('[connect] cannot overwrite an existing connection', async () => {
@@ -42,14 +42,14 @@ describe('VitreaClient', () => {
 
         const socket = new Socket()
 
-        jest.spyOn(socket, 'connect').mockImplementation(() => socket)
+        vi.spyOn(socket, 'connect').mockImplementation(() => socket)
 
         const client = getClient({ socketSupplier: () => socket })
 
         client.connect()
 
         try {
-            jest.runAllTimers()
+            vi.runAllTimers()
         } catch (e) {
             expect(e).toBeInstanceOf(Exceptions.TimeoutException)
         }
@@ -62,12 +62,12 @@ describe('VitreaClient', () => {
 
         const client = getClient({ socketSupplier: () => socket })
 
-        jest.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
+        vi.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
             expect(request).toBeInstanceOf(ToggleHeartbeat)
             return undefined
         })
 
-        jest.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
+        vi.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
             expect(request).toBeInstanceOf(Login)
             return undefined
         })
@@ -89,7 +89,7 @@ describe('VitreaClient', () => {
     it('[handleDisconnect] will attempt to reconnect by default', async () => {
         const socket = new Socket()
 
-        const mock = jest.spyOn(socket, 'connect').mockImplementation(() => socket)
+        const mock = vi.spyOn(socket, 'connect').mockImplementation(() => socket)
 
         const client = getClient({ socketSupplier: () => socket })
 
@@ -106,7 +106,7 @@ describe('VitreaClient', () => {
     it('[handleDisconnect] will not attempt to reconnect', async () => {
         const socket = new Socket()
 
-        const mock = jest.spyOn(socket, 'connect')
+        const mock = vi.spyOn(socket, 'connect')
 
         const client = getClient({ shouldReconnect: false, socketSupplier: () => socket })
 
@@ -207,7 +207,7 @@ describe('VitreaClient', () => {
     it('[disconnect] will not attempt to reconnect when explicitly disconnected', async () => {
         const socket = new Socket()
 
-        const mock = jest.spyOn(socket, 'connect')
+        const mock = vi.spyOn(socket, 'connect')
 
         const client = getClient({ socketSupplier: () => socket })
 
@@ -222,7 +222,7 @@ describe('VitreaClient', () => {
     it('[onKeyStatus] can register a listener for key status changes', () => {
         const client = getClient()
 
-        const mock = jest.fn()
+        const mock = vi.fn()
 
         client.onKeyStatus(mock)
 
