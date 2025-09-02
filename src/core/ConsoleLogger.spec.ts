@@ -4,14 +4,13 @@ describe('ConsoleLogger', () => {
     const logger = new ConsoleLogger()
 
     beforeEach(() => {
-        jest.spyOn(global.console, 'log').mockImplementation()
-        jest.spyOn(global.console, 'error').mockImplementation()
-        jest.spyOn(global.console, 'warn').mockImplementation()
-        jest.spyOn(global.console, 'info').mockImplementation()
-        jest.spyOn(global.console, 'debug').mockImplementation()
+        vi.spyOn(global.console, 'log').mockImplementation(() => {})
+        vi.spyOn(global.console, 'error').mockImplementation(() => {})
+        vi.spyOn(global.console, 'warn').mockImplementation(() => {})
+        vi.spyOn(global.console, 'info').mockImplementation(() => {})
+        vi.spyOn(global.console, 'debug').mockImplementation(() => {})
     })
 
-    afterEach(() => jest.clearAllMocks())
 
     it('[log] logs using console', () => {
         logger.log('Test log message', 'any')

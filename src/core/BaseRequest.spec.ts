@@ -37,7 +37,7 @@ describe('BaseRequest', () => {
     })
 
     it('generates an incremented message ID for each datagram', () => {
-        jest.spyOn(MessageID, 'getNextID')
+        vi.spyOn(MessageID, 'getNextID')
 
         expect(MessageID.getNextID).toHaveBeenCalledTimes(0)
 

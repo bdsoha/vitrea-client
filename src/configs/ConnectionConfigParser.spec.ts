@@ -2,48 +2,43 @@ import { ConnectionConfigParser, ProtocolVersion } from './ConnectionConfigParse
 
 
 describe('ConnectionConfigParser', () => {
-    const env = process.env
-
     beforeEach(() => {
-        jest.resetModules()
-        process.env = { ...env }
+        vi.unstubAllEnvs()
     })
 
-    afterEach(() => process.env = env)
-
     it('[create] uses environment variables when available', () => {
-        process.env.VITREA_VBOX_HOST = '192.168.1.111'
-        process.env.VITREA_VBOX_PORT = '1234'
-        process.env.VITREA_VBOX_USERNAME = 'admin'
-        process.env.VITREA_VBOX_PASSWORD = 'secret'
-        process.env.VITREA_VBOX_VERSION = 'v1'
+        vi.stubEnv('VITREA_VBOX_HOST', '192.168.1.111')
+        vi.stubEnv('VITREA_VBOX_PORT', '1234')
+        vi.stubEnv('VITREA_VBOX_USERNAME', 'admin')
+        vi.stubEnv('VITREA_VBOX_PASSWORD', 'secret')
+        vi.stubEnv('VITREA_VBOX_VERSION', 'v1')
 
         const client = ConnectionConfigParser.create()
 
         expect(client).toStrictEqual({
-            host:     '192.168.1.111',
-            port:     1234,
+            host: '192.168.1.111',
+            port: 1234,
             username: 'admin',
             password: 'secret',
-            version:  ProtocolVersion.V1
+            version: ProtocolVersion.V1
         })
     })
 
     it('[create] uses parameters when available', () => {
         const client = ConnectionConfigParser.create({
-            host:     '192.168.1.111',
-            port:     1234,
+            host: '192.168.1.111',
+            port: 1234,
             username: 'admin',
             password: 'secret',
-            version:  'v1'
+            version: 'v1'
         })
 
         expect(client).toStrictEqual({
-            host:     '192.168.1.111',
-            port:     1234,
+            host: '192.168.1.111',
+            port: 1234,
             username: 'admin',
             password: 'secret',
-            version:  'v1'
+            version: 'v1'
         })
     })
 
@@ -54,17 +49,17 @@ describe('ConnectionConfigParser', () => {
         })
 
         expect(client).toStrictEqual({
-            host:     '192.168.1.23',
-            port:     11501,
+            host: '192.168.1.23',
+            port: 11501,
             username: 'admin',
             password: 'secret',
-            version:  ProtocolVersion.V2
+            version: ProtocolVersion.V2
         })
     })
 
     it('[create] raises an exception for missing host', () => {
         const callback = () => ConnectionConfigParser.create({
-            host:     '',
+            host: '',
             username: 'admin',
             password: 'secret'
         })

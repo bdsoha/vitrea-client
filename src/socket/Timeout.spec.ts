@@ -3,7 +3,7 @@ import { TimeoutException } from '../exceptions/TimeoutException'
 
 
 describe('Timeout', () => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
 
     it('raises an exception when the timeout was reached', () => {
         expect.assertions(1)
@@ -11,7 +11,7 @@ describe('Timeout', () => {
         Timeout.create(1000)
 
         try {
-            jest.runAllTimers()
+            vi.runAllTimers()
         } catch (e) {
             expect(e).toBeInstanceOf(TimeoutException)
         }
@@ -20,12 +20,12 @@ describe('Timeout', () => {
     it('can be provided a callback when timeout is reached', () => {
         expect.assertions(3)
 
-        const onTimeout = jest.fn()
+        const onTimeout = vi.fn()
 
         Timeout.create(1000, { onTimeout, message: 'hello world' })
 
         try {
-            jest.runAllTimers()
+            vi.runAllTimers()
         } catch (e) {
             expect(e).toBeInstanceOf(TimeoutException)
         }
@@ -37,10 +37,10 @@ describe('Timeout', () => {
     it('does not raises an exception when the timeout was not reached', () => {
         const timeout = Timeout.create(1000)
 
-        jest.advanceTimersByTime(999)
+        vi.advanceTimersByTime(999)
 
         timeout.stop()
 
-        jest.runAllTimers()
+        vi.runAllTimers()
     })
 })
