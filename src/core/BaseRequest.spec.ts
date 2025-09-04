@@ -119,4 +119,17 @@ describe('BaseRequest', () => {
             raw:       '56:54:55:3E:FF:00:02:01',
         })
     })
+
+    it('[clone] returns same request with next messageID', () => {
+        MessageID.setNextID(0x10)
+
+        const original = new SampleRequest(0xAB, [0x33, 0x44])
+
+        const cloned = original.clone()
+
+        expect(cloned.getData()).toStrictEqual(original.getData())
+
+        expect(original.messageID).toBe(0x10)
+        expect(cloned.commandID).toBe(0xAB)
+    })
 })
