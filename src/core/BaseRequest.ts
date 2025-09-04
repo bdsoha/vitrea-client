@@ -1,9 +1,9 @@
-import { DataGram }          from './DataGram'
-import { MessageID }         from '../utilities/MessageID'
+import { DataGram } from './DataGram'
+import { MessageID } from '../utilities/MessageID'
 import { DataGramDirection } from '../utilities/Enums'
 
 export abstract class BaseRequest extends DataGram {
-    constructor(commandID = 0x00, data? : number[]) {
+    constructor(commandID = 0x00, data?: number[]) {
         super()
 
         this.buffer.push(DataGramDirection.OUTGOING, commandID)
@@ -27,6 +27,10 @@ export abstract class BaseRequest extends DataGram {
 
     public build() {
         return Buffer.from(this.buffer.concat(this.checksum))
+    }
+
+    public clone(): this {
+        return new (this.constructor as any)(this.commandID, this.getData())
     }
 
     protected get toLog() {

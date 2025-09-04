@@ -122,7 +122,7 @@ export abstract class DataGram {
     }
 
     public get commandName() {
-        return this.constructor.name
+        return this.$self.name
     }
 
     protected get toLog() {
