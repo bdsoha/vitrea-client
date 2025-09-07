@@ -27,7 +27,7 @@ export class VitreaClient extends AbstractSocket {
     protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
-        this.heartbeat = new VitreaHeartbeatHandler(this, socketConfigs.heartbeatInterval)
+        this.heartbeat = new VitreaHeartbeatHandler(socketConfigs.heartbeatInterval, this)
     }
 
     protected async acquire(eventName: string) {
