@@ -27,7 +27,7 @@ export class VitreaClient extends AbstractSocket {
     protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
-        this.heartbeat = new VitreaHeartbeatHandler(this)
+        this.heartbeat = new VitreaHeartbeatHandler(this, socketConfigs.heartbeatInterval)
     }
 
     protected async acquire(eventName: string) {
@@ -49,7 +49,7 @@ export class VitreaClient extends AbstractSocket {
 
         const release = await this.acquire(eventName.eventName)
 
-        return new Promise(async res => {
+        return new Promise(res => {
             this.log.info('Sending data', request.logData)
 
             let callback: (data: R) => void
@@ -78,7 +78,7 @@ export class VitreaClient extends AbstractSocket {
 
             this.once(request.eventName, callback)
 
-            await this.write(request.build())
+            this.write(request.build())
         })
     }
 

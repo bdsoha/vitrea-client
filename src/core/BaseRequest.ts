@@ -1,5 +1,5 @@
-import { DataGram } from './DataGram'
-import { MessageID } from '../utilities/MessageID'
+import { DataGram }          from './DataGram'
+import { MessageID }         from '../utilities/MessageID'
 import { DataGramDirection } from '../utilities/Enums'
 
 export abstract class BaseRequest extends DataGram {

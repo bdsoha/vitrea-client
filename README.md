@@ -31,19 +31,20 @@ npm install vitrea-client
 The section below outlines the different configuration values available and their
 corresponding default settings.
 
-| Config                          | Description                                               | Default              |
-| ------------------------------- | --------------------------------------------------------- | -------------------- |
-| `VBoxConfigs.host`              | Host address to connect to the vBox                       | `192.168.1.23`       |
-| `VBoxConfigs.port`              | Port used to connect to the vBox                          | `11501`              |
-| `VBoxConfigs.username`          | Username used to connect to the vBox                      | `null`               |
-| `VBoxConfigs.password`          | Password used to connect to the vBox                      | `null`               |
-| `VBoxConfigs.version`           | Protocol version of vBox                                  | `ProtocolVersion.V2` |
-| `SocketConfigs.log`             | Logger to print values                                    | `null`               |
-| `SocketConfigs.ignoreAckLogs`   | Ignore `Acknowledgement` and `GenericUnusedResponse` logs | `false`              |
-| `SocketConfigs.requestBuffer`   | Buffer time between requests                              | `250`                |
-| `SocketConfigs.requestTimeout`  | Max timeout for requests                                  | `1000`               |
-| `SocketConfigs.shouldReconnect` | Automatically reconnect on lost connection                | `true`               |
-| `SocketConfigs.socketSupplier`  | Provide a prebuilt `Net.Socket` object                    | `null`               |
+| Config                            | Description                                               | Default              |
+| --------------------------------- | --------------------------------------------------------- | -------------------- |
+| `VBoxConfigs.host`                | Host address to connect to the vBox                       | `192.168.1.23`       |
+| `VBoxConfigs.port`                | Port used to connect to the vBox                          | `11501`              |
+| `VBoxConfigs.username`            | Username used to connect to the vBox                      | `null`               |
+| `VBoxConfigs.password`            | Password used to connect to the vBox                      | `null`               |
+| `VBoxConfigs.version`             | Protocol version of vBox                                  | `ProtocolVersion.V2` |
+| `SocketConfigs.log`               | Logger to print values                                    | `null`               |
+| `SocketConfigs.ignoreAckLogs`     | Ignore `Acknowledgement` and `GenericUnusedResponse` logs | `false`              |
+| `SocketConfigs.requestBuffer`     | Buffer time between requests                              | `250`                |
+| `SocketConfigs.requestTimeout`    | Max timeout for requests                                  | `1000`               |
+| `SocketConfigs.heartbeatInterval` | Interval between heartbeat messages                       | `3000`               |
+| `SocketConfigs.shouldReconnect`   | Automatically reconnect on lost connection                | `true`               |
+| `SocketConfigs.socketSupplier`    | Provide a prebuilt `Net.Socket` object                    | `null`               |
 
 ### Environment Variables
 

@@ -16,29 +16,29 @@ describe('ConnectionConfigParser', () => {
         const client = ConnectionConfigParser.create()
 
         expect(client).toStrictEqual({
-            host: '192.168.1.111',
-            port: 1234,
+            host:     '192.168.1.111',
+            port:     1234,
             username: 'admin',
             password: 'secret',
-            version: ProtocolVersion.V1
+            version:  ProtocolVersion.V1
         })
     })
 
     it('[create] uses parameters when available', () => {
         const client = ConnectionConfigParser.create({
-            host: '192.168.1.111',
-            port: 1234,
+            host:     '192.168.1.111',
+            port:     1234,
             username: 'admin',
             password: 'secret',
-            version: 'v1'
+            version:  'v1'
         })
 
         expect(client).toStrictEqual({
-            host: '192.168.1.111',
-            port: 1234,
+            host:     '192.168.1.111',
+            port:     1234,
             username: 'admin',
             password: 'secret',
-            version: 'v1'
+            version:  'v1'
         })
     })
 
@@ -49,17 +49,17 @@ describe('ConnectionConfigParser', () => {
         })
 
         expect(client).toStrictEqual({
-            host: '192.168.1.23',
-            port: 11501,
+            host:     '192.168.1.23',
+            port:     11501,
             username: 'admin',
             password: 'secret',
-            version: ProtocolVersion.V2
+            version:  ProtocolVersion.V2
         })
     })
 
     it('[create] raises an exception for missing host', () => {
         const callback = () => ConnectionConfigParser.create({
-            host: '',
+            host:     '',
             username: 'admin',
             password: 'secret'
         })
