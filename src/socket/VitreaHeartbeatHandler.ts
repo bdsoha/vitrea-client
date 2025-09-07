@@ -4,7 +4,7 @@ import { RequestSenderContract }    from './RequestSenderContract'
 import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
 
 export class VitreaHeartbeatHandler extends AbstractHeartbeatHandler {
-    public constructor(socket : RequestSenderContract, interval: number) {
+    public constructor(interval: number, socket : RequestSenderContract) {
         super(interval, socket)
     }
 
@@ -12,8 +12,8 @@ export class VitreaHeartbeatHandler extends AbstractHeartbeatHandler {
         return new Heartbeat() as T
     }
 
-    public static create(socket : RequestSenderContract, interval: number) {
-        const instance = new this(socket, interval)
+    public static create(interval: number, socket : RequestSenderContract) {
+        const instance = new this(interval, socket)
 
         instance.restart()
 
