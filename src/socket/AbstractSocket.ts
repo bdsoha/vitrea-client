@@ -1,9 +1,9 @@
 import { Timeout }                                   from './Timeout'
 import { EventEmitter }                              from 'node:events'
 import { SocketConfigs }                             from '../configs'
-import { BaseRequest, BaseResponse, LoggerContract } from '../core'
 import { RequestSenderContract }                     from './RequestSenderContract'
 import { AbstractHeartbeatHandler }                  from './AbstractHeartbeatHandler'
+import { BaseRequest, BaseResponse, LoggerContract } from '../core'
 import * as Exceptions                               from '../exceptions'
 
 
@@ -26,7 +26,9 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
         this.socket = this.socketConfigs.socketSupplier()
 
         return this.socket
-            .setTimeout(this.socketConfigs.requestTimeout * 10)
+            .setKeepAlive(true, 1000)
+            .setNoDelay(true)
+            .setTimeout(60000)
             .on('connect', this.handleConnect.bind(this))
             .on('data', this.handleData.bind(this))
             .on('end', this.handleDisconnect.bind(this))
