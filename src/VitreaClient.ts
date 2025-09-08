@@ -1,7 +1,7 @@
-import { Mutex }                  from 'async-mutex'
 import { Events }                 from './utilities/Events'
 import { Timeout }                from './socket/Timeout'
 import { AbstractSocket }         from './socket/AbstractSocket'
+import { RequestThrottler }       from './socket/RequestThrottler'
 import { ResponseFactory }        from './responses/helpers'
 import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
 import { Login, ToggleHeartbeat } from './requests'
@@ -21,35 +21,20 @@ import {
 
 
 export class VitreaClient extends AbstractSocket {
-    protected readonly mutex = new Mutex()
+    protected readonly limiter: RequestThrottler
     protected readonly configs: ConnectionConfigs
 
     protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
+        this.limiter = new RequestThrottler(socketConfigs)
         this.heartbeat = new VitreaHeartbeatHandler(socketConfigs.heartbeatInterval, this)
-    }
-
-    protected async acquire(eventName: string) {
-        this.log.debug('Waiting for mutex', { eventName })
-
-        const release = await this.mutex.acquire()
-
-        this.log.debug('Acquired mutex', { eventName })
-
-        return async () => {
-            release()
-
-            this.log.debug('Released mutex', { eventName })
-        }
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
         const eventName = { eventName: request.eventName }
 
-        const release = await this.acquire(eventName.eventName)
-
-        return new Promise(res => {
+        return this.limiter.process<R>(eventName.eventName, (resolve, reject) => {
             this.log.info('Sending data', request.logData)
 
             let callback: (data: R) => void
@@ -59,7 +44,7 @@ export class VitreaClient extends AbstractSocket {
 
                 this.removeListener(request.eventName, callback)
 
-                release()
+                reject(error)
             }
 
             const timeout = Timeout.create(this.socketConfigs.requestTimeout, {
@@ -70,10 +55,7 @@ export class VitreaClient extends AbstractSocket {
             callback = data => {
                 timeout.stop()
 
-                setTimeout(() => {
-                    release()
-                    res(data)
-                }, this.socketConfigs.requestBuffer)
+                resolve(data)
             }
 
             this.once(request.eventName, callback)
@@ -145,9 +127,11 @@ export class VitreaClient extends AbstractSocket {
                 version:  parsedConnectionConfigs.version,
             },
             socket: {
-                shouldReconnect: parsedSocketConfigs.shouldReconnect,
-                requestBuffer:   parsedSocketConfigs.requestBuffer,
-                requestTimeout:  parsedSocketConfigs.requestTimeout
+                shouldReconnect:       parsedSocketConfigs.shouldReconnect,
+                requestBuffer:         parsedSocketConfigs.requestBuffer,
+                requestBufferVariance: parsedSocketConfigs.requestBufferVariance,
+                requestTimeout:        parsedSocketConfigs.requestTimeout,
+                heartbeatInterval:     parsedSocketConfigs.heartbeatInterval,
             },
         })
 
