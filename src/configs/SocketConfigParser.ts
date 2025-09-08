@@ -7,6 +7,7 @@ export interface SocketConfigs {
     ignoreAckLogs: boolean
     shouldReconnect: boolean
     requestBuffer: number
+    requestBufferVariance: number
     requestTimeout: number
     heartbeatInterval: number
 
@@ -22,13 +23,14 @@ export class SocketConfigParser extends AbstractConfigParser<SocketConfigs> {
         const instance = new this(configs)
 
         return {
-            log:               instance.configs.log ?? new NullLogger(),
-            socketSupplier:    instance.configs.socketSupplier ?? (() => new Net.Socket()),
-            ignoreAckLogs:     instance.toBoolean(instance.get('ignoreAckLogs', false)),
-            shouldReconnect:   instance.toBoolean(instance.get('shouldReconnect', true)),
-            requestBuffer:     Number(instance.get('requestBuffer', 250)),
-            requestTimeout:    Number(instance.get('requestTimeout', 1000)),
-            heartbeatInterval: Number(instance.get('heartbeatInterval', 3000))
+            log:                   instance.configs.log ?? new NullLogger(),
+            socketSupplier:        instance.configs.socketSupplier ?? (() => new Net.Socket()),
+            ignoreAckLogs:         instance.toBoolean(instance.get('ignoreAckLogs', false)),
+            shouldReconnect:       instance.toBoolean(instance.get('shouldReconnect', true)),
+            requestBuffer:         Number(instance.get('requestBuffer', 250)),
+            requestBufferVariance: Number(instance.get('requestBufferVariance', 0.15)),
+            requestTimeout:        Number(instance.get('requestTimeout', 1000)),
+            heartbeatInterval:     Number(instance.get('heartbeatInterval', 3000)),
         }
     }
 }
