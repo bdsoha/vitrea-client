@@ -1,6 +1,6 @@
 {
   "name": "vitrea-client",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Vitrea Smart Home API Client",
   "type": "module",
   "main": "dist/index.cjs",
