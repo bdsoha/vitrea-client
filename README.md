@@ -6,14 +6,6 @@
     <img alt="GitHub Workflow" src="https://img.shields.io/github/actions/workflow/status/bdsoha/vitrea-client/test.yml?branch=develop&logo=github&style=for-the-badge">
 </a>
 
-<a href="https://codeclimate.com/github/bdsoha/vitrea-client">
-    <img alt="Code Climate maintainability" src="https://img.shields.io/codeclimate/maintainability/bdsoha/vitrea-client?logo=codeclimate&style=for-the-badge">
-</a>
-
-<a href="https://codeclimate.com/github/bdsoha/vitrea-client">
-    <img alt="Code Climate coverage" src="https://img.shields.io/codeclimate/coverage/bdsoha/vitrea-client?logo=codeclimate&style=for-the-badge">
-</a>
-
 ---
 
 ## Requirements
@@ -41,6 +33,7 @@ corresponding default settings.
 | `SocketConfigs.log`               | Logger to print values                                    | `null`               |
 | `SocketConfigs.ignoreAckLogs`     | Ignore `Acknowledgement` and `GenericUnusedResponse` logs | `false`              |
 | `SocketConfigs.requestBuffer`     | Buffer time between requests                              | `250`                |
+| `SocketConfigs.requestBufferVariance` | Variance factor for request buffer jitter (0.0-1.0)     | `0.15`               |
 | `SocketConfigs.requestTimeout`    | Max timeout for requests                                  | `1000`               |
 | `SocketConfigs.heartbeatInterval` | Interval between heartbeat messages                       | `3000`               |
 | `SocketConfigs.shouldReconnect`   | Automatically reconnect on lost connection                | `true`               |

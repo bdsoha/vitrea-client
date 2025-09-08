@@ -26,9 +26,7 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
         this.socket = this.socketConfigs.socketSupplier()
 
         return this.socket
-            .setKeepAlive(true, 1000)
             .setNoDelay(true)
-            .setTimeout(60000)
             .on('connect', this.handleConnect.bind(this))
             .on('data', this.handleData.bind(this))
             .on('end', this.handleDisconnect.bind(this))
