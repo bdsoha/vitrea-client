@@ -38,19 +38,16 @@ export class VitreaClient extends AbstractSocket {
             this.log.info('Sending data', request.logData)
 
             try {
+                this.write(request.build())
+
                 const result = await pTimeout(
                     new Promise<R>(res => this.once(request.eventName, res)),
                     { milliseconds: this.socketConfigs.requestTimeout }
                 )
                 resolve(result)
             } catch (error) {
-                if (error instanceof TimeoutError) {
-                    this.log.error(error.message, request.logData)
-                    return reject(error)
-                }
+                reject(error)
             }
-
-            this.write(request.build())
         })
     }
 
