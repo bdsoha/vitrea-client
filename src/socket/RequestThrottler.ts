@@ -1,4 +1,4 @@
-import { Mutex }         from 'async-mutex'
+import pLimit            from 'p-limit'
 import { LinearJitter }  from './LinearJitter'
 import { SocketConfigs } from '../configs'
 
@@ -6,48 +6,44 @@ import { SocketConfigs } from '../configs'
 type OperationCallback<T> = ConstructorParameters<typeof Promise<T>>[0]
 
 export class RequestThrottler {
-    protected readonly mutex = new Mutex()
     protected readonly jitter: LinearJitter
     protected readonly log: SocketConfigs['log']
+    protected readonly limit = pLimit(1)
 
     constructor(configs: Pick<SocketConfigs, 'log' | 'requestBuffer' | 'requestBufferVariance'>) {
         this.jitter = new LinearJitter(configs.requestBuffer, configs.requestBufferVariance)
         this.log = configs.log
     }
 
-    protected setTimeout(release: () => void, action: () => void) {
+    protected setTimeout(action: () => void) {
         setTimeout(() => {
-            release()
             action()
         }, this.jitter.calculate())
     }
 
-    protected async acquire(label: string) {
-        this.log.debug('Waiting for mutex', { label })
-
-        const release = await this.mutex.acquire()
-
-        this.log.debug('Acquired mutex', { label })
-
-        return async () => {
-            release()
-
-            this.log.debug('Released mutex', { label })
-        }
-    }
-
     async process<T>(label: string, callback: OperationCallback<T>): Promise<T> {
-        const release = await this.acquire(label)
+        return this.limit(() => {
+            this.log.debug('Acquired mutex', { label })
 
-        return new Promise<T>((resolve, reject) => {
-            try {
-                callback(
-                    (value: T) => this.setTimeout(release, () => resolve(value)),
-                    (reason?: unknown) => this.setTimeout(release, () => reject(reason))
-                )
-            } catch (error) {
-                this.setTimeout(release, () => reject(error))
-            }
+            return new Promise<T>((resolve, reject) => {
+                try {
+                    callback(
+                        (value: T) => this.setTimeout(() => {
+                            this.log.debug('Releasing mutex', { label })
+                            resolve(value)
+                        }),
+                        (reason?: unknown) => this.setTimeout(() => {
+                            this.log.debug('Releasing mutex', { label })
+                            reject(reason)
+                        })
+                    )
+                } catch (error) {
+                    this.setTimeout(() => {
+                        this.log.debug('Releasing mutex', { label })
+                        reject(error)
+                    })
+                }
+            })
         })
     }
 }

@@ -40,9 +40,8 @@ describe('RequestThrottler', () => {
         await vi.runAllTimersAsync()
         expect(await promise).toBe('test-result')
 
-        expect(logger.debug).toHaveBeenCalledWith('Waiting for mutex', { label: 'test' })
         expect(logger.debug).toHaveBeenCalledWith('Acquired mutex', { label: 'test' })
-        expect(logger.debug).toHaveBeenCalledWith('Released mutex', { label: 'test' })
+        expect(logger.debug).toHaveBeenCalledWith('Releasing mutex', { label: 'test' })
     })
 
     it('rejects with correct error', async () => {

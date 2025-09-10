@@ -10,4 +10,5 @@ export default defineConfig({
     minify: true,
     target: 'es2020',
     splitting: false,
+    noExternal: ['p-retry', 'p-throttle', 'p-timeout', 'p-limit'],
 })

@@ -1,3 +1,4 @@
+import { TimeoutError }                              from 'p-timeout'
 import { Socket }                                    from 'node:net'
 import { VitreaClient }                              from './VitreaClient'
 import { SocketConfigs }                             from './configs'
@@ -37,22 +38,18 @@ describe('VitreaClient', () => {
         )
     })
 
-    it('[connect] timeout is raised within 1s', () => {
-        expect.assertions(1)
-
+    it('[connect] timeout is raised within 1s', async () => {
         const socket = new Socket()
 
         vi.spyOn(socket, 'connect').mockImplementation(() => socket)
 
-        const client = getClient({ socketSupplier: () => socket })
+        const client = getClient({ socketSupplier: () => socket, requestTimeout: 1000 })
 
-        client.connect()
+        const promise = client.connect()
 
-        try {
-            vi.runAllTimers()
-        } catch (e) {
-            expect(e).toBeInstanceOf(Exceptions.TimeoutException)
-        }
+        vi.runAllTimers()
+
+        await expect(promise).rejects.toThrow(TimeoutError)
     })
 
     it('[handleConnect] sends login and heartbeat requests', async () => {
