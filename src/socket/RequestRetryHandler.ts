@@ -18,7 +18,7 @@ export class RequestRetryHandler {
 
     protected onFailedAttempt(label: string) {
         return (error: FailedAttemptError) => {
-            this.log.debug('Retry attempt', {
+            this.log.warn('Retry attempt', {
                 label,
                 attempt:     error.attemptNumber,
                 retriesLeft: error.retriesLeft,
