@@ -5,7 +5,7 @@ import { RequestRetryHandler }    from './socket/RequestRetryHandler'
 import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
 import { Login, ToggleHeartbeat } from './requests'
 import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
-import pTimeout, { TimeoutError } from 'p-timeout'
+import pTimeout                   from 'p-timeout'
 import * as Core                  from './core'
 import {
     Acknowledgement,
