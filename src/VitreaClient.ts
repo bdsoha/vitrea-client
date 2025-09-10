@@ -1,8 +1,8 @@
 import { Events }                 from './utilities/Events'
 import { Timeout }                from './socket/Timeout'
 import { AbstractSocket }         from './socket/AbstractSocket'
-import { RequestThrottler }       from './socket/RequestThrottler'
 import { ResponseFactory }        from './responses/helpers'
+import { RequestRetryHandler }    from './socket/RequestRetryHandler'
 import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
 import { Login, ToggleHeartbeat } from './requests'
 import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
@@ -21,20 +21,20 @@ import {
 
 
 export class VitreaClient extends AbstractSocket {
-    protected readonly limiter: RequestThrottler
+    protected readonly retryHandler: RequestRetryHandler
     protected readonly configs: ConnectionConfigs
 
     protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
-        this.limiter = new RequestThrottler(socketConfigs)
+        this.retryHandler = new RequestRetryHandler(socketConfigs)
         this.heartbeat = new VitreaHeartbeatHandler(socketConfigs.heartbeatInterval, this)
     }
 
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
         const eventName = { eventName: request.eventName }
 
-        return this.limiter.process<R>(eventName.eventName, (resolve, reject) => {
+        return this.retryHandler.processWithRetry<R>(eventName.eventName, (resolve, reject) => {
             this.log.info('Sending data', request.logData)
 
             let callback: (data: R) => void
@@ -120,19 +120,11 @@ export class VitreaClient extends AbstractSocket {
 
         instance.log.debug('VitreaClient instance created', {
             connection: {
-                host:     parsedConnectionConfigs.host,
+                ...parsedConnectionConfigs,
                 username: redact(parsedConnectionConfigs.username),
                 password: redact(parsedConnectionConfigs.password),
-                port:     parsedConnectionConfigs.port,
-                version:  parsedConnectionConfigs.version,
             },
-            socket: {
-                shouldReconnect:       parsedSocketConfigs.shouldReconnect,
-                requestBuffer:         parsedSocketConfigs.requestBuffer,
-                requestBufferVariance: parsedSocketConfigs.requestBufferVariance,
-                requestTimeout:        parsedSocketConfigs.requestTimeout,
-                heartbeatInterval:     parsedSocketConfigs.heartbeatInterval,
-            },
+            socket: parsedSocketConfigs,
         })
 
         return instance
