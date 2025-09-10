@@ -35,7 +35,7 @@ corresponding default settings.
 | `SocketConfigs.requestBuffer`     | Buffer time between requests                              | `250`                |
 | `SocketConfigs.requestBufferVariance` | Variance factor for request buffer jitter (0.0-1.0)     | `0.15`               |
 | `SocketConfigs.requestTimeout`    | Max timeout for requests                                  | `1000`               |
-| `SocketConfigs.heartbeatInterval` | Interval between heartbeat messages                       | `3000`               |
+| `SocketConfigs.heartbeatInterval` | Interval between heartbeat messages                       | `2500`               |
 | `SocketConfigs.shouldReconnect`   | Automatically reconnect on lost connection                | `true`               |
 | `SocketConfigs.socketSupplier`    | Provide a prebuilt `Net.Socket` object                    | `null`               |
 
