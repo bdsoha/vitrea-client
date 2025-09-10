@@ -1,9 +1,9 @@
-import { Timeout }                                   from './Timeout'
 import { EventEmitter }                              from 'node:events'
 import { SocketConfigs }                             from '../configs'
 import { RequestSenderContract }                     from './RequestSenderContract'
 import { AbstractHeartbeatHandler }                  from './AbstractHeartbeatHandler'
 import { BaseRequest, BaseResponse, LoggerContract } from '../core'
+import pTimeout                                      from 'p-timeout'
 import * as Exceptions                               from '../exceptions'
 
 
@@ -44,19 +44,17 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
             throw error
         }
 
-        return new Promise(res => {
-            const timeout = Timeout.create(this.socketConfigs.requestTimeout)
-
-            this.createNewSocket()
-                .on('connect', () => {
-                    timeout.stop()
-                    res(null)
-                })
-                .connect({
-                    port: this.port,
-                    host: this.host
-                })
-        })
+        return await pTimeout(
+            new Promise<void>(res => {
+                this.createNewSocket()
+                    .on('connect', () => res(null))
+                    .connect({
+                        port: this.port,
+                        host: this.host
+                    })
+            }),
+            { milliseconds: this.socketConfigs.requestTimeout }
+        )
     }
 
     public disconnect() {

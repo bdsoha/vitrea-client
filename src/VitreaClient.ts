@@ -1,11 +1,11 @@
 import { Events }                 from './utilities/Events'
-import { Timeout }                from './socket/Timeout'
 import { AbstractSocket }         from './socket/AbstractSocket'
 import { ResponseFactory }        from './responses/helpers'
 import { RequestRetryHandler }    from './socket/RequestRetryHandler'
 import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
 import { Login, ToggleHeartbeat } from './requests'
 import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
+import pTimeout, { TimeoutError } from 'p-timeout'
 import * as Core                  from './core'
 import {
     Acknowledgement,
@@ -34,31 +34,21 @@ export class VitreaClient extends AbstractSocket {
     public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
         const eventName = { eventName: request.eventName }
 
-        return this.retryHandler.processWithRetry<R>(eventName.eventName, (resolve, reject) => {
+        return this.retryHandler.processWithRetry<R>(eventName.eventName, async (resolve, reject) => {
             this.log.info('Sending data', request.logData)
 
-            let callback: (data: R) => void
-
-            const onTimeout = (error: Error) => {
-                this.log.error(error.message, request.logData)
-
-                this.removeListener(request.eventName, callback)
-
-                reject(error)
+            try {
+                const result = await pTimeout(
+                    new Promise<R>(res => this.once(request.eventName, res)),
+                    { milliseconds: this.socketConfigs.requestTimeout }
+                )
+                resolve(result)
+            } catch (error) {
+                if (error instanceof TimeoutError) {
+                    this.log.error(error.message, request.logData)
+                    return reject(error)
+                }
             }
-
-            const timeout = Timeout.create(this.socketConfigs.requestTimeout, {
-                onTimeout,
-                message: 'Sending timeout reached',
-            })
-
-            callback = data => {
-                timeout.stop()
-
-                resolve(data)
-            }
-
-            this.once(request.eventName, callback)
 
             this.write(request.build())
         })

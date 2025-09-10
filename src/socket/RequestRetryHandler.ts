@@ -1,6 +1,6 @@
+import { TimeoutError }                           from 'p-timeout'
 import { SocketConfigs }                          from '../configs'
 import { RequestThrottler }                       from './RequestThrottler'
-import { TimeoutException }                       from '../exceptions'
 import pRetry, { AbortError, FailedAttemptError } from 'p-retry'
 
 type OperationCallback<T> = ConstructorParameters<typeof Promise<T>>[0]
@@ -25,7 +25,7 @@ export class RequestRetryHandler {
                 error:       error.message
             })
 
-            if (!(error instanceof TimeoutException)) {
+            if (!(error instanceof TimeoutError)) {
                 throw new AbortError(error.message)
             }
         }

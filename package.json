@@ -1,6 +1,6 @@
 {
   "name": "vitrea-client",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Vitrea Smart Home API Client",
   "type": "module",
   "main": "dist/index.cjs",
@@ -46,8 +46,9 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "async-mutex": "^0.5.0",
-    "p-retry": "^6.2.1"
+    "p-limit": "^7.1.1",
+    "p-retry": "^6.2.1",
+    "p-timeout": "^6.1.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.26.0",
