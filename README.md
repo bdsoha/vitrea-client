@@ -5,7 +5,7 @@ socket communication, connection management, and protocol versioning so you don'
 
 <div align="center">
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/bdsoha/vitrea-client/test.yaml?branch=develop&logo=github&style=for-the-badge)](https://github.com/bdsoha/vitrea-client/actions/workflows/test.yaml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/bdsoha/vitrea-client/test.yml?branch=master&logo=github&style=for-the-badge)](https://github.com/bdsoha/vitrea-client/actions/workflows/test.yml)
 [![NPM Version](https://img.shields.io/npm/v/vitrea-client?style=for-the-badge&logo=npm)](https://www.npmjs.com/package/vitrea-client)
 [![License](https://img.shields.io/github/license/bdsoha/vitrea-client?style=for-the-badge)](LICENSE)
 [![Node.js Version](https://img.shields.io/node/v/vitrea-client?style=for-the-badge&logo=node.js)](https://nodejs.org/)
@@ -132,6 +132,7 @@ The `Requests` namespace provides all available commands:
 | `KeyStatus`               | Get current state of a key           | `await client.send(new Requests.KeyStatus({ nodeID: 1, keyID: 1 }))`                   |
 | `KeyParameters`           | Get key configuration settings       | `await client.send(new Requests.KeyParameters({ nodeID: 1, keyID: 1 }))`               |
 | `ToggleKeyStatus`         | Control lights/devices               | `await client.send(new Requests.ToggleKeyStatus({ nodeID: 1, keyID: 1, dimmer: 75 }))` |
+| `ToggleNodeStatus`        | Control node lock and LED backlight  | `await client.send(new Requests.ToggleNodeStatus(11, LockStatus.UNLOCKED, LEDBackgroundBrightness.NORMAL))` |
 | `NodeStatus`              | Get comprehensive node status        | `await client.send(new Requests.NodeStatus({ nodeID: 1 }))`                            |
 | `InternalUnitStatuses`    | Subscribe to internal status changes | `await client.send(new Requests.InternalUnitStatuses())`                               |
 | **Connection Management** |                                      |                                                                                        |

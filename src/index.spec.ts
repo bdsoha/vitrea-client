@@ -7,6 +7,6 @@ describe('imports', () => {
     })
 
     it('contains the requests module', () => {
-        expect(Object.keys(Exports.Requests)).toHaveLength(12)
+        expect(Object.keys(Exports.Requests)).toHaveLength(13)
     })
 })

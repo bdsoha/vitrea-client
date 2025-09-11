@@ -7,10 +7,11 @@ export const KeyPowerStatus = {
 } as const
 
 export const LEDBackgroundBrightness = {
-    OFF:  0,
-    LOW:  1,
-    HIGH: 2,
-    MAX:  3
+    OFF:    0,
+    LOW:    1,
+    NORMAL: 2,
+    HIGH:   3,
+    MAX:    4
 } as const
 
 export const LockStatus = {
