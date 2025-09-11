@@ -1,4 +1,5 @@
 export const CommandID = {
+    Login:                0x01,
     RoomMetaData:         0x1A,
     RoomCount:            0x1D,
     NodeMetaData:         0x1F,
