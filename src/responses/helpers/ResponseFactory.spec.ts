@@ -1,6 +1,6 @@
 import { RoomCount }         from '../RoomCount'
 import { NodeMetaDataV2 }    from '../NodeMetaDataV2'
-import { ProtocolVersion }   from '../../configs'
+import { ProtocolVersion }   from '../../types'
 import { ResponseFactory }   from './ResponseFactory'
 import { DataGramDirection } from '../../utilities/Enums'
 
@@ -35,7 +35,7 @@ describe('ResponseFactory', () => {
     })
 
     it('retrieves `v2` responses', () => {
-        const raw =  [
+        const raw = [
             0x56, 0x54, 0x55, 0x3C, 0x1F, 0x00, 0x18, 0x3C, 0x01, 0x00, 0x15,
             0x8D, 0x00, 0x00, 0x69, 0xC4, 0xFF, 0x02, 0x02, 0x01, 0x02, 0x00,
             0x02, 0x83, 0x01, 0x07, 0x04, 0xFF, 0x07, 0x00, 0x1B,

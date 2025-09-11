@@ -1,6 +1,7 @@
 import { Events }            from '../utilities/Events'
 import { DataGramDirection } from '../utilities/Enums'
 
+
 export abstract class DataGram {
     /**
      * The index of the datagram that contains the direction of the transmission.
@@ -48,7 +49,7 @@ export abstract class DataGram {
         return [...this.data]
     }
 
-    protected get $self() : Record<string, any> {
+    protected get $self(): Record<string, any> {
         return this.constructor
     }
 

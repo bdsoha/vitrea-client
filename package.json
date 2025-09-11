@@ -46,6 +46,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "p-event": "^7.0.0",
     "p-limit": "^7.1.1",
     "p-retry": "^6.2.1",
     "p-timeout": "^6.1.4"

@@ -1,19 +1,6 @@
-import { AbstractConfigParser } from './AbstractConfigParser'
+import { AbstractConfigParser }               from './AbstractConfigParser'
+import { ConnectionConfigs, ProtocolVersion } from '../types'
 
-export interface ConnectionConfigs {
-    host: string
-    port: number
-    username: string
-    password: string
-    version: ProtocolVersion
-}
-
-export const ProtocolVersion = {
-    V1: 'v1',
-    V2: 'v2'
-} as const
-
-export type ProtocolVersion = typeof ProtocolVersion[keyof typeof ProtocolVersion]
 
 export class ConnectionConfigParser extends AbstractConfigParser<ConnectionConfigs> {
     public static create(configs: Partial<ConnectionConfigs> = {}): ConnectionConfigs {

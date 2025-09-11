@@ -1,9 +1,8 @@
 import { TimeoutError }                           from 'p-timeout'
-import { SocketConfigs }                          from '../configs'
 import { RequestThrottler }                       from './RequestThrottler'
+import { SocketConfigs, PromiseExecutor }         from '../types'
 import pRetry, { AbortError, FailedAttemptError } from 'p-retry'
 
-type OperationCallback<T> = ConstructorParameters<typeof Promise<T>>[0]
 
 export class RequestRetryHandler {
     protected throttler: RequestThrottler
@@ -31,7 +30,7 @@ export class RequestRetryHandler {
         }
     }
 
-    public async processWithRetry<T>(label: string, callback: OperationCallback<T>): Promise<T> {
+    public async processWithRetry<T>(label: string, callback: PromiseExecutor<T>): Promise<T> {
         return pRetry(
             () => this.throttler.process(label, callback),
             {

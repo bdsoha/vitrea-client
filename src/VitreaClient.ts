@@ -1,3 +1,4 @@
+import { pEvent }                 from 'p-event'
 import { Events }                 from './utilities/Events'
 import { AbstractSocket }         from './socket/AbstractSocket'
 import { ResponseFactory }        from './responses/helpers'
@@ -13,37 +14,42 @@ import {
     KeyStatus
 } from './responses'
 import {
-    ConnectionConfigs,
     ConnectionConfigParser,
-    SocketConfigs,
     SocketConfigParser
 } from './configs'
+import {
+    ConnectionConfigs,
+    SocketConfigs,
+    ProtocolVersion,
+    RequestToResponse
+} from './types'
 
 
-export class VitreaClient extends AbstractSocket {
+export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends AbstractSocket {
     protected readonly retryHandler: RequestRetryHandler
-    protected readonly configs: ConnectionConfigs
+    protected readonly configs: ConnectionConfigs & { version: V }
 
-    protected constructor(configs: ConnectionConfigs, socketConfigs: SocketConfigs) {
+    protected constructor(configs: ConnectionConfigs & { version: V }, socketConfigs: SocketConfigs) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
         this.retryHandler = new RequestRetryHandler(socketConfigs)
         this.heartbeat = new VitreaHeartbeatHandler(socketConfigs.heartbeatInterval, this)
     }
 
-    public async send<T extends Core.BaseRequest, R extends Core.BaseResponse>(request: T): Promise<R> {
+    public async send<T extends Core.BaseRequest>(request: T): Promise<RequestToResponse<T, V>> {
         const eventName = { eventName: request.eventName }
 
-        return this.retryHandler.processWithRetry<R>(eventName.eventName, async (resolve, reject) => {
+        return this.retryHandler.processWithRetry<RequestToResponse<T, V>>(eventName.eventName, async (resolve, reject) => {
             this.log.info('Sending data', request.logData)
 
             try {
                 this.write(request.build())
 
                 const result = await pTimeout(
-                    new Promise<R>(res => this.once(request.eventName, res)),
+                    pEvent(this, request.eventName) as Promise<RequestToResponse<T, V>>,
                     { milliseconds: this.socketConfigs.requestTimeout }
                 )
+
                 resolve(result)
             } catch (error) {
                 reject(error)
@@ -98,8 +104,11 @@ export class VitreaClient extends AbstractSocket {
         this.on(Events.STATUS_UPDATE, listener)
     }
 
-    public static create(configs: Partial<ConnectionConfigs> = {}, socketConfigs: Partial<SocketConfigs> = {}) {
-        const parsedConnectionConfigs = ConnectionConfigParser.create(configs)
+    public static create<V extends ProtocolVersion = typeof ProtocolVersion.V2>(
+        configs: Partial<ConnectionConfigs> & { version?: V } = {},
+        socketConfigs: Partial<SocketConfigs> = {}
+    ): VitreaClient<V> {
+        const parsedConnectionConfigs = ConnectionConfigParser.create(configs) as ConnectionConfigs & { version: V }
         const parsedSocketConfigs = SocketConfigParser.create(socketConfigs)
         const redact = (str: string) => `${str[0]}***${str[str.length - 1]}`
 

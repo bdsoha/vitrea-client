@@ -1,6 +1,7 @@
 import { MessageID }  from '../utilities/MessageID'
 import { NodeStatus } from './NodeStatus'
 
+
 describe('NodeStatus', () => {
     it('requests the node status', () => {
         MessageID.setNextID(121)

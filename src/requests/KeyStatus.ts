@@ -1,5 +1,5 @@
 import { Events }      from '../utilities/Events'
-import { CommandID }   from '../responses/ResponseCodes'
+import { CommandID }   from '../types'
 import { BaseRequest } from '../core'
 
 

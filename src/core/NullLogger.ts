@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { LoggerContract } from "./LoggerContract";
+import { LoggerContract } from '../types'
+
 
 export class NullLogger implements LoggerContract<any> {
     public log(_message: string, _level: string) { }

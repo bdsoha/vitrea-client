@@ -1,5 +1,5 @@
 import { RequestThrottler } from './RequestThrottler'
-import { LoggerContract }   from '../core/LoggerContract'
+import { LoggerContract }   from '../types'
 
 
 describe('RequestThrottler', () => {
@@ -20,6 +20,7 @@ describe('RequestThrottler', () => {
 
     beforeEach(() => {
         logger = getLogger()
+
         const socketConfigs = {
             requestBuffer:         250,
             requestBufferVariance: 0.15,

@@ -1,19 +1,8 @@
-import { AbstractConfigParser }       from './AbstractConfigParser'
-import { LoggerContract, NullLogger } from '../core'
-import * as Net                       from 'node:net'
+import { NullLogger }           from '../core'
+import { SocketConfigs }        from '../types/SocketConfigs'
+import { AbstractConfigParser } from './AbstractConfigParser'
+import * as Net                 from 'node:net'
 
-export interface SocketConfigs {
-    heartbeatInterval: number
-    ignoreAckLogs: boolean
-    log: LoggerContract,
-    maxRetries: number
-    requestBuffer: number
-    requestBufferVariance: number
-    requestTimeout: number
-    shouldReconnect: boolean
-
-    socketSupplier(): Net.Socket
-}
 
 export class SocketConfigParser extends AbstractConfigParser<SocketConfigs> {
     public toBoolean(value: string | boolean): boolean {

@@ -5,8 +5,8 @@ import { KeyPowerStatus } from '../utilities/Enums'
 
 export class KeyStatus extends BaseResponse {
     protected static readonly nodeIDIndex = 8
-    protected static readonly keyIDIndex  = 9
-    protected static readonly powerIndex  = 10
+    protected static readonly keyIDIndex = 9
+    protected static readonly powerIndex = 10
 
     get nodeID() {
         return this.get(this.$self.nodeIDIndex)

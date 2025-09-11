@@ -5,6 +5,7 @@ import {
     LEDBackgroundBrightness,
 } from './Enums'
 
+
 describe('Enums', () => {
     it('KeyPowerStatus', () => {
         expect(KeyPowerStatus.ON).toBe(0x4F)

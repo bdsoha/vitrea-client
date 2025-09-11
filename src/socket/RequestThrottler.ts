@@ -1,9 +1,7 @@
-import pLimit            from 'p-limit'
-import { LinearJitter }  from './LinearJitter'
-import { SocketConfigs } from '../configs'
+import pLimit                             from 'p-limit'
+import { LinearJitter }                   from './LinearJitter'
+import { SocketConfigs, PromiseExecutor } from '../types'
 
-
-type OperationCallback<T> = ConstructorParameters<typeof Promise<T>>[0]
 
 export class RequestThrottler {
     protected readonly jitter: LinearJitter
@@ -15,35 +13,27 @@ export class RequestThrottler {
         this.log = configs.log
     }
 
-    protected setTimeout(action: () => void) {
-        setTimeout(() => {
-            action()
-        }, this.jitter.calculate())
+    protected delay(ms: number) {
+        return new Promise<void>(resolve => setTimeout(resolve, ms))
     }
 
-    async process<T>(label: string, callback: OperationCallback<T>): Promise<T> {
-        return this.limit(() => {
+    async process<T>(label: string, executor: PromiseExecutor<T>): Promise<T> {
+        return this.limit(async () => {
             this.log.debug('Acquired mutex', { label })
 
-            return new Promise<T>((resolve, reject) => {
-                try {
-                    callback(
-                        (value: T) => this.setTimeout(() => {
-                            this.log.debug('Releasing mutex', { label })
-                            resolve(value)
-                        }),
-                        (reason?: unknown) => this.setTimeout(() => {
-                            this.log.debug('Releasing mutex', { label })
-                            reject(reason)
-                        })
-                    )
-                } catch (error) {
-                    this.setTimeout(() => {
-                        this.log.debug('Releasing mutex', { label })
-                        reject(error)
-                    })
-                }
-            })
+            try {
+                return await new Promise<T>((resolve, reject) => {
+                    try {
+                        executor(resolve, reject)
+                    } catch (err) {
+                        reject(err)
+                    }
+                })
+            } finally {
+                await this.delay(this.jitter.calculate())
+
+                this.log.debug('Releasing mutex', { label })
+            }
         })
     }
 }

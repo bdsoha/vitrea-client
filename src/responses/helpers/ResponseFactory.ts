@@ -1,33 +1,13 @@
-import { CommandID }              from '../ResponseCodes'
-import { ProtocolVersion }        from '../../configs'
-import { DataGramDirection }      from '../../utilities/Enums'
-import { BaseResponse, DataGram } from '../../core'
-import * as Responses             from '..'
+import { DataGramDirection }                  from '../../utilities/Enums'
+import { BaseResponse, DataGram }             from '../../core'
+import { CommandID, ProtocolVersion }         from '../../types'
+import { ResponseLookupV1, ResponseLookupV2 } from './ResponseLookup'
 
-const lookup: Record<CommandID, typeof BaseResponse> = {
-    [CommandID.Acknowledgement]:      Responses.Acknowledgement,
-    [CommandID.InternalUnitStatuses]: Responses.InternalUnitStatuses,
-    [CommandID.KeyParameters]:        Responses.KeyParameters,
-    [CommandID.KeyStatus]:            Responses.KeyStatus,
-    [CommandID.NodeCount]:            Responses.NodeCount,
-    [CommandID.NodeMetaData]:         Responses.NodeMetaData,
-    [CommandID.RoomCount]:            Responses.RoomCount,
-    [CommandID.RoomMetaData]:         Responses.RoomMetaData,
-
-    // Ignored Response
-    [CommandID.NodeExistenceStatus]: Responses.GenericUnusedResponse,
-} as const
-
-const lookupV2: Record<CommandID, typeof BaseResponse> = {
-    ...lookup,
-    [CommandID.NodeMetaData]:  Responses.NodeMetaDataV2,
-    [CommandID.KeyParameters]: Responses.KeyParametersV2,
-} as const
 
 export class ResponseFactory {
     protected static readonly lookupTable = {
-        [ProtocolVersion.V1]: lookup,
-        [ProtocolVersion.V2]: lookupV2,
+        [ProtocolVersion.V1]: ResponseLookupV1,
+        [ProtocolVersion.V2]: ResponseLookupV2,
     }
 
     protected static isIncoming(rawBuffer: Buffer): boolean {
@@ -40,18 +20,19 @@ export class ResponseFactory {
         return this.lookupTable[version][commandID]
     }
 
-    static find<T extends BaseResponse>(rawBuffer: Buffer, version: ProtocolVersion): T | void {
+    static find<T extends BaseResponse>(rawBuffer: Buffer, version: ProtocolVersion): T | undefined {
         if (!this.isIncoming(rawBuffer)) {
-            return
+            return undefined
         }
 
         const supplier = this.lookup(rawBuffer, version)
 
         if (supplier) {
-            // @ts-ignore
             const instance = new supplier(rawBuffer)
 
-            return instance.hasValidChecksum ? instance : undefined
+            return instance.hasValidChecksum ? (instance as T) : undefined
         }
+
+        return undefined
     }
 }

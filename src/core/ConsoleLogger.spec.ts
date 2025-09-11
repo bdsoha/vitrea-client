@@ -1,9 +1,12 @@
 import { ConsoleLogger } from './ConsoleLogger'
 
+
 describe('ConsoleLogger', () => {
     const logger = new ConsoleLogger()
 
     beforeEach(() => {
+        /* eslint-disable */
+
         vi.spyOn(global.console, 'log').mockImplementation(() => {})
         vi.spyOn(global.console, 'error').mockImplementation(() => {})
         vi.spyOn(global.console, 'warn').mockImplementation(() => {})

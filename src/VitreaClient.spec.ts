@@ -1,11 +1,11 @@
-import { TimeoutError }                              from 'p-timeout'
-import { Socket }                                    from 'node:net'
-import { VitreaClient }                              from './VitreaClient'
-import { SocketConfigs }                             from './configs'
-import { Login, ToggleHeartbeat }                    from './requests'
-import { KeyStatus, RoomMetaData }                   from './responses'
-import { BaseRequest, BaseResponse, LoggerContract } from './core'
-import * as Exceptions                               from './exceptions'
+import { Socket }                        from 'node:net'
+import { TimeoutError }                  from 'p-timeout'
+import { VitreaClient }                  from './VitreaClient'
+import { Login, ToggleHeartbeat }        from './requests'
+import { KeyStatus, RoomMetaData }       from './responses'
+import { BaseRequest, BaseResponse }     from './core'
+import { SocketConfigs, LoggerContract } from './types'
+import * as Exceptions                   from './exceptions'
 
 describe('VitreaClient', () => {
     vi.useFakeTimers()

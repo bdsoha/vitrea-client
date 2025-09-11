@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { LoggerContract } from './LoggerContract'
+import { LoggerContract } from '../types'
+
 
 export class ConsoleLogger implements LoggerContract<any> {
     public log(message: string, level: string) {
