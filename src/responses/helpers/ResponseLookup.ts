@@ -5,6 +5,7 @@ import * as Responses from '..'
 export const ResponseLookupV1 = {
     [CommandID.Login]:                Responses.Acknowledgement,
     [CommandID.Acknowledgement]:      Responses.Acknowledgement,
+    [CommandID.ToggleNodeStatus]:     Responses.Acknowledgement,
     [CommandID.InternalUnitStatuses]: Responses.InternalUnitStatuses,
     [CommandID.KeyParameters]:        Responses.KeyParameters,
     [CommandID.KeyStatus]:            Responses.KeyStatus,

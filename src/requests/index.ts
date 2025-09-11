@@ -8,6 +8,7 @@ import { NodeMetaData }         from './NodeMetaData'
 import { NodeStatus }           from './NodeStatus'
 import { RoomCount }            from './RoomCount'
 import { RoomMetaData }         from './RoomMetaData'
+import { ToggleNodeStatus }     from './ToggleNodeStatus'
 import { ToggleKeyStatus }      from './ToggleKeyStatus'
 import { ToggleHeartbeat }      from './ToggleHeartbeat'
 
@@ -23,6 +24,7 @@ export {
     NodeStatus,
     RoomCount,
     RoomMetaData,
+    ToggleNodeStatus,
     ToggleKeyStatus,
     ToggleHeartbeat
 }

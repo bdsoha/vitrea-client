@@ -18,8 +18,9 @@ describe('Enums', () => {
     it('LEDBackgroundBrightness', () => {
         expect(LEDBackgroundBrightness.OFF).toBe(0)
         expect(LEDBackgroundBrightness.LOW).toBe(1)
-        expect(LEDBackgroundBrightness.HIGH).toBe(2)
-        expect(LEDBackgroundBrightness.MAX).toBe(3)
+        expect(LEDBackgroundBrightness.NORMAL).toBe(2)
+        expect(LEDBackgroundBrightness.HIGH).toBe(3)
+        expect(LEDBackgroundBrightness.MAX).toBe(4)
     })
 
     it('LockStatus', () => {
