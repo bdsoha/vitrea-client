@@ -1,4 +1,4 @@
-import { CommandID }   from '../responses/ResponseCodes'
+import { CommandID }   from '../types'
 import { BaseRequest } from '../core'
 
 

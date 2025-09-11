@@ -3,14 +3,14 @@ import { LEDBackgroundBrightness, LockStatus } from '../utilities/Enums'
 
 
 export class NodeMetaData extends BaseResponse {
-    protected static readonly idIndex                  = 8
-    protected static readonly macAddressIndex          = 9
-    protected static readonly totalKeysIndex: number   = 18
+    protected static readonly idIndex = 8
+    protected static readonly macAddressIndex = 9
+    protected static readonly totalKeysIndex: number = 18
     protected static readonly offsetStartIndex: number = 19
-    protected static readonly rawLockedStateIndex      = 0
-    protected static readonly rawLEDLevelIndex         = 1
-    protected static readonly rawVersionIndex          = 3
-    protected static readonly rawRoomIDIndex           = 7
+    protected static readonly rawLockedStateIndex = 0
+    protected static readonly rawLEDLevelIndex = 1
+    protected static readonly rawVersionIndex = 3
+    protected static readonly rawRoomIDIndex = 7
 
     protected offset(byIndex: number) {
         return this.$self.offsetStartIndex + this.totalKeys + byIndex

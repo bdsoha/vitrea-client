@@ -1,5 +1,6 @@
 import { DataGram } from './DataGram'
 
+
 class SampleDataGram extends DataGram {}
 
 describe('DataGram', () => {

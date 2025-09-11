@@ -1,10 +1,8 @@
+import { Ratio }          from '../types'
 import { Events }         from '../utilities/Events'
 import { BaseRequest }    from '../core'
 import { KeyPowerStatus } from '../utilities/Enums'
 
-
-type _Range<T extends number, R extends unknown[]> = R['length'] extends T ? R[number] : _Range<T, [R['length'], ...R]>
-type Ratio<T extends number> = number extends T ? number : _Range<T, []>
 
 const toByteArray = (seconds: number) => [seconds >> 8 & 0xFF, seconds & 0xFF]
 

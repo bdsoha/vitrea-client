@@ -1459,6 +1459,13 @@ optionator@^0.9.3:
     type-check "^0.4.0"
     word-wrap "^1.2.5"
 
+p-event@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/p-event/-/p-event-7.0.0.tgz#e2306cab667a689c98fd15b30d38a8dc89f0a15c"
+  integrity sha512-z4Xv/ieHhi6Dx3A5xbZI8WWTn+eSRo6buGTvA8Yv2iLyX+61SUIMKcBszZRHA6e2Apld6QEDSclAuha2iUntyA==
+  dependencies:
+    p-timeout "^6.1.4"
+
 p-limit@^3.0.2:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-3.1.0.tgz#e1daccbe78d0d1388ca18c64fea38e3e57e3706b"
@@ -1479,6 +1486,13 @@ p-locate@^5.0.0:
   integrity sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==
   dependencies:
     p-limit "^3.0.2"
+
+p-min-delay@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/p-min-delay/-/p-min-delay-4.1.1.tgz#7bec8acd3d19fdbec037aaaf48f20ee83882c160"
+  integrity sha512-Wh7zNrBCOPIU0WgiEV3CymTdPuIp1976CTQk/JrOOR18m1imRxcb3g1UsFxYEQ//FWLbt4hXv/B4YTbOIGHYNw==
+  dependencies:
+    yoctodelay "^2.0.0"
 
 p-retry@^6.2.1:
   version "6.2.1"
@@ -2047,3 +2061,8 @@ yocto-queue@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-1.2.1.tgz#36d7c4739f775b3cbc28e6136e21aa057adec418"
   integrity sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==
+
+yoctodelay@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/yoctodelay/-/yoctodelay-2.0.0.tgz#764574818d7fd16c14b6cea7b5dbb52d6f22cdca"
+  integrity sha512-0m1YaiUEnEPrZ7mKxkfRpPLfOjG1GeWd2E2IfB8toIUEhXjk5cW+czBDiQQkkMDycsuGDkG1dP40QQQoKJmEWw==

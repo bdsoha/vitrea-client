@@ -1,5 +1,6 @@
 import { DataGram } from './DataGram'
 
+
 export abstract class BaseResponse extends DataGram {
     protected readonly rawChecksum: number
 

@@ -1,4 +1,5 @@
-import { ConnectionConfigParser, ProtocolVersion } from './ConnectionConfigParser'
+import { ProtocolVersion }        from '../types'
+import { ConnectionConfigParser } from './ConnectionConfigParser'
 
 
 describe('ConnectionConfigParser', () => {

@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup'
 
+
 export default defineConfig({
     entry: ['src/index.ts'],
     format: ['cjs', 'esm'],
@@ -10,5 +11,5 @@ export default defineConfig({
     minify: true,
     target: 'es2020',
     splitting: false,
-    noExternal: ['p-retry', 'p-throttle', 'p-timeout', 'p-limit'],
+    noExternal: ['p-retry', 'p-throttle', 'p-timeout', 'p-limit', 'p-event'],
 })

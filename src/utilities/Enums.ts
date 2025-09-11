@@ -6,7 +6,7 @@ export const KeyPowerStatus = {
     RELEASED: 0x52,
 } as const
 
-export const LEDBackgroundBrightness  = {
+export const LEDBackgroundBrightness = {
     OFF:  0,
     LOW:  1,
     HIGH: 2,

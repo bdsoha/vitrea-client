@@ -1,5 +1,5 @@
 import { BaseRequest }           from '../core'
-import { RequestSenderContract } from './RequestSenderContract'
+import { RequestSenderContract } from '../types'
 
 
 export abstract class AbstractHeartbeatHandler {

@@ -3,6 +3,7 @@ import { BaseRequest }              from '../core'
 import { RequestSenderContract }    from './RequestSenderContract'
 import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
 
+
 export class VitreaHeartbeatHandler extends AbstractHeartbeatHandler {
     public constructor(interval: number, socket : RequestSenderContract) {
         super(interval, socket)

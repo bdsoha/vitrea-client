@@ -53,7 +53,7 @@ describe('BaseRequest', () => {
         MessageID.setNextID(id)
 
         const dataGram = new SampleRequest()
-        const built    = dataGram.build()
+        const built = dataGram.build()
 
         expect(built[BaseRequest.messageIDIndex]).toBe(dataGram.messageID)
         expect(built[BaseRequest.messageIDIndex]).toBe(id)
@@ -61,8 +61,8 @@ describe('BaseRequest', () => {
 
     it('[commandID] inserts the command ID in every message', () => {
         const commandID = 0xEE
-        const dataGram  = new SampleRequest(commandID)
-        const built    = dataGram.build()
+        const dataGram = new SampleRequest(commandID)
+        const built = dataGram.build()
 
         expect(built[BaseRequest.commandIDIndex]).toBe(dataGram.commandID)
         expect(built[BaseRequest.commandIDIndex]).toBe(commandID)
@@ -77,7 +77,7 @@ describe('BaseRequest', () => {
     it('[data] has a data series of arbitrary length', () => {
         expect(BaseRequest.dataIndex).toBe(8)
 
-        const data     = [0x33, 0x44, 0x55]
+        const data = [0x33, 0x44, 0x55]
         const dataGram = new SampleRequest(0x00, data)
 
         expect(dataGram.getData()).toStrictEqual(data)
@@ -95,7 +95,7 @@ describe('BaseRequest', () => {
 
 
     it('[dataLength] knows the length of the data segment as a two-byte series', () => {
-        const data     = [0x33, 0x44, 0x55]
+        const data = [0x33, 0x44, 0x55]
         const dataGram = new SampleRequest(0x00, data)
 
         expect(dataGram.dataLength).toStrictEqual([0x00, 0x05])

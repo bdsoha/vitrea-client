@@ -2,6 +2,7 @@ import { DataGram }          from './DataGram'
 import { MessageID }         from '../utilities/MessageID'
 import { DataGramDirection } from '../utilities/Enums'
 
+
 export abstract class BaseRequest extends DataGram {
     constructor(commandID = 0x00, data?: number[]) {
         super()
@@ -30,7 +31,9 @@ export abstract class BaseRequest extends DataGram {
     }
 
     public clone(): this {
-        return new (this.constructor as any)(this.commandID, this.getData())
+        const constructor = (this.constructor as new (...args: ConstructorParameters<typeof BaseRequest>) => this)
+
+        return new constructor(this.commandID, this.getData())
     }
 
     protected get toLog() {

@@ -1,5 +1,6 @@
 import { BaseResponse } from '../core'
 
+
 export class NodeCount extends BaseResponse {
     get total() {
         return this.list.length

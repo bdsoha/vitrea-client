@@ -1,10 +1,9 @@
-import { EventEmitter }                              from 'node:events'
-import { SocketConfigs }                             from '../configs'
-import { RequestSenderContract }                     from './RequestSenderContract'
-import { AbstractHeartbeatHandler }                  from './AbstractHeartbeatHandler'
-import { BaseRequest, BaseResponse, LoggerContract } from '../core'
-import pTimeout                                      from 'p-timeout'
-import * as Exceptions                               from '../exceptions'
+import { EventEmitter }                                         from 'node:events'
+import { AbstractHeartbeatHandler }                             from './AbstractHeartbeatHandler'
+import { BaseRequest, BaseResponse }                            from '../core'
+import { RequestSenderContract, SocketConfigs, LoggerContract } from '../types'
+import pTimeout                                                 from 'p-timeout'
+import * as Exceptions                                          from '../exceptions'
 
 
 export abstract class AbstractSocket extends EventEmitter implements RequestSenderContract {
@@ -123,5 +122,5 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
 
     protected abstract handleUnknownData(data: Buffer): void
 
-    public abstract send<T extends BaseRequest, R extends BaseResponse>(request: T): Promise<R>
+    public abstract send<T extends BaseRequest>(request: T): Promise<BaseResponse>
 }
