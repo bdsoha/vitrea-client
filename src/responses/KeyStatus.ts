@@ -32,7 +32,7 @@ export class KeyStatus extends BaseResponse {
         return this.power === KeyPowerStatus.RELEASED
     }
 
-    public get eventName(): string {
+    public override get eventName(): string {
         return Events.STATUS_UPDATE
     }
 }

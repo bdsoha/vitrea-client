@@ -10,7 +10,7 @@ export class NodeCount extends BaseResponse {
         return this.data.slice(1)
     }
 
-    protected get toLog() {
+    protected override get toLog() {
         return {
             ...super.toLog,
             total: this.total,

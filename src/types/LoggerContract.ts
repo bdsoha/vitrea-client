@@ -1,4 +1,4 @@
-export interface LoggerContract<T = any, R = void> {
+export interface LoggerContract<T = unknown, R = void> {
     log(message: string, level: string): R
     error(message: string, ...args: T[]): R
     warn(message: string, ...args: T[]): R

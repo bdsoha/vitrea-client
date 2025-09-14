@@ -24,7 +24,7 @@ export class KeyParameters extends BaseResponse {
         return this.get(this.$self.categoryIndex) as KeyCategory
     }
 
-    protected get toLog() {
+    protected override get toLog() {
         return {
             ...super.toLog,
             name:     this.name,

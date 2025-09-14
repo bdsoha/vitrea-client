@@ -8,7 +8,7 @@ export class KeyStatus extends BaseRequest {
         super(CommandID.KeyStatus, [nodeID, keyID])
     }
 
-    public get eventName(): string {
+    public override get eventName(): string {
         return Events.STATUS_UPDATE
     }
 }

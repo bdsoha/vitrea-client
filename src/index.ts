@@ -1,12 +1,14 @@
-export { ConsoleLogger }   from './core'
 export { VitreaClient }    from './VitreaClient'
+export { ConsoleLogger }   from './core'
 export { ProtocolVersion } from './types'
 export {
+    DataGramDirection,
+    KeyCategory,
     KeyPowerStatus,
+    KeyType,
     LEDBackgroundBrightness,
     LockStatus,
-    DataGramDirection,
-    KeyCategory
+    NodeType
 } from './utilities/Enums'
 
 

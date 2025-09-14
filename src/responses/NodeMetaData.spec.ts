@@ -1,5 +1,9 @@
-import { NodeMetaData }                         from './NodeMetaData'
-import { KeyCategory, LEDBackgroundBrightness } from '../utilities/Enums'
+import { NodeMetaData } from './NodeMetaData'
+import {
+    KeyType,
+    LEDBackgroundBrightness,
+    NodeType
+} from '../utilities/Enums'
 
 
 describe('NodeMetaData', () => {
@@ -16,6 +20,8 @@ describe('NodeMetaData', () => {
         expect(response).toHaveProperty('id', 0x01)
         expect(response).toHaveProperty('totalKeys', 0x02)
         expect(response).toHaveProperty('roomID', 0x07)
+        expect(response).toHaveProperty('type', NodeType.VT_MW3_SR2_10A)
+        expect(response).toHaveProperty('model', 'VT-MW3-SR2-10A')
         expect(response).toHaveProperty('version', '1.74')
         expect(response).toHaveProperty('macAddress', '00:15:8D:00:00:69:C4:FF')
         expect(response).toHaveProperty('isLocked', false)
@@ -25,7 +31,7 @@ describe('NodeMetaData', () => {
         expect(response.keysList).toHaveLength(2)
         expect(response.keysList[0]).toStrictEqual({
             id:   0,
-            type: KeyCategory.UNDEFINED,
+            type: KeyType.NOT_EXIST,
         })
     })
 
@@ -52,6 +58,8 @@ describe('NodeMetaData', () => {
             ledLevel:   2,
             macAddress: '00:15:8D:00:00:69:C4:FF',
             nodeID:     1,
+            type:       2,
+            model:      'VT-MW3-SR2-10A',
             totalKeys:  2,
             version:    '1.74',
             raw:        '56:54:55:3C:1F:00:18:3C:01:00:15:8D:00:00:69:C4:FF:02:02:01:02:00:02:83:01:07:04:FF:07:00',
