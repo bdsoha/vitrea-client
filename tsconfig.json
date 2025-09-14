@@ -4,7 +4,7 @@
         "emitDecoratorMetadata": false,
         "experimentalDecorators": true,
         "esModuleInterop": true,
-        "lib": [ "ES6" ],
+        "lib": ["ES6"],
         "module": "ESNext",
         "moduleResolution": "bundler",
         "noFallthroughCasesInSwitch": true,
@@ -18,8 +18,8 @@
         "sourceMap": true,
         "strictNullChecks": false,
         "target": "es2020",
-        "types": [ "node", "vitest/globals" ]
+        "types": ["node", "vitest/globals"]
     },
-    "include": [ "src" ],
-    "exclude": [ "node_modules" ]
+    "include": ["src"],
+    "exclude": ["node_modules"]
 }

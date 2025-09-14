@@ -1,6 +1,5 @@
-import { Events }      from '../utilities/Events'
 import { BaseRequest } from '../core'
-
+import { Events } from '../utilities/Events'
 
 export class AcknowledgeRequest extends BaseRequest {
     public override get eventName(): string {

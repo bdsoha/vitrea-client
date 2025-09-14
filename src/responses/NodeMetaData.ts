@@ -1,11 +1,10 @@
-import { BaseResponse }        from '../core'
+import { BaseResponse } from '../core'
 import {
-    NodeType,
-    KeyType,
+    type KeyType,
+    type LEDBackgroundBrightness,
     LockStatus,
-    LEDBackgroundBrightness,
+    NodeType,
 } from '../utilities/Enums'
-
 
 export class NodeMetaData extends BaseResponse {
     protected static readonly idIndex = 8
@@ -39,14 +38,21 @@ export class NodeMetaData extends BaseResponse {
     }
 
     get model(): string {
-        const modelEntry = Object.entries(NodeType).find(([, value]) => value === this.type)
+        const modelEntry = Object.entries(NodeType).find(
+            ([, value]) => value === this.type,
+        )
 
-        return modelEntry ? modelEntry[0].replace(/_/g, '-') : `Unknown-${this.type}`
+        return modelEntry
+            ? modelEntry[0].replace(/_/g, '-')
+            : `Unknown-${this.type}`
     }
 
     get version() {
         const offset = this.offset(this.$self.rawVersionIndex)
-        const [version, subversion, patch] = this.buffer.slice(offset, offset + 3)
+        const [version, subversion, patch] = this.buffer.slice(
+            offset,
+            offset + 3,
+        )
 
         return `${version}.${subversion}${patch}`
     }
@@ -54,9 +60,7 @@ export class NodeMetaData extends BaseResponse {
     get macAddress() {
         const start = this.$self.macAddressIndex
 
-        return this.toHexString(
-            this.buffer.slice(start, start + 8)
-        )
+        return this.toHexString(this.buffer.slice(start, start + 8))
     }
 
     get totalKeys() {
@@ -65,7 +69,7 @@ export class NodeMetaData extends BaseResponse {
 
     get keysList() {
         return Array.from({ length: this.totalKeys }, (_, i) => ({
-            id:   i,
+            id: i,
             type: this.atOffset(i) as KeyType,
         }))
     }
@@ -77,21 +81,23 @@ export class NodeMetaData extends BaseResponse {
     }
 
     get ledLevel(): LEDBackgroundBrightness {
-        return this.atOffset(this.$self.rawLEDLevelIndex) as LEDBackgroundBrightness
+        return this.atOffset(
+            this.$self.rawLEDLevelIndex,
+        ) as LEDBackgroundBrightness
     }
 
     protected override get toLog() {
         return {
             ...super.toLog,
-            nodeID:     this.id,
-            totalKeys:  this.totalKeys,
-            isLocked:   this.isLocked,
-            keysList:   this.keysList,
-            type:       this.type,
-            model:      this.model,
-            version:    this.version,
+            nodeID: this.id,
+            totalKeys: this.totalKeys,
+            isLocked: this.isLocked,
+            keysList: this.keysList,
+            type: this.type,
+            model: this.model,
+            version: this.version,
             macAddress: this.macAddress,
-            ledLevel:   this.ledLevel,
+            ledLevel: this.ledLevel,
         }
     }
 }

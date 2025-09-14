@@ -1,6 +1,5 @@
 import { MessageID } from './MessageID'
 
-
 describe('Message ID', () => {
     beforeEach(() => MessageID.resetID())
 
@@ -11,8 +10,8 @@ describe('Message ID', () => {
     })
 
     it('the largest ID is 255 followed by 1', () => {
-        MessageID.resetID(0xFE)
-        expect(MessageID.getNextID()).toBe(0xFF)
+        MessageID.resetID(0xfe)
+        expect(MessageID.getNextID()).toBe(0xff)
         expect(MessageID.getNextID()).toBe(0x01)
     })
 })

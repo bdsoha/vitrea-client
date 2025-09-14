@@ -1,6 +1,5 @@
-import { CommandID }   from '../types'
 import { BaseRequest } from '../core'
-
+import { CommandID } from '../types'
 
 export class InternalUnitStatuses extends BaseRequest {
     constructor() {

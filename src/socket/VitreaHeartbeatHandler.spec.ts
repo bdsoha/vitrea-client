@@ -1,7 +1,6 @@
-import { MessageID }              from '../utilities/MessageID'
+import { MessageID } from '../utilities/MessageID'
+import type { RequestSenderContract } from './RequestSenderContract'
 import { VitreaHeartbeatHandler } from './VitreaHeartbeatHandler'
-import { RequestSenderContract }  from './RequestSenderContract'
-
 
 describe('VitreaHeartbeatHandler', () => {
     let socket: RequestSenderContract

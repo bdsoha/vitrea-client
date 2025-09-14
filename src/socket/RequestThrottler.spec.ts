@@ -1,6 +1,5 @@
+import type { LoggerContract } from '../types'
 import { RequestThrottler } from './RequestThrottler'
-import { LoggerContract }   from '../types'
-
 
 describe('RequestThrottler', () => {
     vi.useFakeTimers()
@@ -10,10 +9,10 @@ describe('RequestThrottler', () => {
 
     const getLogger = (): LoggerContract => {
         return {
-            log:   vi.fn(),
+            log: vi.fn(),
             error: vi.fn(),
-            warn:  vi.fn(),
-            info:  vi.fn(),
+            warn: vi.fn(),
+            info: vi.fn(),
             debug: vi.fn(),
         }
     }
@@ -22,9 +21,9 @@ describe('RequestThrottler', () => {
         logger = getLogger()
 
         const socketConfigs = {
-            requestBuffer:         250,
+            requestBuffer: 250,
             requestBufferVariance: 0.15,
-            log:                   logger,
+            log: logger,
         }
 
         throttler = new RequestThrottler(socketConfigs)
@@ -36,18 +35,26 @@ describe('RequestThrottler', () => {
     })
 
     it('resolves with correct value', async () => {
-        const promise = throttler.process<string>('test', resolve => resolve('test-result'))
+        const promise = throttler.process<string>('test', resolve =>
+            resolve('test-result'),
+        )
 
         await vi.runAllTimersAsync()
         expect(await promise).toBe('test-result')
 
-        expect(logger.debug).toHaveBeenCalledWith('Acquired mutex', { label: 'test' })
-        expect(logger.debug).toHaveBeenCalledWith('Releasing mutex', { label: 'test' })
+        expect(logger.debug).toHaveBeenCalledWith('Acquired mutex', {
+            label: 'test',
+        })
+        expect(logger.debug).toHaveBeenCalledWith('Releasing mutex', {
+            label: 'test',
+        })
     })
 
     it('rejects with correct error', async () => {
         const promise = throttler
-            .process<string>('test', (_, reject) => reject(new Error('test-error')))
+            .process<string>('test', (_, reject) =>
+                reject(new Error('test-error')),
+            )
             .catch(error => error)
 
         await vi.runAllTimersAsync()
@@ -64,7 +71,7 @@ describe('RequestThrottler', () => {
             throttler.process<number>('test', resolve => {
                 order.push(n)
                 resolve(n)
-            })
+            }),
         )
 
         await vi.runAllTimersAsync()
@@ -74,9 +81,11 @@ describe('RequestThrottler', () => {
     })
 
     it('releases mutex after errors', async () => {
-        const promise1 = throttler.process<string>('test', () => {
-            throw new Error('error')
-        }).catch(error => error)
+        const promise1 = throttler
+            .process<string>('test', () => {
+                throw new Error('error')
+            })
+            .catch(error => error)
 
         await vi.runAllTimersAsync()
 

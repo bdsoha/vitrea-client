@@ -1,21 +1,22 @@
+// biome-ignore lint/complexity/noStaticOnlyClass: Static utility class pattern is intentional
 export class MessageID {
     static messageIDIndex = 0
 
-    static resetID(baseID = 0x00) {
-        return this.messageIDIndex = baseID
+    static resetID(baseID = 0x00): void {
+        MessageID.messageIDIndex = baseID
     }
 
-    static getNextID() {
-        this.messageIDIndex++
+    static getNextID(): number {
+        MessageID.messageIDIndex++
 
-        if (this.messageIDIndex > 0xFF) {
-            this.messageIDIndex = 0x01
+        if (MessageID.messageIDIndex > 0xff) {
+            MessageID.messageIDIndex = 0x01
         }
 
-        return this.messageIDIndex
+        return MessageID.messageIDIndex
     }
 
     static setNextID(nextID: number) {
-        this.resetID(nextID - 1)
+        MessageID.resetID(nextID - 1)
     }
 }

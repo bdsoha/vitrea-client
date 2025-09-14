@@ -1,12 +1,18 @@
-import { EventEmitter }                                         from 'node:events'
-import { AbstractHeartbeatHandler }                             from './AbstractHeartbeatHandler'
-import { BaseRequest, BaseResponse }                            from '../core'
-import { RequestSenderContract, SocketConfigs, LoggerContract } from '../types'
-import pTimeout                                                 from 'p-timeout'
-import * as Exceptions                                          from '../exceptions'
+import { EventEmitter } from 'node:events'
+import pTimeout from 'p-timeout'
+import type { BaseRequest, BaseResponse } from '../core'
+import * as Exceptions from '../exceptions'
+import type {
+    LoggerContract,
+    RequestSenderContract,
+    SocketConfigs,
+} from '../types'
+import type { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
 
-
-export abstract class AbstractSocket extends EventEmitter implements RequestSenderContract {
+export abstract class AbstractSocket
+    extends EventEmitter
+    implements RequestSenderContract
+{
     protected socket?: ReturnType<SocketConfigs['socketSupplier']>
     protected heartbeat?: AbstractHeartbeatHandler
     protected readonly log: LoggerContract
@@ -49,10 +55,10 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
                     .on('connect', () => res(null))
                     .connect({
                         port: this.port,
-                        host: this.host
+                        host: this.host,
                     })
             }),
-            { milliseconds: this.socketConfigs.requestTimeout }
+            { milliseconds: this.socketConfigs.requestTimeout },
         )
     }
 
@@ -76,7 +82,9 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
                 this.restartHeartbeat()
 
                 if (error) {
-                    this.log.error(`Data written with an error - ${error.message}`)
+                    this.log.error(
+                        `Data written with an error - ${error.message}`,
+                    )
 
                     return rej(error)
                 }
@@ -92,12 +100,16 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
         this.socket = undefined
 
         if (this.socketConfigs.shouldReconnect) {
-            this.log.info('Automatically reconnecting', { shouldReconnect: this.socketConfigs.shouldReconnect })
+            this.log.info('Automatically reconnecting', {
+                shouldReconnect: this.socketConfigs.shouldReconnect,
+            })
 
             return await this.connect()
         }
 
-        this.log.info('Not reconnecting', { shouldReconnect: this.socketConfigs.shouldReconnect })
+        this.log.info('Not reconnecting', {
+            shouldReconnect: this.socketConfigs.shouldReconnect,
+        })
     }
 
     protected handleError(error: Error) {
@@ -122,5 +134,7 @@ export abstract class AbstractSocket extends EventEmitter implements RequestSend
 
     protected abstract handleUnknownData(data: Buffer): void
 
-    public abstract send<T extends BaseRequest>(request: T): Promise<BaseResponse>
+    public abstract send<T extends BaseRequest>(
+        request: T,
+    ): Promise<BaseResponse>
 }

@@ -1,19 +1,27 @@
-import { Ratio }          from '../types'
-import { Events }         from '../utilities/Events'
-import { BaseRequest }    from '../core'
-import { KeyPowerStatus } from '../utilities/Enums'
+import { BaseRequest } from '../core'
+import type { Ratio } from '../types'
+import type { KeyPowerStatus } from '../utilities/Enums'
+import { Events } from '../utilities/Events'
 
-
-const toByteArray = (seconds: number) => [seconds >> 8 & 0xFF, seconds & 0xFF]
+const toByteArray = (seconds: number) => [(seconds >> 8) & 0xff, seconds & 0xff]
 
 export class ToggleKeyStatus extends BaseRequest {
     constructor(
         nodeID: number,
         keyID: number,
         status: KeyPowerStatus,
-        options: Partial<{ dimmerRatio: Ratio<101>, timer: number }> = { dimmerRatio: 0, timer: 0 }
+        options: Partial<{ dimmerRatio: Ratio<101>; timer: number }> = {
+            dimmerRatio: 0,
+            timer: 0,
+        },
     ) {
-        super(0x28, [nodeID, keyID, status, options.dimmerRatio, ...toByteArray(options.timer)])
+        super(0x28, [
+            nodeID,
+            keyID,
+            status,
+            options.dimmerRatio,
+            ...toByteArray(options.timer),
+        ])
     }
 
     public override get eventName(): string {

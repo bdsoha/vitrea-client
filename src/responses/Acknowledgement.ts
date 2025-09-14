@@ -1,4 +1,3 @@
 import { BaseResponse } from '../core'
 
-
-export class Acknowledgement extends BaseResponse { }
+export class Acknowledgement extends BaseResponse {}

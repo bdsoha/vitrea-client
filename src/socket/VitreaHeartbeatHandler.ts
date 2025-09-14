@@ -1,20 +1,15 @@
-import { Heartbeat }                from '../requests'
-import { BaseRequest }              from '../core'
-import { RequestSenderContract }    from './RequestSenderContract'
+import type { BaseRequest } from '../core'
+import { Heartbeat } from '../requests'
 import { AbstractHeartbeatHandler } from './AbstractHeartbeatHandler'
-
+import type { RequestSenderContract } from './RequestSenderContract'
 
 export class VitreaHeartbeatHandler extends AbstractHeartbeatHandler {
-    public constructor(interval: number, socket : RequestSenderContract) {
-        super(interval, socket)
-    }
-
     protected getHeartbeatRequest<T extends BaseRequest>(): T {
         return new Heartbeat() as T
     }
 
-    public static create(interval: number, socket : RequestSenderContract) {
-        const instance = new this(interval, socket)
+    public static create(interval: number, socket: RequestSenderContract) {
+        const instance = new VitreaHeartbeatHandler(interval, socket)
 
         instance.restart()
 

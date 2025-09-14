@@ -1,7 +1,6 @@
-import { DataGram }          from './DataGram'
-import { MessageID }         from '../utilities/MessageID'
 import { DataGramDirection } from '../utilities/Enums'
-
+import { MessageID } from '../utilities/MessageID'
+import { DataGram } from './DataGram'
 
 export abstract class BaseRequest extends DataGram {
     constructor(commandID = 0x00, data?: number[]) {
@@ -19,11 +18,7 @@ export abstract class BaseRequest extends DataGram {
     }
 
     protected setDataLength() {
-        this.buffer.splice(
-            this.$self.dataLengthIndex,
-            2,
-            ...this.dataLength
-        )
+        this.buffer.splice(this.$self.dataLengthIndex, 2, ...this.dataLength)
     }
 
     public build() {
@@ -31,9 +26,11 @@ export abstract class BaseRequest extends DataGram {
     }
 
     public clone(): this {
-        const constructor = (this.constructor as new (...args: ConstructorParameters<typeof BaseRequest>) => this)
+        const builder = this.constructor as new (
+            ...args: ConstructorParameters<typeof BaseRequest>
+        ) => this
 
-        return new constructor(this.commandID, this.getData())
+        return new builder(this.commandID, this.getData())
     }
 
     protected override get toLog() {

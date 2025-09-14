@@ -1,6 +1,6 @@
-import { Events }            from '../utilities/Events'
+import type { LogMeta } from '../types'
 import { DataGramDirection } from '../utilities/Enums'
-
+import { Events } from '../utilities/Events'
 
 export abstract class DataGram {
     /**
@@ -36,9 +36,7 @@ export abstract class DataGram {
     protected readonly buffer: number[]
 
     public constructor(rawBuffer?: Buffer | number[]) {
-        this.buffer = rawBuffer
-            ? [...rawBuffer]
-            : [...this.$self.prefix]
+        this.buffer = rawBuffer ? [...rawBuffer] : [...this.$self.prefix]
     }
 
     public get(index: number) {
@@ -49,12 +47,15 @@ export abstract class DataGram {
         return [...this.data]
     }
 
+    // biome-ignore lint/suspicious/noExplicitAny: Magic
     protected get $self(): Record<string, any> {
         return this.constructor
     }
 
     protected toHex(number: number): string {
-        return ['0x', number.toString(16).padStart(2, '0').toUpperCase()].join('')
+        const formatted = number.toString(16).padStart(2, '0').toUpperCase()
+
+        return ['0x', formatted].join('')
     }
 
     protected toHexString(buffer?: number[]): string {
@@ -83,7 +84,7 @@ export abstract class DataGram {
      * The checksum for the datagram.
      */
     get checksum() {
-        return this.buffer.reduce((sum, curr) => sum + curr & 0xFF)
+        return this.buffer.reduce((sum, curr) => (sum + curr) & 0xff)
     }
 
     /**
@@ -115,7 +116,7 @@ export abstract class DataGram {
     public get dataLength(): [number, number] {
         const length = this.data.length + 2
 
-        return [length >> 8 & 0xFF, length & 0xFF]
+        return [(length >> 8) & 0xff, length & 0xff]
     }
 
     public get eventName() {
@@ -130,14 +131,17 @@ export abstract class DataGram {
         return {}
     }
 
-    public get logData(): object {
+    public get logData(): LogMeta {
         return {
-            command:   this.commandName,
-            direction: DataGramDirection.INCOMING === this.direction ? 'Incoming' : 'Outgoing',
+            command: this.commandName,
+            direction:
+                DataGramDirection.INCOMING === this.direction
+                    ? 'Incoming'
+                    : 'Outgoing',
             commandID: this.toHex(this.commandID),
             messageID: this.toHex(this.messageID),
             ...this.toLog,
-            raw:       this.toHexString()
+            raw: this.toHexString(),
         }
     }
 }

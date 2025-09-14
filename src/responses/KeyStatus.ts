@@ -1,7 +1,6 @@
-import { Events }         from '../utilities/Events'
-import { BaseResponse }   from '../core'
+import { BaseResponse } from '../core'
 import { KeyPowerStatus } from '../utilities/Enums'
-
+import { Events } from '../utilities/Events'
 
 export class KeyStatus extends BaseResponse {
     protected static readonly nodeIDIndex = 8

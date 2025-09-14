@@ -1,7 +1,6 @@
-import { SocketConfigParser }        from './SocketConfigParser'
+import * as Net from 'node:net'
 import { ConsoleLogger, NullLogger } from '../core'
-import * as Net                      from 'net'
-
+import { SocketConfigParser } from './SocketConfigParser'
 
 describe('SocketConfigParser', () => {
     beforeEach(() => {
@@ -44,14 +43,14 @@ describe('SocketConfigParser', () => {
         const supplier = vi.fn()
 
         const configs = SocketConfigParser.create({
-            socketSupplier:    supplier,
-            ignoreAckLogs:     true,
-            shouldReconnect:   false,
-            requestBuffer:     100,
-            requestTimeout:    2000,
+            socketSupplier: supplier,
+            ignoreAckLogs: true,
+            shouldReconnect: false,
+            requestBuffer: 100,
+            requestTimeout: 2000,
             heartbeatInterval: 7000,
-            maxRetries:        5,
-            log:               new ConsoleLogger()
+            maxRetries: 5,
+            log: new ConsoleLogger(),
         })
 
         expect(configs.log).toBeInstanceOf(ConsoleLogger)

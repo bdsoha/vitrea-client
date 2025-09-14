@@ -1,2 +1,2 @@
-export { SocketConfigParser } from './SocketConfigParser'
 export { ConnectionConfigParser } from './ConnectionConfigParser'
+export { SocketConfigParser } from './SocketConfigParser'
