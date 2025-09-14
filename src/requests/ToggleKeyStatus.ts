@@ -16,7 +16,7 @@ export class ToggleKeyStatus extends BaseRequest {
         super(0x28, [nodeID, keyID, status, options.dimmerRatio, ...toByteArray(options.timer)])
     }
 
-    public get eventName(): string {
+    public override get eventName(): string {
         return Events.acknowledgement(this.messageID)
     }
 }

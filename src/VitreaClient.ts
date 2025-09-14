@@ -36,7 +36,7 @@ export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends A
         this.heartbeat = new VitreaHeartbeatHandler(socketConfigs.heartbeatInterval, this)
     }
 
-    public async send<T extends Core.BaseRequest>(request: T): Promise<RequestToResponse<T, V>> {
+    public override async send<T extends Core.BaseRequest>(request: T): Promise<RequestToResponse<T, V>> {
         const eventName = { eventName: request.eventName }
 
         return this.retryHandler.processWithRetry<RequestToResponse<T, V>>(eventName.eventName, async (resolve, reject) => {
@@ -70,7 +70,7 @@ export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends A
         await this.send(new Login(this.configs.username, this.configs.password))
     }
 
-    protected handleData(data: Buffer): void {
+    protected override handleData(data: Buffer): void {
         const split = SplitMultipleBuffers.handle(data)
 
         if (split.length > 1) {
@@ -96,7 +96,7 @@ export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends A
         this.emit(response.eventName, response)
     }
 
-    protected handleUnknownData(data: Buffer): void {
+    protected override handleUnknownData(data: Buffer): void {
         this.log.warn('Ignoring unrecognized received data', { raw: data.toString('hex') })
     }
 

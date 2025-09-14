@@ -1,5 +1,6 @@
 import {
     LockStatus,
+    KeyType,
     KeyPowerStatus,
     DataGramDirection,
     LEDBackgroundBrightness,
@@ -31,5 +32,23 @@ describe('Enums', () => {
     it('DataGramDirection', () => {
         expect(DataGramDirection.OUTGOING).toBe(0x3E)
         expect(DataGramDirection.INCOMING).toBe(0x3C)
+    })
+
+    it('KeyType', () => {
+        expect(KeyType.NOT_EXIST).toBe(0)
+        expect(KeyType.NOT_ACTIVE).toBe(1)
+        expect(KeyType.TOGGLE).toBe(2)
+        expect(KeyType.BLIND).toBe(3)
+        expect(KeyType.PUSH_BUTTON).toBe(4)
+        expect(KeyType.DIMMER).toBe(5)
+        expect(KeyType.DIMMER_MW).toBe(10)
+        expect(KeyType.BLIND_MW).toBe(11)
+        expect(KeyType.SATELLITE).toBe(12)
+        expect(KeyType.TOGGLE_SCENE).toBe(13)
+        expect(KeyType.DUAL_POLE).toBe(14)
+        expect(KeyType.BOILER).toBe(15)
+        expect(KeyType.REPEATER).toBe(16)
+        expect(KeyType.THERMOSTAT).toBe(17)
+        expect(KeyType.ALL_NODES).toBe(101)
     })
 })

@@ -3,7 +3,7 @@ import { BaseRequest } from '../core'
 
 
 export class AcknowledgeRequest extends BaseRequest {
-    public get eventName(): string {
+    public override get eventName(): string {
         return Events.acknowledgement(this.messageID)
     }
 }

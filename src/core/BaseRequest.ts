@@ -36,7 +36,7 @@ export abstract class BaseRequest extends DataGram {
         return new constructor(this.commandID, this.getData())
     }
 
-    protected get toLog() {
+    protected override get toLog() {
         return { data: this.toHexString(this.data) }
     }
 }

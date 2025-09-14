@@ -1,10 +1,16 @@
-import { BaseResponse }                        from '../core'
-import { LEDBackgroundBrightness, LockStatus } from '../utilities/Enums'
+import { BaseResponse }        from '../core'
+import {
+    NodeType,
+    KeyType,
+    LockStatus,
+    LEDBackgroundBrightness,
+} from '../utilities/Enums'
 
 
 export class NodeMetaData extends BaseResponse {
     protected static readonly idIndex = 8
     protected static readonly macAddressIndex = 9
+    protected static readonly typeIndex: number = 17
     protected static readonly totalKeysIndex: number = 18
     protected static readonly offsetStartIndex: number = 19
     protected static readonly rawLockedStateIndex = 0
@@ -28,6 +34,16 @@ export class NodeMetaData extends BaseResponse {
         return this.atOffset(this.$self.rawRoomIDIndex)
     }
 
+    get type(): NodeType {
+        return this.get(this.$self.typeIndex) as NodeType
+    }
+
+    get model(): string {
+        const modelEntry = Object.entries(NodeType).find(([, value]) => value === this.type)
+
+        return modelEntry ? modelEntry[0].replace(/_/g, '-') : `Unknown-${this.type}`
+    }
+
     get version() {
         const offset = this.offset(this.$self.rawVersionIndex)
         const [version, subversion, patch] = this.buffer.slice(offset, offset + 3)
@@ -48,9 +64,9 @@ export class NodeMetaData extends BaseResponse {
     }
 
     get keysList() {
-        return [...Array(this.totalKeys)].map((_, i) => ({
+        return Array.from({ length: this.totalKeys }, (_, i) => ({
             id:   i,
-            type: this.atOffset(i),
+            type: this.atOffset(i) as KeyType,
         }))
     }
 
@@ -64,16 +80,18 @@ export class NodeMetaData extends BaseResponse {
         return this.atOffset(this.$self.rawLEDLevelIndex) as LEDBackgroundBrightness
     }
 
-    protected get toLog() {
+    protected override get toLog() {
         return {
             ...super.toLog,
             nodeID:     this.id,
             totalKeys:  this.totalKeys,
             isLocked:   this.isLocked,
             keysList:   this.keysList,
+            type:       this.type,
+            model:      this.model,
             version:    this.version,
             macAddress: this.macAddress,
-            ledLevel:   this.ledLevel
+            ledLevel:   this.ledLevel,
         }
     }
 }
