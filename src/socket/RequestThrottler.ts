@@ -1,15 +1,22 @@
-import pLimit                             from 'p-limit'
-import { LinearJitter }                   from './LinearJitter'
-import { SocketConfigs, PromiseExecutor } from '../types'
-
+import pLimit from 'p-limit'
+import type { PromiseExecutor, SocketConfigs } from '../types'
+import { LinearJitter } from './LinearJitter'
 
 export class RequestThrottler {
     protected readonly jitter: LinearJitter
     protected readonly log: SocketConfigs['log']
     protected readonly limit = pLimit(1)
 
-    constructor(configs: Pick<SocketConfigs, 'log' | 'requestBuffer' | 'requestBufferVariance'>) {
-        this.jitter = new LinearJitter(configs.requestBuffer, configs.requestBufferVariance)
+    constructor(
+        configs: Pick<
+            SocketConfigs,
+            'log' | 'requestBuffer' | 'requestBufferVariance'
+        >,
+    ) {
+        this.jitter = new LinearJitter(
+            configs.requestBuffer,
+            configs.requestBufferVariance,
+        )
         this.log = configs.log
     }
 

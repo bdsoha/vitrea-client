@@ -1,6 +1,5 @@
 import { LinearJitter } from './LinearJitter'
 
-
 describe('LinearJitter', () => {
     it('[calculate] returns base value when variance is zero', () => {
         const jitter = new LinearJitter(250, 0)

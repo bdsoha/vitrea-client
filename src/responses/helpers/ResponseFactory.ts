@@ -1,9 +1,9 @@
-import { DataGramDirection }                  from '../../utilities/Enums'
-import { BaseResponse, DataGram }             from '../../core'
-import { CommandID, ProtocolVersion }         from '../../types'
+import { type BaseResponse, DataGram } from '../../core'
+import { type CommandID, ProtocolVersion } from '../../types'
+import { DataGramDirection } from '../../utilities/Enums'
 import { ResponseLookupV1, ResponseLookupV2 } from './ResponseLookup'
 
-
+// biome-ignore lint/complexity/noStaticOnlyClass: Static utility class pattern is intentional
 export class ResponseFactory {
     protected static readonly lookupTable = {
         [ProtocolVersion.V1]: ResponseLookupV1,
@@ -17,15 +17,18 @@ export class ResponseFactory {
     protected static lookup(rawBuffer: Buffer, version: ProtocolVersion) {
         const commandID = rawBuffer[DataGram.commandIDIndex] as CommandID
 
-        return this.lookupTable[version][commandID]
+        return ResponseFactory.lookupTable[version][commandID]
     }
 
-    static find<T extends BaseResponse>(rawBuffer: Buffer, version: ProtocolVersion): T | undefined {
-        if (!this.isIncoming(rawBuffer)) {
+    static find<T extends BaseResponse>(
+        rawBuffer: Buffer,
+        version: ProtocolVersion,
+    ): T | undefined {
+        if (!ResponseFactory.isIncoming(rawBuffer)) {
             return undefined
         }
 
-        const supplier = this.lookup(rawBuffer, version)
+        const supplier = ResponseFactory.lookup(rawBuffer, version)
 
         if (supplier) {
             const instance = new supplier(rawBuffer)

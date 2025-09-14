@@ -1,5 +1,4 @@
-import { ProtocolVersion } from './ProtocolVersion'
-
+import type { ProtocolVersion } from './ProtocolVersion'
 
 export interface ConnectionConfigs {
     host: string

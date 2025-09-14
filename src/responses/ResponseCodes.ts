@@ -1,2 +1,1 @@
 export { CommandID } from '../types'
-

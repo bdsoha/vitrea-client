@@ -1,65 +1,81 @@
-import { pEvent }                 from 'p-event'
-import { Events }                 from './utilities/Events'
-import { AbstractSocket }         from './socket/AbstractSocket'
-import { ResponseFactory }        from './responses/helpers'
-import { RequestRetryHandler }    from './socket/RequestRetryHandler'
-import { SplitMultipleBuffers }   from './utilities/SplitMultipleBuffers'
+import { pEvent } from 'p-event'
+import pTimeout from 'p-timeout'
+import { ConnectionConfigParser, SocketConfigParser } from './configs'
+import type * as Core from './core'
 import { Login, ToggleHeartbeat } from './requests'
-import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
-import pTimeout                   from 'p-timeout'
-import * as Core                  from './core'
 import {
     Acknowledgement,
     GenericUnusedResponse,
-    KeyStatus
+    type KeyStatus,
 } from './responses'
-import {
-    ConnectionConfigParser,
-    SocketConfigParser
-} from './configs'
-import {
+import { ResponseFactory } from './responses/helpers'
+import { AbstractSocket } from './socket/AbstractSocket'
+import { RequestRetryHandler } from './socket/RequestRetryHandler'
+import { VitreaHeartbeatHandler } from './socket/VitreaHeartbeatHandler'
+import type {
     ConnectionConfigs,
-    SocketConfigs,
     ProtocolVersion,
-    RequestToResponse
+    RequestToResponse,
+    SocketConfigs,
 } from './types'
+import { Events } from './utilities/Events'
+import { SplitMultipleBuffers } from './utilities/SplitMultipleBuffers'
 
-
-export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends AbstractSocket {
+export class VitreaClient<
+    V extends ProtocolVersion = ProtocolVersion,
+> extends AbstractSocket {
     protected readonly retryHandler: RequestRetryHandler
     protected readonly configs: ConnectionConfigs & { version: V }
 
-    protected constructor(configs: ConnectionConfigs & { version: V }, socketConfigs: SocketConfigs) {
+    protected constructor(
+        configs: ConnectionConfigs & { version: V },
+        socketConfigs: SocketConfigs,
+    ) {
         super(configs.host, configs.port, socketConfigs)
         this.configs = configs
         this.retryHandler = new RequestRetryHandler(socketConfigs)
-        this.heartbeat = new VitreaHeartbeatHandler(socketConfigs.heartbeatInterval, this)
+        this.heartbeat = new VitreaHeartbeatHandler(
+            socketConfigs.heartbeatInterval,
+            this,
+        )
     }
 
-    public override async send<T extends Core.BaseRequest>(request: T): Promise<RequestToResponse<T, V>> {
+    public override async send<T extends Core.BaseRequest>(
+        request: T,
+    ): Promise<RequestToResponse<T, V>> {
         const eventName = { eventName: request.eventName }
 
-        return this.retryHandler.processWithRetry<RequestToResponse<T, V>>(eventName.eventName, async (resolve, reject) => {
-            this.log.info('Sending data', request.logData)
+        return this.retryHandler.processWithRetry<RequestToResponse<T, V>>(
+            eventName.eventName,
+            async (resolve, reject) => {
+                this.log.info('Sending data', request.logData)
 
-            try {
-                this.write(request.build())
+                try {
+                    this.write(request.build())
 
-                const result = await pTimeout(
-                    pEvent(this, request.eventName) as Promise<RequestToResponse<T, V>>,
-                    { milliseconds: this.socketConfigs.requestTimeout }
-                )
+                    const result = await pTimeout(
+                        pEvent(this, request.eventName) as Promise<
+                            RequestToResponse<T, V>
+                        >,
+                        { milliseconds: this.socketConfigs.requestTimeout },
+                    )
 
-                resolve(result)
-            } catch (error) {
-                reject(error)
-            }
-        })
+                    resolve(result)
+                } catch (error) {
+                    reject(error)
+                }
+            },
+        )
     }
 
     protected shouldLogResponse(response: Core.BaseResponse): boolean {
-        return !this.socketConfigs.ignoreAckLogs
-            || !(response instanceof Acknowledgement || response instanceof GenericUnusedResponse)
+        return (
+            !this.socketConfigs.ignoreAckLogs
+            || !(
+                response instanceof Acknowledgement
+                || response instanceof GenericUnusedResponse
+            )
+        )
     }
 
     protected async handleConnect() {
@@ -74,7 +90,10 @@ export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends A
         const split = SplitMultipleBuffers.handle(data)
 
         if (split.length > 1) {
-            return split.forEach(buffer => this.handleData(buffer))
+            split.forEach(buffer => {
+                this.handleData(buffer)
+            })
+            return
         }
 
         data = split[0]
@@ -97,7 +116,9 @@ export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends A
     }
 
     protected override handleUnknownData(data: Buffer): void {
-        this.log.warn('Ignoring unrecognized received data', { raw: data.toString('hex') })
+        this.log.warn('Ignoring unrecognized received data', {
+            raw: data.toString('hex'),
+        })
     }
 
     public onKeyStatus(listener: (status: KeyStatus) => void): void {
@@ -106,13 +127,18 @@ export class VitreaClient<V extends ProtocolVersion = ProtocolVersion> extends A
 
     public static create<V extends ProtocolVersion = typeof ProtocolVersion.V2>(
         configs: Partial<ConnectionConfigs> & { version?: V } = {},
-        socketConfigs: Partial<SocketConfigs> = {}
+        socketConfigs: Partial<SocketConfigs> = {},
     ): VitreaClient<V> {
-        const parsedConnectionConfigs = ConnectionConfigParser.create(configs) as ConnectionConfigs & { version: V }
+        const parsedConnectionConfigs = ConnectionConfigParser.create(
+            configs,
+        ) as ConnectionConfigs & { version: V }
         const parsedSocketConfigs = SocketConfigParser.create(socketConfigs)
         const redact = (str: string) => `${str[0]}***${str[str.length - 1]}`
 
-        const instance = new this(parsedConnectionConfigs, parsedSocketConfigs)
+        const instance = new VitreaClient(
+            parsedConnectionConfigs,
+            parsedSocketConfigs,
+        )
 
         instance.log.debug('VitreaClient instance created', {
             connection: {

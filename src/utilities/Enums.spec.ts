@@ -1,17 +1,16 @@
 import {
-    LockStatus,
-    KeyType,
-    KeyPowerStatus,
     DataGramDirection,
+    KeyPowerStatus,
+    KeyType,
     LEDBackgroundBrightness,
+    LockStatus,
 } from './Enums'
-
 
 describe('Enums', () => {
     it('KeyPowerStatus', () => {
-        expect(KeyPowerStatus.ON).toBe(0x4F)
+        expect(KeyPowerStatus.ON).toBe(0x4f)
         expect(KeyPowerStatus.OFF).toBe(0x46)
-        expect(KeyPowerStatus.LONG).toBe(0x4C)
+        expect(KeyPowerStatus.LONG).toBe(0x4c)
         expect(KeyPowerStatus.SHORT).toBe(0x53)
         expect(KeyPowerStatus.RELEASED).toBe(0x52)
     })
@@ -30,8 +29,8 @@ describe('Enums', () => {
     })
 
     it('DataGramDirection', () => {
-        expect(DataGramDirection.OUTGOING).toBe(0x3E)
-        expect(DataGramDirection.INCOMING).toBe(0x3C)
+        expect(DataGramDirection.OUTGOING).toBe(0x3e)
+        expect(DataGramDirection.INCOMING).toBe(0x3c)
     })
 
     it('KeyType', () => {

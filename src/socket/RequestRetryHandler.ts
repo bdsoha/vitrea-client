@@ -1,8 +1,7 @@
-import { TimeoutError }                           from 'p-timeout'
-import { RequestThrottler }                       from './RequestThrottler'
-import { SocketConfigs, PromiseExecutor }         from '../types'
-import pRetry, { AbortError, FailedAttemptError } from 'p-retry'
-
+import pRetry, { AbortError, type FailedAttemptError } from 'p-retry'
+import { TimeoutError } from 'p-timeout'
+import type { PromiseExecutor, SocketConfigs } from '../types'
+import { RequestThrottler } from './RequestThrottler'
 
 export class RequestRetryHandler {
     protected throttler: RequestThrottler
@@ -19,9 +18,9 @@ export class RequestRetryHandler {
         return (error: FailedAttemptError) => {
             this.log.warn('Retry attempt', {
                 label,
-                attempt:     error.attemptNumber,
+                attempt: error.attemptNumber,
                 retriesLeft: error.retriesLeft,
-                error:       error.message
+                error: error.message,
             })
 
             if (!(error instanceof TimeoutError)) {
@@ -30,15 +29,15 @@ export class RequestRetryHandler {
         }
     }
 
-    public async processWithRetry<T>(label: string, callback: PromiseExecutor<T>): Promise<T> {
-        return pRetry(
-            () => this.throttler.process(label, callback),
-            {
-                retries:         this.maxRetries,
-                minTimeout:      50,
-                maxTimeout:      250,
-                onFailedAttempt: this.onFailedAttempt(label)
-            }
-        )
+    public async processWithRetry<T>(
+        label: string,
+        callback: PromiseExecutor<T>,
+    ): Promise<T> {
+        return pRetry(() => this.throttler.process(label, callback), {
+            retries: this.maxRetries,
+            minTimeout: 50,
+            maxTimeout: 250,
+            onFailedAttempt: this.onFailedAttempt(label),
+        })
     }
 }

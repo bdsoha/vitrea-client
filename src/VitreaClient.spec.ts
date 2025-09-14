@@ -1,28 +1,31 @@
-import { Socket }                        from 'node:net'
-import { TimeoutError }                  from 'p-timeout'
-import { VitreaClient }                  from './VitreaClient'
-import { Login, ToggleHeartbeat }        from './requests'
-import { KeyStatus, RoomMetaData }       from './responses'
-import { BaseRequest, BaseResponse }     from './core'
-import { SocketConfigs, LoggerContract } from './types'
-import * as Exceptions                   from './exceptions'
+import { Socket } from 'node:net'
+import { TimeoutError } from 'p-timeout'
+import type { BaseRequest, BaseResponse } from './core'
+import * as Exceptions from './exceptions'
+import { Login, ToggleHeartbeat } from './requests'
+import { KeyStatus, RoomMetaData } from './responses'
+import type { LoggerContract, SocketConfigs } from './types'
+import { VitreaClient } from './VitreaClient'
 
 describe('VitreaClient', () => {
     vi.useFakeTimers()
 
     const getClient = (configs?: Partial<SocketConfigs>) => {
-        return VitreaClient.create({
-            username: 'admin',
-            password: 'secret'
-        }, configs)
+        return VitreaClient.create(
+            {
+                username: 'admin',
+                password: 'secret',
+            },
+            configs,
+        )
     }
 
     const getLogger = (): LoggerContract => {
         return {
-            log:   vi.fn(),
+            log: vi.fn(),
             error: vi.fn(),
-            warn:  vi.fn(),
-            info:  vi.fn(),
+            warn: vi.fn(),
+            info: vi.fn(),
             debug: vi.fn(),
         }
     }
@@ -30,11 +33,11 @@ describe('VitreaClient', () => {
     it('[connect] cannot overwrite an existing connection', async () => {
         const client = getClient()
 
-        // @ts-ignore
+        // @ts-expect-error
         client.socket = 'any non-null value'
 
         await expect(() => client.connect()).rejects.toBeInstanceOf(
-            Exceptions.ConnectionExistsException
+            Exceptions.ConnectionExistsException,
         )
     })
 
@@ -43,7 +46,10 @@ describe('VitreaClient', () => {
 
         vi.spyOn(socket, 'connect').mockImplementation(() => socket)
 
-        const client = getClient({ socketSupplier: () => socket, requestTimeout: 1000 })
+        const client = getClient({
+            socketSupplier: () => socket,
+            requestTimeout: 1000,
+        })
 
         const promise = client.connect()
 
@@ -59,17 +65,21 @@ describe('VitreaClient', () => {
 
         const client = getClient({ socketSupplier: () => socket })
 
-        vi.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
-            expect(request).toBeInstanceOf(ToggleHeartbeat)
-            return undefined
-        })
+        vi.spyOn(client, 'send').mockImplementationOnce(
+            async (request: BaseRequest) => {
+                expect(request).toBeInstanceOf(ToggleHeartbeat)
+                return undefined
+            },
+        )
 
-        vi.spyOn(client, 'send').mockImplementationOnce(async (request: BaseRequest) => {
-            expect(request).toBeInstanceOf(Login)
-            return undefined
-        })
+        vi.spyOn(client, 'send').mockImplementationOnce(
+            async (request: BaseRequest) => {
+                expect(request).toBeInstanceOf(Login)
+                return undefined
+            },
+        )
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         socket.emit('connect')
@@ -79,18 +89,20 @@ describe('VitreaClient', () => {
         const buffer = Buffer.from([])
 
         await expect(getClient().write(buffer)).rejects.toBeInstanceOf(
-            Exceptions.NoConnectionException
+            Exceptions.NoConnectionException,
         )
     })
 
     it('[handleDisconnect] will attempt to reconnect by default', async () => {
         const socket = new Socket()
 
-        const mock = vi.spyOn(socket, 'connect').mockImplementation(() => socket)
+        const mock = vi
+            .spyOn(socket, 'connect')
+            .mockImplementation(() => socket)
 
         const client = getClient({ socketSupplier: () => socket })
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         expect(mock).not.toHaveBeenCalled()
@@ -105,9 +117,12 @@ describe('VitreaClient', () => {
 
         const mock = vi.spyOn(socket, 'connect')
 
-        const client = getClient({ shouldReconnect: false, socketSupplier: () => socket })
+        const client = getClient({
+            shouldReconnect: false,
+            socketSupplier: () => socket,
+        })
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         socket.emit('end')
@@ -119,9 +134,9 @@ describe('VitreaClient', () => {
         expect.assertions(2)
 
         const raw = [
-            0x56, 0x54, 0x55, 0x3C, 0x1A, 0x00, 0x15, 0x1F, 0x00, 0x00, 0x10,
-            0x45, 0x00, 0x6E, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6E,
-            0x00, 0x63, 0x00, 0x65, 0x00, 0xC9,
+            0x56, 0x54, 0x55, 0x3c, 0x1a, 0x00, 0x15, 0x1f, 0x00, 0x00, 0x10,
+            0x45, 0x00, 0x6e, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6e,
+            0x00, 0x63, 0x00, 0x65, 0x00, 0xc9,
         ]
 
         const buffer = Buffer.from([...raw, ...raw])
@@ -130,7 +145,7 @@ describe('VitreaClient', () => {
 
         const client = getClient({ socketSupplier: () => socket })
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         client.addListener('data::1a-1f', (response: BaseResponse) => {
@@ -141,19 +156,17 @@ describe('VitreaClient', () => {
     })
 
     it('[handleData] can ignore Ack logs', async () => {
-        const ack = [
-            0x56, 0x54, 0x55, 0x3C, 0x00, 0x00, 0x03, 0x00, 0x00, 0x3E
-        ]
+        const ack = [0x56, 0x54, 0x55, 0x3c, 0x00, 0x00, 0x03, 0x00, 0x00, 0x3e]
 
         const generic = [
-            0x56, 0x54, 0x55, 0x3C, 0xC8, 0x00, 0x0E, 0x64, 0x03, 0xFF,
-            0x00, 0x0D, 0x6F, 0x00, 0x16, 0x17, 0x09, 0x54, 0x7D
+            0x56, 0x54, 0x55, 0x3c, 0xc8, 0x00, 0x0e, 0x64, 0x03, 0xff, 0x00,
+            0x0d, 0x6f, 0x00, 0x16, 0x17, 0x09, 0x54, 0x7d,
         ]
 
         const notAck = [
-            0x56, 0x54, 0x55, 0x3C, 0x1A, 0x00, 0x15, 0x1F, 0x00, 0x00, 0x10,
-            0x45, 0x00, 0x6E, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6E,
-            0x00, 0x63, 0x00, 0x65, 0x00, 0xC9,
+            0x56, 0x54, 0x55, 0x3c, 0x1a, 0x00, 0x15, 0x1f, 0x00, 0x00, 0x10,
+            0x45, 0x00, 0x6e, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6e,
+            0x00, 0x63, 0x00, 0x65, 0x00, 0xc9,
         ]
 
         const socket = new Socket()
@@ -162,11 +175,11 @@ describe('VitreaClient', () => {
 
         const client = getClient({
             socketSupplier: () => socket,
-            log:            mock,
-            ignoreAckLogs:  true
+            log: mock,
+            ignoreAckLogs: true,
         })
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         socket.emit('data', Buffer.from(ack))
@@ -191,7 +204,7 @@ describe('VitreaClient', () => {
 
         const client = getClient({ socketSupplier: () => socket })
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         client.addListener('vitrea::data::unknown', (response: Buffer) => {
@@ -208,7 +221,7 @@ describe('VitreaClient', () => {
 
         const client = getClient({ socketSupplier: () => socket })
 
-        // @ts-ignore
+        // @ts-expect-error
         client.createNewSocket()
 
         client.disconnect()
@@ -224,8 +237,8 @@ describe('VitreaClient', () => {
         client.onKeyStatus(mock)
 
         const status = new KeyStatus([
-            0x56, 0x54, 0x55, 0x3C, 0x29, 0x00, 0x0A, 0x48, 0x01, 0x00, 0x46,
-            0x00, 0x00, 0x00, 0x41, 0x00, 0x3E,
+            0x56, 0x54, 0x55, 0x3c, 0x29, 0x00, 0x0a, 0x48, 0x01, 0x00, 0x46,
+            0x00, 0x00, 0x00, 0x41, 0x00, 0x3e,
         ])
 
         client.emit('vitrea::status::update', status)
@@ -234,7 +247,7 @@ describe('VitreaClient', () => {
         expect(mock).toHaveBeenCalledWith(status)
     })
 
-    it('[create] redact user credentials in log', function () {
+    it('[create] redact user credentials in log', () => {
         const mock = getLogger()
 
         getClient({ log: mock })
@@ -244,13 +257,13 @@ describe('VitreaClient', () => {
             expect.anything(),
             expect.objectContaining({
                 connection: {
-                    host:     '192.168.1.23',
+                    host: '192.168.1.23',
                     username: 'a***n',
                     password: 's***t',
-                    port:     11501,
-                    version:  'v2'
-                }
-            })
+                    port: 11501,
+                    version: 'v2',
+                },
+            }),
         )
     })
 })

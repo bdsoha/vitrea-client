@@ -1,3 +1,4 @@
+// biome-ignore lint/complexity/noStaticOnlyClass: Static utility class pattern is intentional
 export class SplitMultipleBuffers {
     public static handle(buffer: Buffer): Buffer[] {
         return buffer

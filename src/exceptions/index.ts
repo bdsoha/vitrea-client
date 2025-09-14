@@ -1,2 +1,2 @@
-export { NoConnectionException }     from './NoConnectionException'
 export { ConnectionExistsException } from './ConnectionExistsException'
+export { NoConnectionException } from './NoConnectionException'

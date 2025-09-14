@@ -1,8 +1,8 @@
 export class LinearJitter {
     constructor(
         protected readonly base: number,
-        protected readonly variance: number
-    ) { }
+        protected readonly variance: number,
+    ) {}
 
     public calculate(): number {
         if (this.variance === 0) {

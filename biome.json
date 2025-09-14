@@ -1,0 +1,32 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+    "vcs": {
+        "enabled": false
+    },
+    "files": {
+        "includes": [ "src/**" ]
+    },
+    "formatter": {
+        "useEditorconfig": true
+    },
+    "javascript": {
+        "formatter": {
+            "quoteStyle": "single",
+            "semicolons": "asNeeded",
+            "arrowParentheses": "asNeeded",
+            "operatorLinebreak": "before"
+        }
+    },
+    "assist": {
+        "actions": {
+            "source": {
+                "organizeImports": {
+                    "level": "on",
+                    "options": {
+                        "identifierOrder": "lexicographic"
+                    }
+                }
+            }
+        }
+    }
+}

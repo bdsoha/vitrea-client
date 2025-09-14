@@ -1,6 +1,5 @@
-import { KeyCategory }  from '../utilities/Enums'
 import { BaseResponse } from '../core'
-
+import type { KeyCategory } from '../utilities/Enums'
 
 export class KeyParameters extends BaseResponse {
     protected static readonly nodeIDIndex = 8
@@ -27,9 +26,9 @@ export class KeyParameters extends BaseResponse {
     protected override get toLog() {
         return {
             ...super.toLog,
-            name:     this.name,
-            nodeID:   this.nodeID,
-            keyID:    this.keyID,
+            name: this.name,
+            nodeID: this.nodeID,
+            keyID: this.keyID,
             category: this.category,
         }
     }

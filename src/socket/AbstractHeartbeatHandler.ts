@@ -1,13 +1,12 @@
-import { BaseRequest }           from '../core'
-import { RequestSenderContract } from '../types'
-
+import type { BaseRequest } from '../core'
+import type { RequestSenderContract } from '../types'
 
 export abstract class AbstractHeartbeatHandler {
     protected interval: number
     protected timer?: NodeJS.Timeout
     protected socket: RequestSenderContract
 
-    protected constructor(interval: number, socket: RequestSenderContract) {
+    public constructor(interval: number, socket: RequestSenderContract) {
         this.interval = interval
         this.socket = socket
     }
@@ -26,10 +25,7 @@ export abstract class AbstractHeartbeatHandler {
     public restart() {
         this.pause()
 
-        this.timer = setTimeout(
-            this.handleHeartbeat.bind(this),
-            this.interval
-        )
+        this.timer = setTimeout(this.handleHeartbeat.bind(this), this.interval)
     }
 
     protected async handleHeartbeat() {

@@ -1,6 +1,5 @@
 import { BaseResponse } from '../core'
 
-
 export class RoomMetaData extends BaseResponse {
     protected static readonly idIndex = 8
     protected static readonly nameIndex: number = 11

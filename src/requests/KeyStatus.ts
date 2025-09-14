@@ -1,7 +1,6 @@
-import { Events }      from '../utilities/Events'
-import { CommandID }   from '../types'
 import { BaseRequest } from '../core'
-
+import { CommandID } from '../types'
+import { Events } from '../utilities/Events'
 
 export class KeyStatus extends BaseRequest {
     constructor(nodeID: number, keyID: number) {

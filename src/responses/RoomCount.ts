@@ -1,6 +1,5 @@
 import { BaseResponse } from '../core'
 
-
 export class RoomCount extends BaseResponse {
     public get total() {
         return this.list.length

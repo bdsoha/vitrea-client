@@ -1,6 +1,5 @@
 import * as Exports from './index'
 
-
 describe('imports', () => {
     it('exports 13 modules', () => {
         expect(Object.keys(Exports)).toHaveLength(13)

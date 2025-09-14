@@ -1,9 +1,10 @@
+// biome-ignore lint/complexity/noStaticOnlyClass: Static utility class pattern is intentional
 export class Events {
     public static readonly STATUS_UPDATE: string = 'vitrea::status::update'
     public static readonly UNKNOWN_DATA: string = 'vitrea::data::unknown'
 
     public static acknowledgement(messageID: number): string {
-        return this.generate(0x00, messageID)
+        return Events.generate(0x00, messageID)
     }
 
     public static generate(...keys: string[] | number[]): string {

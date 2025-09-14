@@ -1,6 +1,5 @@
 import { BaseResponse } from '../core'
 
-
 export class NodeCount extends BaseResponse {
     get total() {
         return this.list.length
@@ -14,7 +13,7 @@ export class NodeCount extends BaseResponse {
         return {
             ...super.toLog,
             total: this.total,
-            list:  this.list
+            list: this.list,
         }
     }
 }

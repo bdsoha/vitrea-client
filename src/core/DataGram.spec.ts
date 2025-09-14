@@ -1,6 +1,5 @@
 import { DataGram } from './DataGram'
 
-
 class SampleDataGram extends DataGram {}
 
 describe('DataGram', () => {
@@ -30,19 +29,19 @@ describe('DataGram', () => {
 
     it('[logData] retrieve data to log', () => {
         const buffer = [
-            0x56, 0x54, 0x55, 0x3C, 0x65, 0x00, 0x13, 0x31, 0x0A, 0x0A, 0x0E,
+            0x56, 0x54, 0x55, 0x3c, 0x65, 0x00, 0x13, 0x31, 0x0a, 0x0a, 0x0e,
             0x43, 0x00, 0x75, 0x00, 0x72, 0x00, 0x74, 0x00, 0x61, 0x00, 0x69,
-            0x00, 0x6E, 0x00, 0xDC,
+            0x00, 0x6e, 0x00, 0xdc,
         ]
 
         const dataGram = new SampleDataGram(buffer)
 
         expect(dataGram.logData).toStrictEqual({
-            command:   'SampleDataGram',
+            command: 'SampleDataGram',
             commandID: '0x65',
             direction: 'Incoming',
             messageID: '0x31',
-            raw:       '56:54:55:3C:65:00:13:31:0A:0A:0E:43:00:75:00:72:00:74:00:61:00:69:00:6E:00:DC',
+            raw: '56:54:55:3C:65:00:13:31:0A:0A:0E:43:00:75:00:72:00:74:00:61:00:69:00:6E:00:DC',
         })
     })
 })

@@ -1,9 +1,9 @@
-import { DataGram }          from './DataGram'
-import { MessageID }         from '../utilities/MessageID'
-import { BaseRequest }       from './BaseRequest'
 import { DataGramDirection } from '../utilities/Enums'
+import { MessageID } from '../utilities/MessageID'
+import { BaseRequest } from './BaseRequest'
+import { DataGram } from './DataGram'
 
-class SampleRequest extends BaseRequest { }
+class SampleRequest extends BaseRequest {}
 
 describe('BaseRequest', () => {
     beforeEach(() => MessageID.resetID())
@@ -23,7 +23,7 @@ describe('BaseRequest', () => {
     it('[checksum] calculates a checksum based on the sum of all values', () => {
         expect(new SampleRequest(0x00).checksum).toBe(0x40)
         expect(new SampleRequest(0x01).checksum).toBe(0x42)
-        expect(new SampleRequest(0xC3).checksum).toBe(0x05)
+        expect(new SampleRequest(0xc3).checksum).toBe(0x05)
     })
 
     it('[build] adds the checksum value to the end of the collection', () => {
@@ -60,7 +60,7 @@ describe('BaseRequest', () => {
     })
 
     it('[commandID] inserts the command ID in every message', () => {
-        const commandID = 0xEE
+        const commandID = 0xee
         const dataGram = new SampleRequest(commandID)
         const built = dataGram.build()
 
@@ -69,9 +69,9 @@ describe('BaseRequest', () => {
     })
 
     it('[eventName] generates a unique event-listener name based on command & message IDs', () => {
-        MessageID.setNextID(0xCC)
+        MessageID.setNextID(0xcc)
 
-        expect(new SampleRequest(0xEE).eventName).toBe('data::ee-cc')
+        expect(new SampleRequest(0xee).eventName).toBe('data::ee-cc')
     })
 
     it('[data] has a data series of arbitrary length', () => {
@@ -93,7 +93,6 @@ describe('BaseRequest', () => {
         expect(withoutData.hasData).toBeFalsy()
     })
 
-
     it('[dataLength] knows the length of the data segment as a two-byte series', () => {
         const data = [0x33, 0x44, 0x55]
         const dataGram = new SampleRequest(0x00, data)
@@ -108,28 +107,28 @@ describe('BaseRequest', () => {
     })
 
     it('[logData] retrieve data to log', () => {
-        const dataGram = new SampleRequest(0xFF)
+        const dataGram = new SampleRequest(0xff)
 
         expect(dataGram.logData).toStrictEqual({
-            command:   'SampleRequest',
+            command: 'SampleRequest',
             commandID: '0xFF',
-            data:      '',
+            data: '',
             direction: 'Outgoing',
             messageID: '0x01',
-            raw:       '56:54:55:3E:FF:00:02:01',
+            raw: '56:54:55:3E:FF:00:02:01',
         })
     })
 
     it('[clone] returns same request with next messageID', () => {
         MessageID.setNextID(0x10)
 
-        const original = new SampleRequest(0xAB, [0x33, 0x44])
+        const original = new SampleRequest(0xab, [0x33, 0x44])
 
         const cloned = original.clone()
 
         expect(cloned.getData()).toStrictEqual(original.getData())
 
         expect(original.messageID).toBe(0x10)
-        expect(cloned.commandID).toBe(0xAB)
+        expect(cloned.commandID).toBe(0xab)
     })
 })
