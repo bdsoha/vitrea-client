@@ -4,7 +4,7 @@ import {
     KeyType,
     LEDBackgroundBrightness,
     LockStatus,
-} from './Enums'
+} from '.'
 
 describe('Enums', () => {
     it('KeyPowerStatus', () => {

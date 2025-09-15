@@ -1,5 +1,5 @@
 import { BaseResponse } from '../core'
-import type { KeyCategory } from '../utilities/Enums'
+import type { KeyCategory } from '../types'
 
 export class KeyParameters extends BaseResponse {
     protected static readonly nodeIDIndex = 8

@@ -1,4 +1,4 @@
-import { DataGramDirection } from '../utilities/Enums'
+import { DataGramDirection } from '../types'
 import { BaseResponse } from './BaseResponse'
 import { DataGram } from './DataGram'
 

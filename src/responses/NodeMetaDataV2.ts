@@ -1,4 +1,4 @@
-import type { KeyType } from '../utilities/Enums'
+import type { KeyType } from '../types'
 import { NodeMetaData } from './NodeMetaData'
 
 export class NodeMetaDataV2 extends NodeMetaData {

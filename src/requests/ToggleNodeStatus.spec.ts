@@ -1,4 +1,4 @@
-import { LEDBackgroundBrightness, LockStatus } from '../utilities/Enums'
+import { LEDBackgroundBrightness, LockStatus } from '../types'
 import { MessageID } from '../utilities/MessageID'
 import { ToggleNodeStatus } from './ToggleNodeStatus'
 

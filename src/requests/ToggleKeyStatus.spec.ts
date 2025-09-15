@@ -1,4 +1,4 @@
-import { KeyPowerStatus } from '../utilities/Enums'
+import { KeyPowerStatus } from '../types'
 import { MessageID } from '../utilities/MessageID'
 import { ToggleKeyStatus } from './ToggleKeyStatus'
 

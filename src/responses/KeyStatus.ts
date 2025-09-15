@@ -1,5 +1,5 @@
 import { BaseResponse } from '../core'
-import { KeyPowerStatus } from '../utilities/Enums'
+import { KeyPowerStatus } from '../types'
 import { Events } from '../utilities/Events'
 
 export class KeyStatus extends BaseResponse {

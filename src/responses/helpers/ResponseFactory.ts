@@ -1,6 +1,5 @@
 import { type BaseResponse, DataGram } from '../../core'
-import { type CommandID, ProtocolVersion } from '../../types'
-import { DataGramDirection } from '../../utilities/Enums'
+import { type CommandID, DataGramDirection, ProtocolVersion } from '../../types'
 import { ResponseLookupV1, ResponseLookupV2 } from './ResponseLookup'
 
 // biome-ignore lint/complexity/noStaticOnlyClass: Static utility class pattern is intentional

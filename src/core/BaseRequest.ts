@@ -1,4 +1,4 @@
-import { DataGramDirection } from '../utilities/Enums'
+import { DataGramDirection } from '../types'
 import { MessageID } from '../utilities/MessageID'
 import { DataGram } from './DataGram'
 

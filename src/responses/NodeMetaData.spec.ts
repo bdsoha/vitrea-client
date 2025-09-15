@@ -1,4 +1,4 @@
-import { KeyType, LEDBackgroundBrightness, NodeType } from '../utilities/Enums'
+import { KeyType, LEDBackgroundBrightness, NodeType } from '../types'
 import { NodeMetaData } from './NodeMetaData'
 
 describe('NodeMetaData', () => {

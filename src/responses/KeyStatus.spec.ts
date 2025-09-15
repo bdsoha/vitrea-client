@@ -1,4 +1,4 @@
-import { KeyPowerStatus } from '../utilities/Enums'
+import { KeyPowerStatus } from '../types'
 import { KeyStatus } from './KeyStatus'
 
 describe('KeyStatus', () => {
