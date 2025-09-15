@@ -1,5 +1,5 @@
 import type { LogMeta } from '../types'
-import { DataGramDirection } from '../utilities/Enums'
+import { DataGramDirection } from '../types'
 import { Events } from '../utilities/Events'
 
 export abstract class DataGram {

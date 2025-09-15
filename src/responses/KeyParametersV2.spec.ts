@@ -1,4 +1,4 @@
-import { KeyCategory } from '../utilities/Enums'
+import { KeyCategory } from '../types'
 import { KeyParametersV2 } from './KeyParametersV2'
 
 describe('KeyParametersV2', () => {

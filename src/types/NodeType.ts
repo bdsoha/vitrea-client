@@ -1,56 +1,3 @@
-export const KeyPowerStatus = {
-    ON: 0x4f,
-    OFF: 0x46,
-    LONG: 0x4c,
-    SHORT: 0x53,
-    RELEASED: 0x52,
-} as const
-
-export const LEDBackgroundBrightness = {
-    OFF: 0,
-    LOW: 1,
-    NORMAL: 2,
-    HIGH: 3,
-    MAX: 4,
-} as const
-
-export const LockStatus = {
-    UNLOCKED: 0,
-    LOCKED: 1,
-} as const
-
-export const DataGramDirection = {
-    OUTGOING: 0x3e,
-    INCOMING: 0x3c,
-} as const
-
-export const KeyType = {
-    NOT_EXIST: 0,
-    NOT_ACTIVE: 1,
-    TOGGLE: 2,
-    BLIND: 3,
-    PUSH_BUTTON: 4,
-    DIMMER: 5,
-    DIMMER_MW: 10,
-    BLIND_MW: 11,
-    SATELLITE: 12,
-    TOGGLE_SCENE: 13,
-    DUAL_POLE: 14,
-    BOILER: 15,
-    REPEATER: 16,
-    THERMOSTAT: 17,
-    ALL_NODES: 101,
-} as const
-
-export const KeyCategory = {
-    UNDEFINED: 0,
-    LIGHT: 1,
-    FAN: 6,
-    BOILER: 7,
-    AUDIO: 8,
-    SCENARIO: 11,
-} as const
-
 export const NodeType = {
     VT_MW3_SR1_10A: 1,
     VT_MW3_SR2_10A: 2,
@@ -216,13 +163,4 @@ export const NodeType = {
     VT_BW1_02206_D2B0S2_02: 228,
 } as const
 
-export type KeyPowerStatus =
-    (typeof KeyPowerStatus)[keyof typeof KeyPowerStatus]
-export type LEDBackgroundBrightness =
-    (typeof LEDBackgroundBrightness)[keyof typeof LEDBackgroundBrightness]
-export type LockStatus = (typeof LockStatus)[keyof typeof LockStatus]
-export type DataGramDirection =
-    (typeof DataGramDirection)[keyof typeof DataGramDirection]
-export type KeyType = (typeof KeyType)[keyof typeof KeyType]
-export type KeyCategory = (typeof KeyCategory)[keyof typeof KeyCategory]
 export type NodeType = (typeof NodeType)[keyof typeof NodeType]

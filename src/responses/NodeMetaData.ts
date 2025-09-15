@@ -4,7 +4,7 @@ import {
     type LEDBackgroundBrightness,
     LockStatus,
     NodeType,
-} from '../utilities/Enums'
+} from '../types'
 
 export class NodeMetaData extends BaseResponse {
     protected static readonly idIndex = 8

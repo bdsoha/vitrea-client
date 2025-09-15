@@ -1,6 +1,5 @@
 import { BaseRequest } from '../core'
-import type { Ratio } from '../types'
-import type { KeyPowerStatus } from '../utilities/Enums'
+import type { KeyPowerStatus, Ratio } from '../types'
 import { Events } from '../utilities/Events'
 
 const toByteArray = (seconds: number) => [(seconds >> 8) & 0xff, seconds & 0xff]

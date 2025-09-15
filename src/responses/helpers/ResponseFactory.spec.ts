@@ -1,5 +1,4 @@
-import { ProtocolVersion } from '../../types'
-import { DataGramDirection } from '../../utilities/Enums'
+import { DataGramDirection, ProtocolVersion } from '../../types'
 import { NodeMetaDataV2 } from '../NodeMetaDataV2'
 import { RoomCount } from '../RoomCount'
 import { ResponseFactory } from './ResponseFactory'
