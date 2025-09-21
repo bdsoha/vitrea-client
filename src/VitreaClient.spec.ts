@@ -2,13 +2,20 @@ import { Socket } from 'node:net'
 import { TimeoutError } from 'p-timeout'
 import type { BaseRequest, BaseResponse } from './core'
 import * as Exceptions from './exceptions'
-import { Login, ToggleHeartbeat } from './requests'
-import { KeyStatus, RoomMetaData } from './responses'
+import { Login, NodeCount, ToggleHeartbeat } from './requests'
+import {
+    KeyStatus,
+    NodeCount as NodeCountResponse,
+    RoomMetaData,
+} from './responses'
 import type { LoggerContract, SocketConfigs } from './types'
+import { MessageID } from './utilities/MessageID'
 import { VitreaClient } from './VitreaClient'
 
 describe('VitreaClient', () => {
-    vi.useFakeTimers()
+    beforeEach(() => {
+        vi.useFakeTimers()
+    })
 
     const getClient = (configs?: Partial<SocketConfigs>) => {
         return VitreaClient.create(
@@ -265,5 +272,34 @@ describe('VitreaClient', () => {
                 },
             }),
         )
+    })
+
+    it('[send] successfully sends request and receives response', async () => {
+        vi.useRealTimers()
+
+        const socket = new Socket()
+        const client = getClient({ socketSupplier: () => socket })
+
+        vi.spyOn(socket, 'write').mockImplementation(() => true)
+
+        // @ts-expect-error
+        client.createNewSocket()
+
+        MessageID.setNextID(0x3b)
+
+        const requestPromise = client.send(new NodeCount())
+
+        const responseBuffer = Buffer.from([
+            0x56, 0x54, 0x55, 0x3c, 0x24, 0x00, 0x12, 0x3b, 0x0f, 0x01, 0x02,
+            0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0d, 0x0e,
+            0x0f, 0x10, 0x37,
+        ])
+
+        setImmediate(() => socket.emit('data', responseBuffer))
+
+        const response = await requestPromise
+
+        expect(response).toBeInstanceOf(NodeCountResponse)
+        expect((response as NodeCountResponse).messageID).toBe(0x3b)
     })
 })
