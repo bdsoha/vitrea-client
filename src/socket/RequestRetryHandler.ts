@@ -1,4 +1,4 @@
-import pRetry, { AbortError, type FailedAttemptError } from 'p-retry'
+import pRetry, { AbortError, type RetryContext } from 'p-retry'
 import { TimeoutError } from 'p-timeout'
 import type { PromiseExecutor, SocketConfigs } from '../types'
 import { RequestThrottler } from './RequestThrottler'
@@ -15,11 +15,11 @@ export class RequestRetryHandler {
     }
 
     protected onFailedAttempt(label: string) {
-        return (error: FailedAttemptError) => {
+        return ({ error, attemptNumber, retriesLeft }: RetryContext) => {
             this.log.warn('Retry attempt', {
                 label,
-                attempt: error.attemptNumber,
-                retriesLeft: error.retriesLeft,
+                attempt: attemptNumber,
+                retriesLeft: retriesLeft,
                 error: error.message,
             })
 

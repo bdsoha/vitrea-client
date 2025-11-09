@@ -51,7 +51,7 @@ await client.connect()
 
 // Get room information
 const rooms = await client.send(new Requests.RoomCount())
-console.log(`Found ${rooms.count} rooms`)
+console.log(`Found ${rooms.total} rooms`)
 
 // Monitor real-time key presses
 client.onKeyStatus(status => {

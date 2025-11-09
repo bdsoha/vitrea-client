@@ -71,15 +71,20 @@ describe('RequestRetryHandler', () => {
     })
 
     it('[onFailedAttempt] logs retry attempt information for TimeoutError', () => {
-        const failedAttemptError = Object.assign(new TimeoutError(), {
+        const timeoutError = new TimeoutError()
+        timeoutError.message = 'Timeout occurred'
+
+        const retryContext = {
+            error: timeoutError,
             attemptNumber: 2,
             retriesLeft: 1,
-            message: 'Timeout occurred',
-        })
+            retriesConsumed: 0,
+        }
 
-        const onFailedAttempt = handler.onFailedAttempt('test-label')
+        // biome-ignore lint/complexity/useLiteralKeys: Accessing protected member in test
+        const onFailedAttempt = handler['onFailedAttempt']('test-label')
 
-        expect(() => onFailedAttempt(failedAttemptError)).not.toThrow()
+        expect(() => onFailedAttempt(retryContext)).not.toThrow()
 
         expect(mockLogger.warn).toHaveBeenCalledWith('Retry attempt', {
             label: 'test-label',
@@ -90,17 +95,19 @@ describe('RequestRetryHandler', () => {
     })
 
     it('[onFailedAttempt] throws AbortError for non-TimeoutError', () => {
-        const failedAttemptError = Object.assign(
-            new Error('Connection refused'),
-            {
-                attemptNumber: 1,
-                retriesLeft: 2,
-            },
-        )
+        const error = new Error('Connection refused')
 
-        const onFailedAttempt = handler.onFailedAttempt('test-label')
+        const retryContext = {
+            error: error,
+            attemptNumber: 1,
+            retriesLeft: 2,
+            retriesConsumed: 0,
+        }
 
-        expect(() => onFailedAttempt(failedAttemptError)).toThrow(AbortError)
+        // biome-ignore lint/complexity/useLiteralKeys: Accessing protected member in test
+        const onFailedAttempt = handler['onFailedAttempt']('test-label')
+
+        expect(() => onFailedAttempt(retryContext)).toThrow(AbortError)
         expect(mockLogger.warn).toHaveBeenCalledWith('Retry attempt', {
             label: 'test-label',
             attempt: 1,
