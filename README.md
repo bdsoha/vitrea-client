@@ -53,6 +53,18 @@ await client.connect()
 const rooms = await client.send(new Requests.RoomCount())
 console.log(`Found ${rooms.total} rooms`)
 
+// Get node meta information
+const meta = await client.send(new Requests.NodeMetaData(7))
+console.log('Node 7 meta')
+console.log(`   ID:          ${meta.id}`)
+console.log(`   Room ID:     ${meta.roomID}`)
+console.log(`   Version:     ${meta.version}`)
+console.log(`   MAC Address: ${meta.macAddress}`)
+console.log(`   LED Level:   ${meta.ledLevel}`)
+console.log(`   Locked?:     ${meta.isLocked}`)
+console.log(`   Total Keys:  ${meta.totalKeys}`)
+console.log(`   Key List:    ${meta.keysList}`)
+
 // Monitor real-time key presses
 client.onKeyStatus(status => {
     console.log(`${status.isOn ? 'ON' : 'OFF'}: Room ${status.nodeID}, Key ${status.keyID}`)
@@ -121,24 +133,24 @@ configuration keys.
 
 The `Requests` namespace provides all available commands:
 
-| Command                   | Purpose                              | Example Usage                                                                          |
-| ------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------- |
-| **System Information**    |                                      |                                                                                        |
-| `NodeCount`               | Get total nodes in system            | `await client.send(new Requests.NodeCount())`                                          |
-| `RoomCount`               | Get total rooms in system            | `await client.send(new Requests.RoomCount())`                                          |
-| `NodeMetaData`            | Get node details and capabilities    | `await client.send(new Requests.NodeMetaData({ nodeID: 1 }))`                          |
-| `RoomMetaData`            | Get room information                 | `await client.send(new Requests.RoomMetaData({ roomID: 1 }))`                          |
-| **Status & Control**      |                                      |                                                                                        |
-| `KeyStatus`               | Get current state of a key           | `await client.send(new Requests.KeyStatus({ nodeID: 1, keyID: 1 }))`                   |
-| `KeyParameters`           | Get key configuration settings       | `await client.send(new Requests.KeyParameters({ nodeID: 1, keyID: 1 }))`               |
-| `ToggleKeyStatus`         | Control lights/devices               | `await client.send(new Requests.ToggleKeyStatus({ nodeID: 1, keyID: 1, dimmer: 75 }))` |
+| Command                   | Purpose                              | Example Usage                                                                                               |
+| ------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| **System Information**    |                                      |                                                                                                             |
+| `NodeCount`               | Get total nodes in system            | `await client.send(new Requests.NodeCount())`                                                               |
+| `RoomCount`               | Get total rooms in system            | `await client.send(new Requests.RoomCount())`                                                               |
+| `NodeMetaData`            | Get node details and capabilities    | `await client.send(new Requests.NodeMetaData(nodeID: number))`                                              |
+| `RoomMetaData`            | Get room information                 | `await client.send(new Requests.RoomMetaData(roomID: number))`                                              |
+| **Status & Control**      |                                      |                                                                                                             |
+| `KeyStatus`               | Get current state of a key           | `await client.send(new Requests.KeyStatus(nodeID: number, keyID: number))`                                  |
+| `KeyParameters`           | Get key configuration settings       | `await client.send(new Requests.KeyParameters(nodeID: 1, keyID: number))`                                   |
+| `ToggleKeyStatus`         | Control lights/devices               | `await client.send(new Requests.ToggleKeyStatus(nodeID: number, keyID: number, dimmer: number))`            |
 | `ToggleNodeStatus`        | Control node lock and LED backlight  | `await client.send(new Requests.ToggleNodeStatus(11, LockStatus.UNLOCKED, LEDBackgroundBrightness.NORMAL))` |
-| `NodeStatus`              | Get comprehensive node status        | `await client.send(new Requests.NodeStatus({ nodeID: 1 }))`                            |
-| `InternalUnitStatuses`    | Subscribe to internal status changes | `await client.send(new Requests.InternalUnitStatuses())`                               |
-| **Connection Management** |                                      |                                                                                        |
-| `Login`                   | Authenticate with the system         | `await client.send(new Requests.Login())`                                              |
-| `Heartbeat`               | Manual heartbeat (auto-handled)      | `await client.send(new Requests.Heartbeat())`                                          |
-| `ToggleHeartbeat`         | Enable/disable auto-heartbeat        | `await client.send(new Requests.ToggleHeartbeat(false))`                               |
+| `NodeStatus`              | Get comprehensive node status        | `await client.send(new Requests.NodeStatus(nodeID: number))`                                                |
+| `InternalUnitStatuses`    | Subscribe to internal status changes | `await client.send(new Requests.InternalUnitStatuses())`                                                    |
+| **Connection Management** |                                      |                                                                                                             |
+| `Login`                   | Authenticate with the system         | `await client.send(new Requests.Login())`                                                                   |
+| `Heartbeat`               | Manual heartbeat (auto-handled)      | `await client.send(new Requests.Heartbeat())`                                                               |
+| `ToggleHeartbeat`         | Enable/disable auto-heartbeat        | `await client.send(new Requests.ToggleHeartbeat(false))`                                                    |
 
 ### Protocol Versions
 
