@@ -30,4 +30,20 @@ describe('KeyStatus', () => {
 
         expect(command).toHaveProperty('eventName', 'vitrea::status::update')
     })
+
+    it('[logData] names the node, key and power status', () => {
+        expect(new KeyStatus(raw).logData).toMatchObject({
+            nodeID: 0x01,
+            keyID: 0x00,
+            power: 'OFF',
+        })
+    })
+
+    it('[logData] shows an unnamed power status as hex', () => {
+        const press = [...raw.slice(0, 10), 0x50, ...raw.slice(11, 16)]
+
+        expect(new KeyStatus([...press, 0x00]).logData).toMatchObject({
+            power: '0x50',
+        })
+    })
 })
