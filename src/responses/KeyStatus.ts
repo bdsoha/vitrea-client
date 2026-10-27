@@ -31,6 +31,23 @@ export class KeyStatus extends BaseResponse {
         return this.power === KeyPowerStatus.RELEASED
     }
 
+    protected get powerName(): string {
+        const entry = Object.entries(KeyPowerStatus).find(
+            ([, value]) => value === this.power,
+        )
+
+        return entry ? entry[0] : this.toHex(this.power)
+    }
+
+    protected override get toLog() {
+        return {
+            ...super.toLog,
+            nodeID: this.nodeID,
+            keyID: this.keyID,
+            power: this.powerName,
+        }
+    }
+
     public override get eventName(): string {
         return Events.STATUS_UPDATE
     }
