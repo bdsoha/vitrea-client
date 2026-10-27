@@ -1,8 +1,8 @@
 import * as Exports from './index'
 
 describe('imports', () => {
-    it('exports 13 modules', () => {
-        expect(Object.keys(Exports)).toHaveLength(13)
+    it('exports 14 modules', () => {
+        expect(Object.keys(Exports)).toHaveLength(14)
     })
 
     it('contains the requests module', () => {
