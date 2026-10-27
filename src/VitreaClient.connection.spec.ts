@@ -98,6 +98,47 @@ describe('VitreaClient connection', () => {
         expect(controller.connections).toHaveLength(2)
     })
 
+    it('[heartbeat] a reconnect while a heartbeat is in flight keeps one heartbeat loop', async () => {
+        let held = false
+
+        await start(
+            received => {
+                if (
+                    received.command === CommandID.Heartbeat
+                    && received.connection === 0
+                    && !held
+                ) {
+                    held = true
+                    controller.connections[0].end()
+
+                    return []
+                }
+
+                return acknowledgeAll(received)
+            },
+            { heartbeatInterval: 20 },
+        )
+
+        await client.connect()
+        await waitFor(() => controller.connections.length === 2)
+        await waitFor(() => controller.commands(1).includes(CommandID.Login))
+
+        const before = controller
+            .commands(1)
+            .filter(command => command === CommandID.Heartbeat).length
+
+        await sleep(500)
+
+        const beats =
+            controller
+                .commands(1)
+                .filter(command => command === CommandID.Heartbeat).length
+            - before
+
+        expect(beats).toBeGreaterThan(5)
+        expect(beats).toBeLessThanOrEqual(26)
+    })
+
     it('[reconnect] backs off when the handshake keeps failing', async () => {
         await start(received =>
             received.connection === 0 ? acknowledgeAll(received) : [],

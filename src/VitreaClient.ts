@@ -62,7 +62,7 @@ export class VitreaClient<
     }
 
     public disconnect() {
-        this.heartbeat.stop()
+        this.heartbeat.dispose()
         this.connection.disconnect()
     }
 
