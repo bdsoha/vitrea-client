@@ -17,11 +17,16 @@ socket communication, connection management, and protocol versioning so you don'
 Smart home integrations shouldn't be fragile.
 This client was built from the ground up with real-world reliability in mind:
 
-- **Battle-tested connection handling:** Automatic retries, exponential backoff, and intelligent reconnection.
-- **Zero-downtime heartbeats:** Keeps your connection alive without manual intervention.
-- **Thread-safe messaging:** Built-in mutex prevents race conditions and message collisions.
-- **Protocol flexibility:**  Seamlessly supports both V1 legacy and V2 modern protocols.
-- **Production-ready logging:** Integrates with your existing logging infrastructure.
+- **Reconnects on its own:** A dropped, reset or silent connection is reopened with backoff, and the
+  login handshake is repeated.
+- **Heartbeats that notice a dead controller:** A heartbeat that goes unanswered closes the
+  connection so it can be reopened.
+- **Replies matched like the vendor's own client:** Each request is matched to its reply by message
+  ID, and acknowledgements are handled per protocol version.
+- **One request at a time:** Requests are queued, spaced and resent with the same message ID on
+  timeout.
+- **Protocol flexibility:** Supports both the V1 and V2 protocols.
+- **Production-ready logging:** Plugs into your logger, with credentials redacted.
 
 ## Quick Start
 
@@ -31,7 +36,7 @@ This client was built from the ground up with real-world reliability in mind:
 npm install vitrea-client
 ```
 
-Requires Node.js 18.17+ or 20.5+
+Requires Node.js 22.12 or later. Ships both ESM and CommonJS builds.
 
 ### Basic Usage
 
@@ -67,9 +72,12 @@ console.log(`   Key List:    ${meta.keysList}`)
 
 // Monitor real-time key presses
 client.onKeyStatus(status => {
-    console.log(`${status.isOn ? 'ON' : 'OFF'}: Room ${status.nodeID}, Key ${status.keyID}`)
+    console.log(`${status.isOn ? 'ON' : 'OFF'}: Node ${status.nodeID}, Key ${status.keyID}`)
 })
 ```
+
+`send()` resolves with the response type of the request, so `rooms` above is typed as
+`Responses.RoomCount`.
 
 ## Configuration
 
@@ -86,32 +94,32 @@ const client = VitreaClient.create({
 }, {
     // Optional socket configuration
     requestBuffer: 250,          // ms between requests (prevents overwhelming)
-    requestTimeout: 1000,        // ms to wait for responses
-    heartbeatInterval: 2500,     // ms between heartbeat pings
+    requestTimeout: 1000,        // ms to wait for a reply before resending
+    maxRetries: 3,               // resends after a timeout
+    heartbeatInterval: 3000,     // ms between heartbeat pings
     shouldReconnect: true,       // Auto-reconnect on disconnect
-    ignoreAckLogs: false        // Filter out acknowledgment noise
 })
 ```
 
 ### Complete Configuration Reference
 
-| Setting                 | Description                   | Default        | Notes                                      |
-| ----------------------- | ----------------------------- | -------------- | ------------------------------------------ |
-| **Connection**          |                               |                |                                            |
-| `host`                  | Vitrea system IP address      | `192.168.1.23` |                                            |
-| `port`                  | Connection port               | `11501`        |                                            |
-| `username`              | Authentication username       | `null`         | Required for most operations               |
-| `password`              | Authentication password       | `null`         | Required for most operations               |
-| `version`               | Protocol version              | `V2`           | V2 recommended for new projects            |
-| **Reliability**         |                               |                |                                            |
-| `requestBuffer`         | Delay between requests *(ms)* | `250`          | Prevents server overload                   |
-| `requestBufferVariance` | Jitter factor *(0.0-1.0)*     | `0.15`         | Adds randomness to prevent thundering herd |
-| `requestTimeout`        | Request timeout *(ms)*        | `1000`         | How long to wait for responses             |
-| `heartbeatInterval`     | Heartbeat frequency *(ms)*    | `2500`         | Keep-alive interval                        |
-| `shouldReconnect`       | Auto-reconnect on failure     | `true`         | Recommended for production                 |
-| **Debugging**           |                               |                |                                            |
-| `log`                   | Custom logger instance        | `null`         | Implement LoggerContract interface         |
-| `ignoreAckLogs`         | Hide acknowledgment logs      | `false`        | Reduces log noise                          |
+| Setting                 | Description                        | Default        | Notes                                      |
+| ----------------------- | ---------------------------------- | -------------- | ------------------------------------------ |
+| **Connection**          |                                    |                |                                            |
+| `host`                  | Vitrea system IP address           | `192.168.1.23` |                                            |
+| `port`                  | Connection port                    | `11501`        |                                            |
+| `username`              | Authentication username            |                | Required                                   |
+| `password`              | Authentication password            |                | Required                                   |
+| `version`               | Protocol version                   | `V2`           | V2 recommended for new projects            |
+| **Reliability**         |                                    |                |                                            |
+| `requestBuffer`         | Delay between requests *(ms)*      | `250`          | Prevents server overload                   |
+| `requestBufferVariance` | Jitter factor *(0.0-1.0)*          | `0.15`         | Adds randomness to the delay               |
+| `requestTimeout`        | Reply and connect timeout *(ms)*   | `1000`         | Must be greater than 0                     |
+| `maxRetries`            | Resends after a timeout            | `3`            | Same message ID on every resend            |
+| `heartbeatInterval`     | Heartbeat frequency *(ms)*         | `3000`         | Must be greater than 0                     |
+| `shouldReconnect`       | Auto-reconnect on failure          | `true`         | Recommended for production                 |
+| **Debugging**           |                                    |                |                                            |
+| `log`                   | Custom logger instance             | silent         | Implement the `LoggerContract` interface   |
 
 ### Environment Variables
 
@@ -125,7 +133,7 @@ export VITREA_VBOX_PASSWORD=secure-password
 ```
 
 The client will automatically pick up any `VITREA_VBOX_*` environment variables that match
-configuration keys.
+configuration keys, such as `VITREA_VBOX_REQUEST_TIMEOUT` for `requestTimeout`.
 
 ## API Reference
 
@@ -136,29 +144,46 @@ The `Requests` namespace provides all available commands:
 | Command                   | Purpose                              | Example Usage                                                                                               |
 | ------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | **System Information**    |                                      |                                                                                                             |
-| `NodeCount`               | Get total nodes in system            | `await client.send(new Requests.NodeCount())`                                                               |
-| `RoomCount`               | Get total rooms in system            | `await client.send(new Requests.RoomCount())`                                                               |
-| `NodeMetaData`            | Get node details and capabilities    | `await client.send(new Requests.NodeMetaData(nodeID: number))`                                              |
-| `RoomMetaData`            | Get room information                 | `await client.send(new Requests.RoomMetaData(roomID: number))`                                              |
+| `NodeCount`               | Get the nodes in the system          | `await client.send(new Requests.NodeCount())`                                                               |
+| `RoomCount`               | Get the rooms in the system          | `await client.send(new Requests.RoomCount())`                                                               |
+| `NodeMetaData`            | Get node details and capabilities    | `await client.send(new Requests.NodeMetaData(nodeID))`                                                      |
+| `RoomMetaData`            | Get room information                 | `await client.send(new Requests.RoomMetaData(roomID))`                                                      |
 | **Status & Control**      |                                      |                                                                                                             |
-| `KeyStatus`               | Get current state of a key           | `await client.send(new Requests.KeyStatus(nodeID: number, keyID: number))`                                  |
-| `KeyParameters`           | Get key configuration settings       | `await client.send(new Requests.KeyParameters(nodeID: 1, keyID: number))`                                   |
-| `ToggleKeyStatus`         | Control lights/devices               | `await client.send(new Requests.ToggleKeyStatus(nodeID: number, keyID: number, dimmer: number))`            |
+| `KeyStatus`               | Get the current state of a key       | `await client.send(new Requests.KeyStatus(nodeID, keyID))`                                                  |
+| `NodeStatus`              | Get the status of a node             | `await client.send(new Requests.NodeStatus(nodeID))`                                                        |
+| `KeyParameters`           | Get key configuration settings       | `await client.send(new Requests.KeyParameters(nodeID, keyID))`                                              |
+| `ToggleKeyStatus`         | Control lights/devices               | `await client.send(new Requests.ToggleKeyStatus(nodeID, keyID, KeyPowerStatus.ON, { dimmerRatio: 50 }))`    |
 | `ToggleNodeStatus`        | Control node lock and LED backlight  | `await client.send(new Requests.ToggleNodeStatus(11, LockStatus.UNLOCKED, LEDBackgroundBrightness.NORMAL))` |
-| `NodeStatus`              | Get comprehensive node status        | `await client.send(new Requests.NodeStatus(nodeID: number))`                                                |
-| `InternalUnitStatuses`    | Subscribe to internal status changes | `await client.send(new Requests.InternalUnitStatuses())`                                                    |
+| `InternalUnitStatuses`    | Get the controller's internal units  | `await client.send(new Requests.InternalUnitStatuses())`                                                    |
 | **Connection Management** |                                      |                                                                                                             |
-| `Login`                   | Authenticate with the system         | `await client.send(new Requests.Login())`                                                                   |
-| `Heartbeat`               | Manual heartbeat (auto-handled)      | `await client.send(new Requests.Heartbeat())`                                                               |
-| `ToggleHeartbeat`         | Enable/disable auto-heartbeat        | `await client.send(new Requests.ToggleHeartbeat(false))`                                                    |
+| `Login`                   | Authenticate *(sent on connect)*     | `await client.send(new Requests.Login(username, password))`                                                 |
+| `Heartbeat`               | Manual heartbeat *(sent for you)*    | `await client.send(new Requests.Heartbeat())`                                                               |
+| `ToggleHeartbeat`         | Enable/disable heartbeat and pushes  | `await client.send(new Requests.ToggleHeartbeat(false))`                                                    |
+
+Commands that only change something, such as `ToggleKeyStatus` and `Login`, resolve with a
+`Responses.Acknowledgement`. Check `isOK` to see whether the controller accepted it.
+
+### Errors
+
+The `Exceptions` namespace holds the errors `connect()` and `send()` reject with:
+
+| Error                       | When                                                                         |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| `NoConnectionException`     | A request is sent while there is no connection                               |
+| `ConnectionExistsException` | `connect()` is called while a connection is already open                     |
+| `RequestRejectedException`  | The controller rejected the request; `error.ack.type` holds the `AckType`    |
+
+A request that gets no reply after all resends rejects with the `TimeoutError` of `p-timeout`.
+A refused connection rejects with the socket error, such as `ECONNREFUSED`.
 
 ### Protocol Versions
 
 - **V2 *(Recommended)*:** Modern protocol with full feature support.
 - **V1 *(Legacy)*:** Compatibility mode for older systems.
 
-The client automatically handles protocol differences.
-V2 provides enhanced metadata and improved error handling.
+The client parses the replies of each version with its own layout.
+On V2, a `KeyStatus` for a node that is not responding rejects at once with a
+`RequestRejectedException` of type `NOT_AVAILABLE`.
 
 ## Advanced Features
 
@@ -175,12 +200,21 @@ const client = VitreaClient.create(
     { log: new ConsoleLogger() }
 )
 
-// Your existing logger (must implement LoggerContract)
+// Your existing logger, implementing LoggerContract
 const client = VitreaClient.create(
     { host: '192.168.1.23', username: 'admin', password: 'secret' },
-    { log: yourLogger, ignoreAckLogs: true } // Hide noisy acknowledgments
+    { log: yourLogger }
 )
 ```
+
+A logger implements `error`, `warn`, `info` and `debug`, each called with a message and one meta
+object.
+Every line carries the `host` and a `scope` (`client`, `connection` or `heartbeat`).
+
+- **info:** Requests sent, replies and status pushes received, connection changes, and a
+  `Heartbeat summary` every 5 minutes.
+- **debug:** Heartbeats and acknowledgements.
+- **Credentials:** `Login` requests are logged with their data redacted.
 
 ### Real-Time Event Monitoring
 
@@ -190,28 +224,33 @@ React to system changes as they happen:
 import { VitreaClient, Responses } from 'vitrea-client'
 
 const client = VitreaClient.create({ /* config */ })
-await client.connect()
 
 // Monitor all key state changes
 client.onKeyStatus((status: Responses.KeyStatus) => {
-    console.log(`Room ${status.nodeID}, Key ${status.keyID}: ${status.isOn ? 'ON' : 'OFF'}`)
-
-    // React to specific events
-    if (status.nodeID === 1 && status.keyID === 'security-panel' && status.isOn) {
-        handleSecurityActivation()
-    }
+    console.log(`Node ${status.nodeID}, Key ${status.keyID}: ${status.isOn ? 'ON' : 'OFF'}`)
 })
 
-// Connection status monitoring
-client.on('connected', () => console.log('System connected'))
-client.on('disconnected', () => console.log('System disconnected'))
-client.on('reconnecting', () => console.log('Attempting reconnection...'))
+// Re-read anything you cache: changes during the outage were not pushed
+client.onReconnect(() => console.log('Reconnected and logged in again'))
+
+// The controller did not accept the credentials
+client.onLoginFailed(ack => console.error('Login rejected', ack.type))
+
+await client.connect()
 ```
 
 ## Contributing
 
 Found a bug or want to contribute?
 Check out our [GitHub repository](https://github.com/bdsoha/vitrea-client) or open an issue.
+
+```bash
+pnpm install
+pnpm typecheck && pnpm lint && pnpm test
+pnpm build && pnpm build:check
+```
+
+The repository uses pnpm and refuses dependency versions published less than 14 days ago.
 
 ## License
 
