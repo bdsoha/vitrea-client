@@ -77,4 +77,77 @@ describe('HeartbeatMonitor', () => {
             }),
         )
     })
+
+    it('[start] a restart while a beat is in flight keeps a single loop', async () => {
+        const hanging: Array<() => void> = []
+        const beat = vi.fn(async () => {
+            if (beat.mock.calls.length === 1) {
+                await new Promise<void>(resolve => hanging.push(resolve))
+            }
+        })
+        const monitor = new HeartbeatMonitor(
+            100,
+            beat,
+            vi.fn(),
+            new ScopedLogger(getLogger()),
+        )
+
+        monitor.start()
+        await vi.advanceTimersByTimeAsync(100)
+        monitor.start()
+        hanging[0]()
+        await vi.advanceTimersByTimeAsync(1000)
+        monitor.dispose()
+
+        expect(beat).toHaveBeenCalledTimes(11)
+    })
+
+    it('[start] ignores the failure of a beat from before a restart', async () => {
+        const onFailure = vi.fn()
+        const failing: Array<(error: Error) => void> = []
+        const beat = vi.fn(async () => {
+            if (beat.mock.calls.length === 1) {
+                await new Promise<void>((_, reject) => failing.push(reject))
+            }
+        })
+        const monitor = new HeartbeatMonitor(
+            100,
+            beat,
+            onFailure,
+            new ScopedLogger(getLogger()),
+        )
+
+        monitor.start()
+        await vi.advanceTimersByTimeAsync(100)
+        monitor.start()
+        failing[0](new Error('No socket connection established'))
+        await vi.advanceTimersByTimeAsync(300)
+        monitor.dispose()
+
+        expect(onFailure).not.toHaveBeenCalled()
+        expect(beat).toHaveBeenCalledTimes(4)
+    })
+
+    it('[summarize] keeps its interval across restarts', async () => {
+        const logger = getLogger()
+        const monitor = new HeartbeatMonitor(
+            100,
+            async () => {},
+            vi.fn(),
+            new ScopedLogger(logger),
+            1000,
+        )
+
+        monitor.start()
+
+        for (let i = 0; i < 4; i++) {
+            await vi.advanceTimersByTimeAsync(400)
+            monitor.stop()
+            monitor.start()
+        }
+
+        monitor.dispose()
+
+        expect(logger.info).toHaveBeenCalledTimes(1)
+    })
 })

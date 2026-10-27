@@ -3,6 +3,7 @@ import type { ScopedLogger } from '../logging'
 export class HeartbeatMonitor {
     protected timer?: NodeJS.Timeout
     protected summaryTimer?: NodeJS.Timeout
+    protected epoch = 0
     protected sent = 0
     protected acknowledged = 0
     protected reconnects = 0
@@ -20,18 +21,26 @@ export class HeartbeatMonitor {
     public start() {
         this.stop()
         this.connectedAt = Date.now()
-        this.schedule()
-        this.summaryTimer = setInterval(
-            () => this.summarize(),
-            this.summaryInterval,
-        )
-        this.summaryTimer.unref()
+        this.schedule(this.epoch)
+
+        if (!this.summaryTimer) {
+            this.summaryTimer = setInterval(
+                () => this.summarize(),
+                this.summaryInterval,
+            )
+            this.summaryTimer.unref()
+        }
     }
 
     public stop() {
+        this.epoch++
         clearTimeout(this.timer)
-        clearInterval(this.summaryTimer)
         this.timer = undefined
+    }
+
+    public dispose() {
+        this.stop()
+        clearInterval(this.summaryTimer)
         this.summaryTimer = undefined
     }
 
@@ -39,19 +48,21 @@ export class HeartbeatMonitor {
         this.reconnects++
     }
 
-    protected schedule() {
-        this.timer = setTimeout(() => void this.tick(), this.interval)
+    protected schedule(epoch: number) {
+        this.timer = setTimeout(() => void this.tick(epoch), this.interval)
         this.timer.unref()
     }
 
-    protected async tick() {
+    protected async tick(epoch: number) {
         this.sent++
 
         try {
             await this.beat()
         } catch (error) {
-            this.timer = undefined
-            this.onFailure(error)
+            if (epoch === this.epoch) {
+                this.timer = undefined
+                this.onFailure(error)
+            }
 
             return
         }
@@ -59,8 +70,8 @@ export class HeartbeatMonitor {
         this.acknowledged++
         this.lastAcknowledgedAt = Date.now()
 
-        if (this.timer) {
-            this.schedule()
+        if (epoch === this.epoch) {
+            this.schedule(epoch)
         }
     }
 
