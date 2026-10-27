@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { Login } from './Login'
 
 describe('Login', () => {
-    beforeEach(() => MessageID.resetID())
-
     it('converts credentials as 16-byte characters', () => {
-        const command = new Login('user', 'super')
+        const command = new Login('user', 'super').withMessageID(1)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -16,9 +13,13 @@ describe('Login', () => {
         )
     })
 
-    it('[eventName] uses the Acknowledgement event name', () => {
-        const command = new Login('user', 'super')
+    it('[logData] redacts the credentials', () => {
+        const command = new Login('user', 'super').withMessageID(1)
 
-        expect(command).toHaveProperty('eventName', 'data::00-01')
+        expect(command.logData).toMatchObject({
+            data: '[redacted]',
+            raw: '56:54:55:3E:01:00:16:01:[redacted]',
+        })
+        expect(JSON.stringify(command.logData)).not.toContain('73:00:75:00')
     })
 })

@@ -1,25 +1,20 @@
 {
     "compilerOptions": {
-        "declaration": true,
-        "emitDecoratorMetadata": false,
-        "experimentalDecorators": true,
-        "esModuleInterop": true,
-        "lib": ["ES6"],
+        "target": "ES2023",
+        "lib": ["ES2023"],
         "module": "ESNext",
         "moduleResolution": "bundler",
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitAny": true,
+        "types": ["node", "vitest/globals"],
+        "strict": true,
+        "noImplicitOverride": true,
         "noImplicitReturns": true,
-        "noImplicitThis": false,
-        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
         "noUnusedLocals": true,
-        "outDir": "dist",
-        "resolveJsonModule": true,
-        "sourceMap": true,
-        "strictNullChecks": false,
-        "target": "es2020",
-        "types": ["node", "vitest/globals"]
+        "noUnusedParameters": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "noEmit": true
     },
-    "include": ["src"],
-    "exclude": ["node_modules"]
+    "include": ["src", "*.config.ts"]
 }

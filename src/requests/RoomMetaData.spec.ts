@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { RoomMetaData } from './RoomMetaData'
 
 describe('RoomMetaData', () => {
     it('requests the metadata for a node', () => {
-        MessageID.setNextID(30)
-
-        const command = new RoomMetaData(0)
+        const command = new RoomMetaData(0).withMessageID(30)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([

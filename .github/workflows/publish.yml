@@ -5,6 +5,10 @@ on:
     types:
       - published
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   publish:
     name: 🚀 Publish
@@ -15,20 +19,21 @@ jobs:
       - name: 📚 Checkout
         uses: actions/checkout@v5
 
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v6
+
       - name: 🔵 Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org/
-          cache: yarn
+          cache: pnpm
 
       - name: ⏬ Install Dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: 🏗 Build
-        run: npm run build
+        run: pnpm build
 
       - name: 🚀 Publish
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

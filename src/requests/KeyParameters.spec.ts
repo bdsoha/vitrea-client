@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { KeyParameters } from './KeyParameters'
 
 describe('KeyParameters ', () => {
     it('requests the key parameters', () => {
-        MessageID.setNextID(124)
-
-        const command = new KeyParameters(1, 2)
+        const command = new KeyParameters(1, 2).withMessageID(124)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([

@@ -1,12 +1,13 @@
 import { KeyPowerStatus } from '../types'
-import { MessageID } from '../utilities/MessageID'
 import { ToggleKeyStatus } from './ToggleKeyStatus'
 
 describe('ToggleKeyStatus ', () => {
-    beforeEach(() => MessageID.setNextID(121))
-
     it('requests to toggle the power status', () => {
-        const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF)
+        const command = new ToggleKeyStatus(
+            1,
+            2,
+            KeyPowerStatus.OFF,
+        ).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -19,7 +20,7 @@ describe('ToggleKeyStatus ', () => {
     it('sets dimmer ratio', () => {
         const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF, {
             dimmerRatio: 99,
-        })
+        }).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -32,19 +33,13 @@ describe('ToggleKeyStatus ', () => {
     it('sets timer', () => {
         const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF, {
             timer: 6890,
-        })
+        }).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
                 0x56, 0x54, 0x55, 0x3e, 0x28, 0x00, 0x08, 0x79, 0x01, 0x02,
-                0x46, 0x00, 0x1a, 0xea, 0x04,
+                0x46, 0x00, 0x1a, 0xea, 0x33,
             ]),
         )
-    })
-
-    it('[eventName] uses the acknowledgement event name', () => {
-        const command = new ToggleKeyStatus(1, 2, KeyPowerStatus.OFF)
-
-        expect(command).toHaveProperty('eventName', 'data::00-79')
     })
 })

@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { KeyStatus } from './KeyStatus'
 
 describe('KeyStatus ', () => {
     it('requests the status for a key', () => {
-        MessageID.setNextID(121)
-
-        const command = new KeyStatus(1, 2)
+        const command = new KeyStatus(1, 2).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -13,11 +10,5 @@ describe('KeyStatus ', () => {
                 0xe6,
             ]),
         )
-    })
-
-    it('[eventName] uses the *status update* event name', () => {
-        const command = new KeyStatus(1, 2)
-
-        expect(command).toHaveProperty('eventName', 'vitrea::status::update')
     })
 })

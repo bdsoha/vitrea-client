@@ -3,16 +3,16 @@ export abstract class AbstractConfigParser<R> {
 
     protected validate<T extends keyof R>(
         lookup: string,
-        found: string | R[T],
+        found: string | R[T] | undefined,
     ) {
-        if (!found && found !== false) {
+        if (found === undefined || found === null || found === '') {
             throw TypeError(`A value for [${lookup}] is required`)
         }
 
         return found
     }
 
-    protected get<T extends keyof R>(key: T, fallback: R[T] = undefined) {
+    protected get<T extends keyof R>(key: T, fallback?: R[T]) {
         const lookup: string = key as string
 
         const envLookup = lookup

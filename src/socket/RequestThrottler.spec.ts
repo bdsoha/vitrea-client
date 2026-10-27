@@ -1,103 +1,75 @@
-import type { LoggerContract } from '../types'
 import { RequestThrottler } from './RequestThrottler'
 
 describe('RequestThrottler', () => {
     vi.useFakeTimers()
 
     let throttler: RequestThrottler
-    let logger: LoggerContract
-
-    const getLogger = (): LoggerContract => {
-        return {
-            log: vi.fn(),
-            error: vi.fn(),
-            warn: vi.fn(),
-            info: vi.fn(),
-            debug: vi.fn(),
-        }
-    }
 
     beforeEach(() => {
-        logger = getLogger()
-
-        const socketConfigs = {
+        throttler = new RequestThrottler({
             requestBuffer: 250,
             requestBufferVariance: 0.15,
-            log: logger,
-        }
-
-        throttler = new RequestThrottler(socketConfigs)
-        vi.clearAllMocks()
+        })
     })
 
     afterEach(() => {
         vi.clearAllTimers()
     })
 
-    it('resolves with correct value', async () => {
-        const promise = throttler.process<string>('test', resolve =>
-            resolve('test-result'),
-        )
+    it('resolves with the task result', async () => {
+        const promise = throttler.process(async () => 'test-result')
 
         await vi.runAllTimersAsync()
-        expect(await promise).toBe('test-result')
 
-        expect(logger.debug).toHaveBeenCalledWith('Acquired mutex', {
-            label: 'test',
-        })
-        expect(logger.debug).toHaveBeenCalledWith('Releasing mutex', {
-            label: 'test',
-        })
+        expect(await promise).toBe('test-result')
     })
 
-    it('rejects with correct error', async () => {
+    it('rejects with the task error', async () => {
         const promise = throttler
-            .process<string>('test', (_, reject) =>
-                reject(new Error('test-error')),
-            )
+            .process(async () => {
+                throw new Error('test-error')
+            })
             .catch(error => error)
 
         await vi.runAllTimersAsync()
 
-        const result = await promise
-        expect(result).toBeInstanceOf(Error)
-        expect((result as Error).message).toBe('test-error')
+        expect(((await promise) as Error).message).toBe('test-error')
     })
 
     it('enforces sequential processing', async () => {
-        const order: number[] = []
+        const order: string[] = []
 
         const promises = [1, 2, 3].map(n =>
-            throttler.process<number>('test', resolve => {
-                order.push(n)
-                resolve(n)
+            throttler.process(async () => {
+                order.push(`start ${n}`)
+                await new Promise(resolve => setTimeout(resolve, 10))
+                order.push(`end ${n}`)
             }),
         )
 
         await vi.runAllTimersAsync()
         await Promise.all(promises)
 
-        expect(order).toEqual([1, 2, 3])
+        expect(order).toEqual([
+            'start 1',
+            'end 1',
+            'start 2',
+            'end 2',
+            'start 3',
+            'end 3',
+        ])
     })
 
-    it('releases mutex after errors', async () => {
-        const promise1 = throttler
-            .process<string>('test', () => {
-                throw new Error('error')
-            })
-            .catch(error => error)
+    it('waits the request buffer before releasing', async () => {
+        const second = vi.fn(async () => {})
 
-        await vi.runAllTimersAsync()
+        void throttler.process(async () => {})
+        void throttler.process(second)
 
-        const result1 = await promise1
-        expect(result1).toBeInstanceOf(Error)
-        expect((result1 as Error).message).toBe('error')
+        await vi.advanceTimersByTimeAsync(200)
+        expect(second).not.toHaveBeenCalled()
 
-        const promise2 = throttler.process<string>('test', resolve => {
-            resolve('success')
-        })
-
-        await vi.runAllTimersAsync()
-        expect(await promise2).toBe('success')
+        await vi.advanceTimersByTimeAsync(100)
+        expect(second).toHaveBeenCalled()
     })
 })
