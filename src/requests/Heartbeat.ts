@@ -1,7 +1,11 @@
+import type { LogLevel } from '../types'
+import { CommandID } from '../types'
 import { AcknowledgeRequest } from './AcknowledgeRequest'
 
 export class Heartbeat extends AcknowledgeRequest {
+    static override readonly logLevel: LogLevel = 'debug'
+
     constructor() {
-        super(0x07)
+        super(CommandID.Heartbeat)
     }
 }

@@ -14,6 +14,10 @@ export abstract class BaseResponse extends DataGram {
         return [this.get(start), this.get(start + 1)]
     }
 
+    protected override get frame(): number[] {
+        return [...this.buffer, this.rawChecksum]
+    }
+
     public get hasValidChecksum() {
         return this.checksum === this.rawChecksum
     }

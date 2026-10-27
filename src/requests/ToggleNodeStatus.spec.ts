@@ -1,16 +1,13 @@
 import { LEDBackgroundBrightness, LockStatus } from '../types'
-import { MessageID } from '../utilities/MessageID'
 import { ToggleNodeStatus } from './ToggleNodeStatus'
 
 describe('ToggleNodeStatus', () => {
-    beforeEach(() => MessageID.setNextID(121))
-
     it('builds command with node, lock status, and LED level parameters', () => {
         const command = new ToggleNodeStatus(
             11,
             LockStatus.UNLOCKED,
             LEDBackgroundBrightness.NORMAL,
-        )
+        ).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -25,7 +22,7 @@ describe('ToggleNodeStatus', () => {
             5,
             LockStatus.LOCKED,
             LEDBackgroundBrightness.MAX,
-        )
+        ).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -40,7 +37,7 @@ describe('ToggleNodeStatus', () => {
             1,
             LockStatus.UNLOCKED,
             LEDBackgroundBrightness.OFF,
-        )
+        ).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -48,15 +45,5 @@ describe('ToggleNodeStatus', () => {
                 0x00, 0xda,
             ]),
         )
-    })
-
-    it('[eventName] uses the Acknowledgement event name', () => {
-        const command = new ToggleNodeStatus(
-            11,
-            LockStatus.UNLOCKED,
-            LEDBackgroundBrightness.NORMAL,
-        )
-
-        expect(command).toHaveProperty('eventName', 'data::00-79')
     })
 })

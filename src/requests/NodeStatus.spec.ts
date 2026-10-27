@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { NodeStatus } from './NodeStatus'
 
 describe('NodeStatus', () => {
     it('requests the node status', () => {
-        MessageID.setNextID(121)
-
-        const command = new NodeStatus(1)
+        const command = new NodeStatus(1).withMessageID(121)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([

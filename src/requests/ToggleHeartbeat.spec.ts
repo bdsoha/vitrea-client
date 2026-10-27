@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { ToggleHeartbeat } from './ToggleHeartbeat'
 
 describe('ToggleHeartbeat', () => {
-    beforeEach(() => MessageID.resetID())
-
     it('is set to `enabled` and `unsolicited` by default', () => {
-        const command = new ToggleHeartbeat()
+        const command = new ToggleHeartbeat().withMessageID(1)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([
@@ -16,7 +13,7 @@ describe('ToggleHeartbeat', () => {
     })
 
     it('can set `enabled` and `unsolicited` to false', () => {
-        const command = new ToggleHeartbeat(false, false)
+        const command = new ToggleHeartbeat(false, false).withMessageID(1)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([

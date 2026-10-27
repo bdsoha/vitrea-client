@@ -1,4 +1,4 @@
-import type { LogMeta } from '../types'
+import type { LogLevel, LogMeta } from '../types'
 import { DataGramDirection } from '../types'
 import { Events } from '../utilities/Events'
 
@@ -31,7 +31,12 @@ export abstract class DataGram {
     /**
      * The first 3 bytes of every `DataGram`.
      */
-    protected static readonly prefix = [0x56, 0x54, 0x55]
+    static readonly prefix = [0x56, 0x54, 0x55]
+
+    /**
+     * The level at which the `DataGram` is logged when it is sent or received.
+     */
+    static readonly logLevel: LogLevel = 'info'
 
     protected readonly buffer: number[]
 
@@ -127,6 +132,14 @@ export abstract class DataGram {
         return this.$self.name
     }
 
+    public get logLevel(): LogLevel {
+        return this.$self.logLevel
+    }
+
+    protected get frame(): number[] {
+        return this.buffer
+    }
+
     protected get toLog() {
         return {}
     }
@@ -141,7 +154,7 @@ export abstract class DataGram {
             commandID: this.toHex(this.commandID),
             messageID: this.toHex(this.messageID),
             ...this.toLog,
-            raw: this.toHexString(),
+            raw: this.toHexString(this.frame),
         }
     }
 }

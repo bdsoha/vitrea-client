@@ -1,3 +1,5 @@
+import { DataGram } from '../core'
+import type { LogMeta } from '../types'
 import { CommandID } from '../types'
 import { AcknowledgeRequest } from './AcknowledgeRequest'
 
@@ -9,5 +11,15 @@ export class Login extends AcknowledgeRequest {
             Buffer.from(password, 'utf16le').length,
             ...Buffer.from(password, 'utf16le'),
         ])
+    }
+
+    public override get logData(): LogMeta {
+        const header = this.frame.slice(0, DataGram.dataIndex)
+
+        return {
+            ...super.logData,
+            data: '[redacted]',
+            raw: `${this.toHexString(header)}:[redacted]`,
+        }
     }
 }

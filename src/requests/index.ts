@@ -23,7 +23,7 @@ export {
     NodeStatus,
     RoomCount,
     RoomMetaData,
-    ToggleNodeStatus,
-    ToggleKeyStatus,
     ToggleHeartbeat,
+    ToggleKeyStatus,
+    ToggleNodeStatus,
 }

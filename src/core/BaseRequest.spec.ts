@@ -1,13 +1,10 @@
 import { DataGramDirection } from '../types'
-import { MessageID } from '../utilities/MessageID'
 import { BaseRequest } from './BaseRequest'
 import { DataGram } from './DataGram'
 
 class SampleRequest extends BaseRequest {}
 
 describe('BaseRequest', () => {
-    beforeEach(() => MessageID.resetID())
-
     it('is an instance of DataGram', () => {
         expect(new SampleRequest()).toBeInstanceOf(DataGram)
     })
@@ -21,9 +18,9 @@ describe('BaseRequest', () => {
     })
 
     it('[checksum] calculates a checksum based on the sum of all values', () => {
-        expect(new SampleRequest(0x00).checksum).toBe(0x40)
-        expect(new SampleRequest(0x01).checksum).toBe(0x42)
-        expect(new SampleRequest(0xc3).checksum).toBe(0x05)
+        expect(new SampleRequest(0x00).withMessageID(1).checksum).toBe(0x40)
+        expect(new SampleRequest(0x01).withMessageID(2).checksum).toBe(0x42)
+        expect(new SampleRequest(0xc3).withMessageID(3).checksum).toBe(0x05)
     })
 
     it('[build] adds the checksum value to the end of the collection', () => {
@@ -36,23 +33,10 @@ describe('BaseRequest', () => {
         expect(datagram.build()[8]).toBe(datagram.checksum)
     })
 
-    it('generates an incremented message ID for each datagram', () => {
-        vi.spyOn(MessageID, 'getNextID')
-
-        expect(MessageID.getNextID).toHaveBeenCalledTimes(0)
-
-        new SampleRequest()
-        expect(MessageID.getNextID).toHaveBeenCalledTimes(1)
-
-        new SampleRequest()
-        expect(MessageID.getNextID).toHaveBeenCalledTimes(2)
-    })
-
     it('[messageID] inserts the message ID in every message', () => {
         const id = 0x44
-        MessageID.setNextID(id)
 
-        const dataGram = new SampleRequest()
+        const dataGram = new SampleRequest().withMessageID(id)
         const built = dataGram.build()
 
         expect(built[BaseRequest.messageIDIndex]).toBe(dataGram.messageID)
@@ -69,9 +53,9 @@ describe('BaseRequest', () => {
     })
 
     it('[eventName] generates a unique event-listener name based on command & message IDs', () => {
-        MessageID.setNextID(0xcc)
-
-        expect(new SampleRequest(0xee).eventName).toBe('data::ee-cc')
+        expect(new SampleRequest(0xee).withMessageID(0xcc).eventName).toBe(
+            'data::ee-cc',
+        )
     })
 
     it('[data] has a data series of arbitrary length', () => {
@@ -107,7 +91,7 @@ describe('BaseRequest', () => {
     })
 
     it('[logData] retrieve data to log', () => {
-        const dataGram = new SampleRequest(0xff)
+        const dataGram = new SampleRequest(0xff).withMessageID(1)
 
         expect(dataGram.logData).toStrictEqual({
             command: 'SampleRequest',
@@ -115,20 +99,11 @@ describe('BaseRequest', () => {
             data: '',
             direction: 'Outgoing',
             messageID: '0x01',
-            raw: '56:54:55:3E:FF:00:02:01',
+            raw: '56:54:55:3E:FF:00:02:01:3F',
         })
     })
 
-    it('[clone] returns same request with next messageID', () => {
-        MessageID.setNextID(0x10)
-
-        const original = new SampleRequest(0xab, [0x33, 0x44])
-
-        const cloned = original.clone()
-
-        expect(cloned.getData()).toStrictEqual(original.getData())
-
-        expect(original.messageID).toBe(0x10)
-        expect(cloned.commandID).toBe(0xab)
+    it('[replyCommands] expects a reply with its own command ID', () => {
+        expect(new SampleRequest(0x24).replyCommands).toStrictEqual([0x24])
     })
 })

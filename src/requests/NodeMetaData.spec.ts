@@ -1,11 +1,8 @@
-import { MessageID } from '../utilities/MessageID'
 import { NodeMetaData } from './NodeMetaData'
 
 describe('NodeMetaData', () => {
     it('requests the metadata for a node', () => {
-        MessageID.setNextID(52)
-
-        const command = new NodeMetaData(1)
+        const command = new NodeMetaData(1).withMessageID(52)
 
         expect(command.build()).toStrictEqual(
             Buffer.from([

@@ -1,4 +1,4 @@
-export { BaseRequest } from './BaseRequest'
+export { type AckOutcome, BaseRequest } from './BaseRequest'
 export { BaseResponse } from './BaseResponse'
 export { ConsoleLogger } from './ConsoleLogger'
 export { DataGram } from './DataGram'

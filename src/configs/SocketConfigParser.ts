@@ -8,6 +8,19 @@ export class SocketConfigParser extends AbstractConfigParser<SocketConfigs> {
         return ['1', 'true', 'TRUE', true].includes(value)
     }
 
+    protected positive(
+        key: 'heartbeatInterval' | 'requestTimeout',
+        fallback: number,
+    ) {
+        const value = Number(this.get(key, fallback))
+
+        if (!(value > 0)) {
+            throw TypeError(`A positive value for [${key}] is required`)
+        }
+
+        return value
+    }
+
     public static create(
         configs: Partial<SocketConfigs> = {},
     ): Required<SocketConfigs> {
@@ -17,19 +30,16 @@ export class SocketConfigParser extends AbstractConfigParser<SocketConfigs> {
             log: instance.configs.log ?? new NullLogger(),
             socketSupplier:
                 instance.configs.socketSupplier ?? (() => new Net.Socket()),
-            ignoreAckLogs: instance.toBoolean(
-                instance.get('ignoreAckLogs', false),
-            ),
             shouldReconnect: instance.toBoolean(
                 instance.get('shouldReconnect', true),
             ),
-            heartbeatInterval: Number(instance.get('heartbeatInterval', 3000)),
+            heartbeatInterval: instance.positive('heartbeatInterval', 3000),
             maxRetries: Number(instance.get('maxRetries', 3)),
             requestBuffer: Number(instance.get('requestBuffer', 250)),
             requestBufferVariance: Number(
                 instance.get('requestBufferVariance', 0.15),
             ),
-            requestTimeout: Number(instance.get('requestTimeout', 1000)),
+            requestTimeout: instance.positive('requestTimeout', 1000),
         }
     }
 }

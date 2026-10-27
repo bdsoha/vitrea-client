@@ -1,305 +1,334 @@
 import { Socket } from 'node:net'
 import { TimeoutError } from 'p-timeout'
-import type { BaseRequest, BaseResponse } from './core'
 import * as Exceptions from './exceptions'
-import { Login, NodeCount, ToggleHeartbeat } from './requests'
+import { Requests, Responses } from './index'
 import {
-    KeyStatus,
-    NodeCount as NodeCountResponse,
-    RoomMetaData,
-} from './responses'
-import type { LoggerContract, SocketConfigs } from './types'
-import { MessageID } from './utilities/MessageID'
+    FakeController,
+    type Reply,
+    ack,
+    acknowledgeAll,
+    frame,
+    sleep,
+    waitFor,
+} from './testing/FakeController'
+import {
+    AckType,
+    CommandID,
+    KeyPowerStatus,
+    type LoggerContract,
+    ProtocolVersion,
+    type SocketConfigs,
+} from './types'
 import { VitreaClient } from './VitreaClient'
 
-describe('VitreaClient', () => {
-    beforeEach(() => {
-        vi.useFakeTimers()
-    })
+const keyStatus = (messageID: number, nodeID: number, keyID: number) =>
+    frame(CommandID.KeyStatus, messageID, [
+        nodeID,
+        keyID,
+        0x4f,
+        0,
+        0,
+        0,
+        0x55,
+        0,
+    ])
 
-    const getClient = (configs?: Partial<SocketConfigs>) => {
-        return VitreaClient.create(
+const getLogger = (): LoggerContract => ({
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn(),
+})
+
+describe('VitreaClient', () => {
+    let controller: FakeController
+    let client: VitreaClient
+
+    const start = async (
+        reply: Reply = acknowledgeAll,
+        configs: Partial<SocketConfigs> = {},
+        version: ProtocolVersion = ProtocolVersion.V2,
+    ) => {
+        controller = await FakeController.start(reply)
+        client = VitreaClient.create(
             {
+                host: '127.0.0.1',
+                port: controller.port,
                 username: 'admin',
                 password: 'secret',
+                version,
             },
-            configs,
+            {
+                heartbeatInterval: 60_000,
+                maxRetries: 1,
+                requestBuffer: 0,
+                requestTimeout: 200,
+                ...configs,
+            },
         )
+
+        await client.connect()
+        await waitFor(() => controller.commands(0).includes(CommandID.Login))
     }
 
-    const getLogger = (): LoggerContract => {
-        return {
-            log: vi.fn(),
-            error: vi.fn(),
-            warn: vi.fn(),
-            info: vi.fn(),
-            debug: vi.fn(),
-        }
-    }
+    const handshakeAnd =
+        (reply: Reply): Reply =>
+        received =>
+            [
+                CommandID.ToggleHeartbeat,
+                CommandID.Login,
+                CommandID.Heartbeat,
+            ].includes(received.command as 0x07)
+                ? acknowledgeAll(received)
+                : reply(received)
+
+    afterEach(() => {
+        client?.disconnect()
+        controller?.stop()
+    })
 
     it('[connect] cannot overwrite an existing connection', async () => {
-        const client = getClient()
+        await start()
 
-        // @ts-expect-error
-        client.socket = 'any non-null value'
-
-        await expect(() => client.connect()).rejects.toBeInstanceOf(
+        await expect(client.connect()).rejects.toBeInstanceOf(
             Exceptions.ConnectionExistsException,
         )
     })
 
-    it('[connect] timeout is raised within 1s', async () => {
+    it('[connect] raises a timeout when the controller does not answer', async () => {
         const socket = new Socket()
 
         vi.spyOn(socket, 'connect').mockImplementation(() => socket)
 
-        const client = getClient({
-            socketSupplier: () => socket,
-            requestTimeout: 1000,
-        })
-
-        const promise = client.connect()
-
-        vi.runAllTimers()
-
-        await expect(promise).rejects.toThrow(TimeoutError)
-    })
-
-    it('[handleConnect] sends login and heartbeat requests', async () => {
-        expect.assertions(2)
-
-        const socket = new Socket()
-
-        const client = getClient({ socketSupplier: () => socket })
-
-        vi.spyOn(client, 'send').mockImplementationOnce(
-            async (request: BaseRequest) => {
-                expect(request).toBeInstanceOf(ToggleHeartbeat)
-                return undefined
-            },
+        const silent = VitreaClient.create(
+            { username: 'admin', password: 'secret' },
+            { socketSupplier: () => socket, requestTimeout: 50 },
         )
 
-        vi.spyOn(client, 'send').mockImplementationOnce(
-            async (request: BaseRequest) => {
-                expect(request).toBeInstanceOf(Login)
-                return undefined
-            },
+        await expect(silent.connect()).rejects.toThrow(TimeoutError)
+    })
+
+    it('[handshake] toggles the heartbeat then logs in', async () => {
+        await start()
+
+        expect(controller.commands(0).slice(0, 2)).toStrictEqual([
+            CommandID.ToggleHeartbeat,
+            CommandID.Login,
+        ])
+    })
+
+    it('[send] resolves with the reply that carries its message ID', async () => {
+        await start(
+            handshakeAnd(({ messageID }) => [
+                frame(CommandID.NodeCount, messageID + 1, [1, 9]),
+                frame(CommandID.NodeCount, messageID, [2, 7, 8]),
+            ]),
         )
 
-        // @ts-expect-error
-        client.createNewSocket()
+        const response = await client.send(new Requests.NodeCount())
 
-        socket.emit('connect')
+        expect(response).toBeInstanceOf(Responses.NodeCount)
+        expect(response.list).toStrictEqual([7, 8])
     })
 
-    it('[write] cannot write to a disconnected socket', async () => {
-        const buffer = Buffer.from([])
-
-        await expect(getClient().write(buffer)).rejects.toBeInstanceOf(
-            Exceptions.NoConnectionException,
+    it('[send] ignores a status push for another key with the same message ID', async () => {
+        await start(
+            handshakeAnd(({ messageID }) => [
+                keyStatus(messageID, 5, 2),
+                keyStatus(messageID, 5, 1),
+            ]),
         )
+
+        const response = await client.send(new Requests.KeyStatus(5, 1))
+
+        expect(response.keyID).toBe(1)
     })
 
-    it('[handleDisconnect] will attempt to reconnect by default', async () => {
-        const socket = new Socket()
+    it('[send] resolves a node status request with a key status reply', async () => {
+        await start(
+            handshakeAnd(({ messageID }) => [keyStatus(messageID, 7, 0)]),
+        )
 
-        const mock = vi
-            .spyOn(socket, 'connect')
-            .mockImplementation(() => socket)
+        const response = await client.send(new Requests.NodeStatus(7))
 
-        const client = getClient({ socketSupplier: () => socket })
-
-        // @ts-expect-error
-        client.createNewSocket()
-
-        expect(mock).not.toHaveBeenCalled()
-
-        socket.emit('end')
-
-        expect(mock).toHaveBeenCalledTimes(1)
+        expect(response).toBeInstanceOf(Responses.KeyStatus)
+        expect(response.nodeID).toBe(7)
     })
 
-    it('[handleDisconnect] will not attempt to reconnect', async () => {
-        const socket = new Socket()
+    it('[send] rejects a key status at once when V2 reports the node unavailable', async () => {
+        await start(
+            handshakeAnd(({ messageID }) => [
+                ack(messageID, AckType.NOT_AVAILABLE),
+            ]),
+        )
 
-        const mock = vi.spyOn(socket, 'connect')
+        const started = Date.now()
 
-        const client = getClient({
-            shouldReconnect: false,
-            socketSupplier: () => socket,
-        })
-
-        // @ts-expect-error
-        client.createNewSocket()
-
-        socket.emit('end')
-
-        expect(mock).not.toHaveBeenCalled()
+        await expect(client.send(new Requests.KeyStatus(5, 1))).rejects.toThrow(
+            'NOT_AVAILABLE',
+        )
+        expect(Date.now() - started).toBeLessThan(100)
     })
 
-    it('[handleData] will fire an event for received buffer', async () => {
-        expect.assertions(2)
+    it('[send] keeps waiting on a V1 key status NACK and rejects on ERROR', async () => {
+        let replies = 0
 
-        const raw = [
-            0x56, 0x54, 0x55, 0x3c, 0x1a, 0x00, 0x15, 0x1f, 0x00, 0x00, 0x10,
-            0x45, 0x00, 0x6e, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6e,
-            0x00, 0x63, 0x00, 0x65, 0x00, 0xc9,
-        ]
+        await start(
+            handshakeAnd(({ messageID }) => [
+                ack(messageID, replies++ === 0 ? AckType.NACK : AckType.ERROR),
+            ]),
+            {},
+            ProtocolVersion.V1,
+        )
 
-        const buffer = Buffer.from([...raw, ...raw])
-
-        const socket = new Socket()
-
-        const client = getClient({ socketSupplier: () => socket })
-
-        // @ts-expect-error
-        client.createNewSocket()
-
-        client.addListener('data::1a-1f', (response: BaseResponse) => {
-            expect(response).toBeInstanceOf(RoomMetaData)
-        })
-
-        socket.emit('data', buffer)
+        await expect(client.send(new Requests.KeyStatus(5, 1))).rejects.toThrow(
+            'ERROR',
+        )
+        expect(replies).toBe(2)
     })
 
-    it('[handleData] can ignore Ack logs', async () => {
-        const ack = [0x56, 0x54, 0x55, 0x3c, 0x00, 0x00, 0x03, 0x00, 0x00, 0x3e]
+    it('[send] keeps waiting on a data read NACK and rejects on ERROR', async () => {
+        let replies = 0
 
-        const generic = [
-            0x56, 0x54, 0x55, 0x3c, 0xc8, 0x00, 0x0e, 0x64, 0x03, 0xff, 0x00,
-            0x0d, 0x6f, 0x00, 0x16, 0x17, 0x09, 0x54, 0x7d,
-        ]
+        await start(
+            handshakeAnd(({ messageID }) => [
+                ack(messageID, replies++ === 0 ? AckType.NACK : AckType.ERROR),
+            ]),
+        )
 
-        const notAck = [
-            0x56, 0x54, 0x55, 0x3c, 0x1a, 0x00, 0x15, 0x1f, 0x00, 0x00, 0x10,
-            0x45, 0x00, 0x6e, 0x00, 0x74, 0x00, 0x72, 0x00, 0x61, 0x00, 0x6e,
-            0x00, 0x63, 0x00, 0x65, 0x00, 0xc9,
-        ]
-
-        const socket = new Socket()
-
-        const mock = getLogger()
-
-        const client = getClient({
-            socketSupplier: () => socket,
-            log: mock,
-            ignoreAckLogs: true,
-        })
-
-        // @ts-expect-error
-        client.createNewSocket()
-
-        socket.emit('data', Buffer.from(ack))
-
-        expect(mock.info).toHaveBeenCalledTimes(0)
-
-        socket.emit('data', Buffer.from(generic))
-
-        expect(mock.info).toHaveBeenCalledTimes(0)
-
-        socket.emit('data', Buffer.from(notAck))
-
-        expect(mock.info).toHaveBeenCalledTimes(1)
+        await expect(
+            client.send(new Requests.NodeCount()),
+        ).rejects.toBeInstanceOf(Exceptions.RequestRejectedException)
+        expect(replies).toBe(2)
     })
 
-    it('[handleUnknownData] will fire an event for unknown buffer', async () => {
-        expect.assertions(1)
+    it('[send] resends a request with the same message ID after a timeout', async () => {
+        await start(handshakeAnd(() => []))
 
-        const buffer = Buffer.from([1, 2, 3, 4])
+        await expect(client.send(new Requests.NodeCount())).rejects.toThrow(
+            TimeoutError,
+        )
 
-        const socket = new Socket()
+        const resent = controller.received.filter(
+            entry => entry.command === CommandID.NodeCount,
+        )
 
-        const client = getClient({ socketSupplier: () => socket })
-
-        // @ts-expect-error
-        client.createNewSocket()
-
-        client.addListener('vitrea::data::unknown', (response: Buffer) => {
-            expect(response).toBeInstanceOf(Buffer)
-        })
-
-        socket.emit('data', buffer)
+        expect(resent).toHaveLength(2)
+        expect(resent[0].messageID).toBe(resent[1].messageID)
     })
 
-    it('[disconnect] will not attempt to reconnect when explicitly disconnected', async () => {
-        const socket = new Socket()
+    it('[send] resolves an acknowledged command with the acknowledgement', async () => {
+        await start()
 
-        const mock = vi.spyOn(socket, 'connect')
+        const response = await client.send(
+            new Requests.ToggleKeyStatus(1, 2, KeyPowerStatus.ON),
+        )
 
-        const client = getClient({ socketSupplier: () => socket })
+        expect(response).toBeInstanceOf(Responses.Acknowledgement)
+        expect(response.isOK).toBeTruthy()
+    })
 
-        // @ts-expect-error
-        client.createNewSocket()
-
+    it('[send] rejects when there is no connection', async () => {
+        await start()
         client.disconnect()
 
-        expect(mock).not.toHaveBeenCalled()
+        await expect(
+            client.send(new Requests.NodeCount()),
+        ).rejects.toBeInstanceOf(Exceptions.NoConnectionException)
     })
 
-    it('[onKeyStatus] can register a listener for key status changes', () => {
-        const client = getClient()
+    it('[onKeyStatus] receives every status push, split or joined', async () => {
+        await start()
 
-        const mock = vi.fn()
+        const statuses: number[] = []
 
-        client.onKeyStatus(mock)
+        client.onKeyStatus(status => statuses.push(status.keyID))
 
-        const status = new KeyStatus([
-            0x56, 0x54, 0x55, 0x3c, 0x29, 0x00, 0x0a, 0x48, 0x01, 0x00, 0x46,
-            0x00, 0x00, 0x00, 0x41, 0x00, 0x3e,
+        const pushes = Buffer.concat([
+            keyStatus(0x10, 3, 1),
+            keyStatus(0x11, 3, 2),
         ])
 
-        client.emit('vitrea::status::update', status)
+        controller.push(0, pushes.subarray(0, 5))
+        await sleep(10)
+        controller.push(0, pushes.subarray(5))
 
-        expect(mock).toHaveBeenCalledTimes(1)
-        expect(mock).toHaveBeenCalledWith(status)
+        await waitFor(() => statuses.length === 2)
+
+        expect(statuses).toStrictEqual([1, 2])
     })
 
-    it('[create] redact user credentials in log', () => {
-        const mock = getLogger()
+    it('[handleFrame] emits an event for an unknown command', async () => {
+        await start()
 
-        getClient({ log: mock })
+        const unknown = vi.fn()
 
-        expect(mock.debug).toHaveBeenCalledTimes(1)
-        expect(mock.debug).toHaveBeenCalledWith(
-            expect.anything(),
+        client.on('vitrea::data::unknown', unknown)
+        controller.push(0, frame(0x99, 0x01))
+
+        await waitFor(() => unknown.mock.calls.length === 1)
+    })
+
+    it('[create] redacts user credentials in the log', () => {
+        const log = getLogger()
+
+        VitreaClient.create({ username: 'admin', password: 'secret' }, { log })
+
+        expect(log.debug).toHaveBeenCalledWith(
+            'Client created',
             expect.objectContaining({
-                connection: {
-                    host: '192.168.1.23',
+                connection: expect.objectContaining({
                     username: 'a***n',
                     password: 's***t',
-                    port: 11501,
-                    version: 'v2',
-                },
+                }),
             }),
         )
     })
 
-    it('[send] successfully sends request and receives response', async () => {
-        vi.useRealTimers()
+    it('[log] logs requests at info with scope and host, and never the credentials', async () => {
+        const log = getLogger()
 
-        const socket = new Socket()
-        const client = getClient({ socketSupplier: () => socket })
+        await start(acknowledgeAll, { log })
+        await client.send(new Requests.NodeCount()).catch(() => {})
 
-        vi.spyOn(socket, 'write').mockImplementation(() => true)
+        expect(log.info).toHaveBeenCalledWith(
+            'Request sent',
+            expect.objectContaining({
+                command: 'NodeCount',
+                scope: 'client',
+                host: '127.0.0.1',
+            }),
+        )
 
-        // @ts-expect-error
-        client.createNewSocket()
-
-        MessageID.setNextID(0x3b)
-
-        const requestPromise = client.send(new NodeCount())
-
-        const responseBuffer = Buffer.from([
-            0x56, 0x54, 0x55, 0x3c, 0x24, 0x00, 0x12, 0x3b, 0x0f, 0x01, 0x02,
-            0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0d, 0x0e,
-            0x0f, 0x10, 0x37,
+        const lines = JSON.stringify([
+            vi.mocked(log.debug).mock.calls,
+            vi.mocked(log.info).mock.calls,
         ])
 
-        setImmediate(() => socket.emit('data', responseBuffer))
+        expect(lines).not.toContain('73:00:65:00:63:00')
+        expect(lines).toContain('"data":"[redacted]"')
+    })
 
-        const response = await requestPromise
+    it('[log] logs heartbeats and acknowledgements at debug only', async () => {
+        const log = getLogger()
 
-        expect(response).toBeInstanceOf(NodeCountResponse)
-        expect((response as NodeCountResponse).messageID).toBe(0x3b)
+        await start(acknowledgeAll, { log, heartbeatInterval: 20 })
+        await waitFor(() =>
+            controller.commands(0).includes(CommandID.Heartbeat),
+        )
+        await sleep(20)
+
+        const commands = vi
+            .mocked(log.info)
+            .mock.calls.map(
+                ([, meta]) => (meta as { command?: string }).command,
+            )
+
+        expect(commands).not.toContain('Heartbeat')
+        expect(commands).not.toContain('Acknowledgement')
+        expect(log.debug).toHaveBeenCalledWith(
+            'Request sent',
+            expect.objectContaining({ command: 'Heartbeat' }),
+        )
     })
 })

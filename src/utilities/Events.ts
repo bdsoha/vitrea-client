@@ -2,6 +2,9 @@
 export class Events {
     public static readonly STATUS_UPDATE: string = 'vitrea::status::update'
     public static readonly UNKNOWN_DATA: string = 'vitrea::data::unknown'
+    public static readonly RECONNECTED: string =
+        'vitrea::connection::reconnected'
+    public static readonly LOGIN_FAILED: string = 'vitrea::login::failed'
 
     public static acknowledgement(messageID: number): string {
         return Events.generate(0x00, messageID)

@@ -1,29 +1,25 @@
-import { BaseRequest } from '../core'
 import type { KeyPowerStatus, Ratio } from '../types'
-import { Events } from '../utilities/Events'
+import { CommandID } from '../types'
+import { AcknowledgeRequest } from './AcknowledgeRequest'
 
 const toByteArray = (seconds: number) => [(seconds >> 8) & 0xff, seconds & 0xff]
 
-export class ToggleKeyStatus extends BaseRequest {
+export class ToggleKeyStatus extends AcknowledgeRequest {
     constructor(
         nodeID: number,
         keyID: number,
         status: KeyPowerStatus,
-        options: Partial<{ dimmerRatio: Ratio<101>; timer: number }> = {
-            dimmerRatio: 0,
-            timer: 0,
-        },
+        {
+            dimmerRatio = 0,
+            timer = 0,
+        }: Partial<{ dimmerRatio: Ratio<101>; timer: number }> = {},
     ) {
-        super(0x28, [
+        super(CommandID.ToggleKeyStatus, [
             nodeID,
             keyID,
             status,
-            options.dimmerRatio,
-            ...toByteArray(options.timer),
+            dimmerRatio,
+            ...toByteArray(timer),
         ])
-    }
-
-    public override get eventName(): string {
-        return Events.acknowledgement(this.messageID)
     }
 }
